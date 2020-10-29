@@ -4,38 +4,26 @@ import 'package:intl/intl.dart';
 
 
 class ChatItemWidget extends StatelessWidget {
-  ChatItemWidget({
+  const ChatItemWidget({
     @required this.text,
     @required this.INT,
-
   });
 
 
   final int INT;
   final String text;
-  bool isME;
-  
-  bool Check(int INT){
-    if ((INT%2) == 0 ){
-      return true;
-    }else {
-      return false;
-  }
-  }
-  
-
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment:
-      Check(INT) ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      INT%2==0 ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
             crossAxisAlignment:
-            Check(INT) ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            INT%2==0 ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(bottom: 2),
@@ -49,7 +37,7 @@ class ChatItemWidget extends StatelessWidget {
                 ),
               ),
               Material(
-                borderRadius: Check(INT)
+                borderRadius: INT%2==0
                     ? BorderRadius.only(
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30),
@@ -61,14 +49,14 @@ class ChatItemWidget extends StatelessWidget {
                   topRight: Radius.circular(30),
                 ),
                 elevation: 5,
-                color: Check(INT) ? Palette.selfMessageBackgroundColor : Palette.otherMessageBackgroundColor,
+                color: INT%2==0 ? Palette.selfMessageBackgroundColor : Palette.otherMessageBackgroundColor,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20, vertical: 10),
                   child: Text(
                     text,
                     style: TextStyle(
-                      color: Check(INT) ? Colors.white : Colors.black,
+                      color: INT%2==0 ? Colors.white : Colors.black,
                       fontSize: 14,
                       fontStyle: FontStyle.normal,
                     ),

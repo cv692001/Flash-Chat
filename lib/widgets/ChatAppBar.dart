@@ -6,6 +6,7 @@ import 'package:flash_chat/config/color_palette.dart';
 
 class ChatAppBar extends StatelessWidget implements PreferredSizeWidget{
   final double height = 80;
+  const ChatAppBar();
   @override
   Widget build(BuildContext context) {
     var textHeading = TextStyle(color: Palette.primaryTextColor,fontSize: 20,);

@@ -3,6 +3,9 @@ import 'package:flash_chat/config/color_palette.dart';
 
 class InputWidget extends StatelessWidget {
   final TextEditingController textEditingController = new TextEditingController();
+  InputWidget();
+
+
   @override
   Widget build(BuildContext context) {
     return Container(
