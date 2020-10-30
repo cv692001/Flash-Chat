@@ -1,5 +1,5 @@
 import 'dart:ui';
-
+import 'package:flash_chat/config/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/config/assets.dart';
 import 'package:flash_chat/config/color_palette.dart';
@@ -9,8 +9,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget{
   const ChatAppBar();
   @override
   Widget build(BuildContext context) {
-    var textHeading = TextStyle(color: Palette.primaryTextColor,fontSize: 20,);
-    var textStyle = TextStyle(color: Palette.secondaryTextColor);
+
 
     return Material(
       child: Container(
@@ -19,6 +18,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget{
             BoxShadow(
               color: Colors.black,
               blurRadius : 5.0,
+                spreadRadius: 0.1
             )
           ]
         ),
@@ -48,7 +48,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget{
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
-                                  Text('Chirag Vaishnav', style: textHeading),
+                                  Text('Chirag Vaishnav', style: Styles.textHeading),
                                 ],
                               ),),),
 

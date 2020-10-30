@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flash_chat/config/color_palette.dart';
 import 'package:intl/intl.dart';
+import 'package:flash_chat/config/style.dart';
 
 
 class ChatItemWidget extends StatelessWidget {
@@ -30,10 +31,7 @@ class ChatItemWidget extends StatelessWidget {
                 child: Text(
                   DateFormat('dd MMM kk:mm')
                       .format(DateTime.fromMillisecondsSinceEpoch(1565888474278)),
-                  style: TextStyle(
-                      color: Palette.timeColor,
-                      fontSize: 10.0,
-                      fontWeight: FontWeight.bold),
+                  style: Styles.date,
                 ),
               ),
               Material(
