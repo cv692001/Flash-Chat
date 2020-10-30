@@ -15,9 +15,20 @@ dependencies:
   intl: ^0.16.1
   rubber: ^0.4.0
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  flutter_launcher_icons: ^0.7.2+1
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path_ios: "images/launcher/ic_launcher.png"
+  image_path_android: "images/launcher/ic_launcher.png"
+  adaptive_icon_background: "images/launcher/ic_background.png"
+  adaptive_icon_foreground: "images/launcher/ic_foreground.png"
 
 
 flutter:

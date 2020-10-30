@@ -14,13 +14,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget{
     return Material(
       child: Container(
         decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black,
-              blurRadius : 5.0,
-                spreadRadius: 0.1
-            )
-          ]
+          boxShadow: kElevationToShadow[5],
         ),
         child: Container(
           color: Palette.primaryBackgroundColor,

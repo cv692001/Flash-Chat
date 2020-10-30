@@ -14,30 +14,57 @@ class ConversationBottomSheet extends StatefulWidget {
 }
 
 class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
+
   @override
   Widget build(BuildContext context) {
-    return Material(
-        child: Scaffold(
-            backgroundColor: Colors.white,
-            body: ListView(children: <Widget>[
-              NavigationPillWidget(),
-              Center(child: Text('Messages', style: Styles.textHeading)),
-              SizedBox(
-                height: 20,
-              ),
-              ListView.separated(
-                shrinkWrap: true,
-                physics: ClampingScrollPhysics(),
-                itemCount: 5,
-                separatorBuilder: (context, index) => Padding(
-                    padding: EdgeInsets.only(left: 75,right: 20),
-                    child: Divider(
-                      color: Palette.accentColor,
-                    )),
-                itemBuilder: (context, index) {
-                  return ChatRowWidget();
-                },
-              )
-            ])));
+    double statusBarHeight = MediaQuery.of(context).padding.top;
+
+    return Padding(
+      padding: new EdgeInsets.only(top: statusBarHeight),
+      child: Material(
+          child: Scaffold(
+              backgroundColor: Colors.white,
+              body: ListView(children: <Widget>[
+
+                SizedBox(
+                  height: 20,
+                ),
+                GestureDetector(
+                  onVerticalDragEnd: (details) {
+                    print('Dragged Down');
+                    if (details.primaryVelocity > 50) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: ListView(
+                    shrinkWrap: true,
+                    physics: ClampingScrollPhysics(),
+                    children: <Widget>[
+                      NavigationPillWidget(),
+                      Center(child: Text('Messages', style: Styles.textHeading)),
+                      SizedBox(
+                        height: 20,
+                      ),
+                    ],
+
+                  ),
+                ),
+
+
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: ClampingScrollPhysics(),
+                  itemCount: 5,
+                  separatorBuilder: (context, index) => Padding(
+                      padding: EdgeInsets.only(left: 75,right: 20),
+                      child: Divider(
+                        color: Palette.accentColor,
+                      )),
+                  itemBuilder: (context, index) {
+                    return ChatRowWidget();
+                  },
+                )
+              ]))),
+    );
   }
 }
