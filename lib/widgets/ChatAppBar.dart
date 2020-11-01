@@ -56,7 +56,7 @@ class ChatAppBar extends StatelessWidget implements PreferredSizeWidget{
               child: Center(
                 child: CircleAvatar(
                 radius: 30,
-                  backgroundImage: AssetImage('images/user.jpg')
+                  backgroundImage: AssetImage('images/user.jpg'),
                 ),
               ),
             ),

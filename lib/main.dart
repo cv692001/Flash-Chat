@@ -4,6 +4,7 @@ import 'package:flash_chat/pages/ConversationPageSlide.dart';
 import 'package:flash_chat/pages/ConversationBottomSheet.dart';
 import 'package:flash_chat/pages/ConversationPage.dart';
 import 'config/color_palette.dart';
+import 'package:flash_chat/pages/RegisterPage.dart';
 
 void main() => runApp(Messio());
 
@@ -16,7 +17,7 @@ class Messio extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: ConversationPageSlide(),
+      home: RegisterPage(),
     );
   }
 }
