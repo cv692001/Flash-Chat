@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "69429453427",
+    "firebase_url": "https://start-eae60.firebaseio.com",
+    "project_id": "start-eae60",
+    "storage_bucket": "start-eae60.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:69429453427:android:8b3c1e918f101623c5c006",
+        "android_client_info": {
+          "package_name": "com.example.flash_chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "69429453427-u195tiqq62r105pc70s9lq6lq4j16bgp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flash_chat",
+            "certificate_hash": "a57a9af08923fc020651c325bbf930f4401df544"
+          }
+        },
+        {
+          "client_id": "69429453427-qefqb3oqo6sugn1v2hak8ad3n3so9sae.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDs0zyZSDABdH7wtiUHp2nNMwcNkO8W44U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "69429453427-qefqb3oqo6sugn1v2hak8ad3n3so9sae.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

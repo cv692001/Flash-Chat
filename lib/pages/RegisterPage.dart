@@ -1,30 +1,46 @@
-import 'package:flash_chat/config/assets.dart';
+import 'dart:ffi';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash_chat/widgets/CircleIndicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flash_chat/config/assets.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash_chat/config/color_palette.dart';
 import 'package:flash_chat/config/style.dart';
 import 'package:flash_chat/config/Transitions.dart';
 import 'package:flash_chat/pages/ConversationPageSlide.dart';
-import 'package:flash_chat/widgets/CircleIndicator.dart';
 import 'package:flash_chat/widgets/NumberPicker.dart';
+import 'package:flash_chat/widgets/ProgressWidget.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPage extends StatefulWidget {
+  RegisterPage({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _RegisterPageState();
   }
 }
 
 class _RegisterPageState extends State<RegisterPage>
     with TickerProviderStateMixin, WidgetsBindingObserver {
+  final GoogleSignIn googledignin = GoogleSignIn();
+  final FirebaseAuth firebaseauth = FirebaseAuth.instance;
+  SharedPreferences preferences;
+  bool isLoggedIn = false;
+  bool isLoading = false;
+  FirebaseUser currentuser;
+
   int currentPage = 0;
   int age = 18;
-  var isKeyboardOpen = false; //this variable keeps track of the keyboard, when its shown and when its hidden
+  var isKeyboardOpen =
+      false; //this variable keeps track of the keyboard, when its shown and when its hidden
 
-  PageController pageController = PageController(); // this is the controller of the page. This is used to navigate back and forth between the pages
+  PageController pageController =
+      PageController(); // this is the controller of the page. This is used to navigate back and forth between the pages
 
   //Fields related to animation of the gradient
   Alignment begin = Alignment.center;
@@ -32,12 +48,14 @@ class _RegisterPageState extends State<RegisterPage>
 
   //Fields related to animating the layout and pushing widgets up when the focus is on the username field
   AnimationController usernameFieldAnimationController;
-  Animation profilePicHeightAnimation, usernameAnimation, ageAnimation , picAnimation;
+  Animation profilePicHeightAnimation,
+      usernameAnimation,
+      ageAnimation,
+      picAnimation;
   FocusNode usernameFocusNode = FocusNode();
 
   AnimationController controller;
   Animation animation;
-
 
   @override
   void initState() {
@@ -45,29 +63,27 @@ class _RegisterPageState extends State<RegisterPage>
     usernameFieldAnimationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
 
-
-
     profilePicHeightAnimation =
-    Tween(begin: 100.0, end: 0.0).animate(usernameFieldAnimationController)
-      ..addListener(() {
-        setState(() {});
-      });
+        Tween(begin: 100.0, end: 0.0).animate(usernameFieldAnimationController)
+          ..addListener(() {
+            setState(() {});
+          });
     usernameAnimation =
-    Tween(begin: 30.0, end: 0.0).animate(usernameFieldAnimationController)
-      ..addListener(() {
-        setState(() {});
-      });
+        Tween(begin: 30.0, end: 0.0).animate(usernameFieldAnimationController)
+          ..addListener(() {
+            setState(() {});
+          });
     ageAnimation =
-    Tween(begin: 80.0, end: 0.0).animate(usernameFieldAnimationController)
-      ..addListener(() {
-        setState(() {});
-      });
+        Tween(begin: 80.0, end: 0.0).animate(usernameFieldAnimationController)
+          ..addListener(() {
+            setState(() {});
+          });
 
     picAnimation =
-    Tween(begin: 60.0, end: 45.0).animate(usernameFieldAnimationController)
-      ..addListener(() {
-        setState(() {});
-      });
+        Tween(begin: 60.0, end: 45.0).animate(usernameFieldAnimationController)
+          ..addListener(() {
+            setState(() {});
+          });
 
     usernameFocusNode.addListener(() {
       if (usernameFocusNode.hasFocus) {
@@ -76,12 +92,14 @@ class _RegisterPageState extends State<RegisterPage>
         usernameFieldAnimationController.reverse();
       }
     });
-    pageController.addListener(() {
-      setState(() {
-        begin = Alignment(pageController.page, pageController.page);
-        end = Alignment(1 - pageController.page, 1 - pageController.page);
-      });
-    },);
+    pageController.addListener(
+      () {
+        setState(() {
+          begin = Alignment(pageController.page, pageController.page);
+          end = Alignment(1 - pageController.page, 1 - pageController.page);
+        });
+      },
+    );
 
     controller = AnimationController(
       duration: Duration(seconds: 1),
@@ -95,6 +113,29 @@ class _RegisterPageState extends State<RegisterPage>
     });
 
     super.initState();
+
+    isSignedIn();
+  }
+
+  void isSignedIn() async {
+    this.setState(() {
+      isLoggedIn = true;
+    });
+
+    preferences = await SharedPreferences.getInstance();
+
+    isLoggedIn = await googledignin.isSignedIn();
+    if (isLoggedIn) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ConversationPageSlide(
+                  currentUserId: preferences.getString("id"))));
+    }
+
+    this.setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -108,9 +149,9 @@ class _RegisterPageState extends State<RegisterPage>
               child: Container(
                   decoration: BoxDecoration(
                       gradient: LinearGradient(begin: begin, end: end, colors: [
-                        Colors.lightBlue,
-                        Palette.gradientEndColor
-                      ])),
+                    Colors.lightBlue,
+                    Palette.gradientEndColor
+                  ])),
                   child: Stack(
                       alignment: AlignmentDirectional.bottomCenter,
                       children: <Widget>[
@@ -137,7 +178,9 @@ class _RegisterPageState extends State<RegisterPage>
                           ),
                         ),
                         AnimatedOpacity(
-                            opacity: currentPage == 1 ? 1.0 : 0.0, //shows only on page 1
+                            opacity: currentPage == 1
+                                ? 1.0
+                                : 0.0, //shows only on page 1
                             duration: Duration(milliseconds: 500),
                             child: Container(
                                 margin: EdgeInsets.only(right: 20, bottom: 20),
@@ -164,35 +207,33 @@ class _RegisterPageState extends State<RegisterPage>
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-
-
         children: <Widget>[
-          Row(
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
                   //margin: EdgeInsets.only(top: 150),
-                  child: Image.asset('images/launcher/logo.png', height: controller.value*120)),
+                  child: Image.asset('images/launcher/logo.png',
+                      height: controller.value * 130)),
               Padding(
                 padding: const EdgeInsets.only(left: 0),
                 child: Container(
-                    //margin: EdgeInsets.only(top: 150),
+                    margin: EdgeInsets.only(top: 35),
                     child: Text('Flash Chat',
                         style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontWeight: FontWeight.w500,
                             fontStyle: FontStyle.italic,
                             fontSize: 30))),
               ),
             ],
           ),
-
           Container(
               margin: EdgeInsets.only(top: 125),
               child: ButtonTheme(
                   height: 40,
                   child: FlatButton.icon(
-                      onPressed: () => updatePageState(1),
+                      onPressed: () => controlSignIn(),
                       color: Colors.transparent,
                       icon: Image.asset(
                         'images/google.png',
@@ -203,7 +244,11 @@ class _RegisterPageState extends State<RegisterPage>
                         style: TextStyle(
                             color: Palette.primaryTextColorLight,
                             fontWeight: FontWeight.w800),
-                      ))))
+                      )))),
+          Padding(
+            padding: EdgeInsets.all(8),
+            child: isLoading ? circularProgress() : Container(),
+          )
         ],
       ),
     );
@@ -218,32 +263,32 @@ class _RegisterPageState extends State<RegisterPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              SizedBox(height: profilePicHeightAnimation.value*.3),
+              SizedBox(height: profilePicHeightAnimation.value * .3),
               Container(
                   child: Flexible(
-                    child: CircleAvatar(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Icon(
-                            Icons.camera,
-                            color: Colors.white,
-                            size: 15,
-                          ),
-                          Text(
-                            'Set Profile Picture',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                            ),
-                          )
-                        ],
+                child: CircleAvatar(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        Icons.camera,
+                        color: Colors.white,
+                        size: 15,
                       ),
-                      backgroundImage: Image.asset('images/user.jpg').image,
-                      radius: picAnimation.value,
-                    ),
-                  )),
+                      Text(
+                        'Set Profile Picture',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                      )
+                    ],
+                  ),
+                  backgroundImage: Image.asset('images/user.jpg').image,
+                  radius: picAnimation.value,
+                ),
+              )),
               SizedBox(
                 height: ageAnimation.value,
               ),
@@ -290,11 +335,11 @@ class _RegisterPageState extends State<RegisterPage>
                       contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 5),
                       focusedBorder: OutlineInputBorder(
                         borderSide:
-                        BorderSide(color: Palette.primaryColor, width: 0.1),
+                            BorderSide(color: Palette.primaryColor, width: 0.1),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderSide:
-                        BorderSide(color: Palette.primaryColor, width: 0.1),
+                            BorderSide(color: Palette.primaryColor, width: 0.1),
                       ),
                     ),
                   ))
@@ -332,6 +377,7 @@ class _RegisterPageState extends State<RegisterPage>
     usernameFocusNode.dispose();
     controller.dispose();
     super.dispose();
+    isLoading = false;
   }
 
   ///
@@ -361,7 +407,87 @@ class _RegisterPageState extends State<RegisterPage>
   navigateToHome() {
     Navigator.push(
       context,
-      SlideLeftRoute(page: ConversationPageSlide()),
+      SlideLeftRoute(
+          page: ConversationPageSlide(
+        currentUserId: preferences.getString("id"),
+      )),
     );
+  }
+
+  Future<Null> controlSignIn() async {
+    preferences = await SharedPreferences.getInstance();
+
+    this.setState(() {
+      isLoading = true;
+      //updatePageState(1);
+    });
+
+    GoogleSignInAccount googleUser = await googledignin.signIn();
+    GoogleSignInAuthentication googleAuthentication =
+        await googleUser.authentication;
+
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      idToken: googleAuthentication.idToken,
+      accessToken: googleAuthentication.accessToken,
+    );
+
+    FirebaseUser firebaseUser =
+        (await firebaseauth.signInWithCredential(credential)).user;
+
+    //signin success
+    if (firebaseUser != null) {
+      final QuerySnapshot resultQuery = await Firestore.instance
+          .collection("users")
+          .where("id", isEqualTo: firebaseUser.uid)
+          .getDocuments();
+
+      final List<DocumentSnapshot> documentSnapshots = resultQuery.documents;
+
+      if (documentSnapshots.length == 0) {
+        Firestore.instance
+            .collection('users')
+            .document(firebaseUser.uid)
+            .setData({
+          "nickname": firebaseUser.displayName,
+          "photourl": firebaseUser.photoUrl,
+          "id": firebaseUser.uid,
+          "age": "18",
+          "aboutMe": "using application created by Chirag Vaishnav",
+          "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
+          "chattingWith": null,
+        });
+
+        currentuser = firebaseUser;
+        await preferences.setString("id", currentuser.uid);
+        await preferences.setString("photourl", currentuser.photoUrl);
+        await preferences.setString("nickname", currentuser.displayName);
+        await preferences.setString(
+            "aboutMe", "using application created by Chirag Vaishnav");
+      } else {
+        currentuser = firebaseUser;
+        await preferences.setString("id", documentSnapshots[0]["id"]);
+        await preferences.setString(
+            "photourl", documentSnapshots[0]["photourl"]);
+        await preferences.setString(
+            "nickname", documentSnapshots[0]["nickname"]);
+        await preferences.setString("aboutMe", documentSnapshots[0]["aboutMe"]);
+      }
+
+      Fluttertoast.showToast(msg: "Congratulations , Sign In Successful !!");
+      this.setState(() {
+        isLoading = false;
+      });
+
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ConversationPageSlide(
+                  currentUserId: preferences.getString("id"))));
+    } else {
+      Fluttertoast.showToast(msg: "Try Again , Sign In Failed");
+      this.setState(() {
+        isLoading = false;
+      });
+    }
   }
 }

@@ -3,7 +3,8 @@ import 'package:flash_chat/config/color_palette.dart';
 import 'package:flash_chat/config/style.dart';
 import 'package:flash_chat/widgets/ChatRowWidget.dart';
 import 'package:flash_chat/widgets/NavigationPillWIdget.dart';
-
+import 'package:flash_chat/pages/settings.dart';
+import 'serachPage.dart';
 
 class ConversationBottomSheet extends StatefulWidget {
   @override
@@ -14,7 +15,7 @@ class ConversationBottomSheet extends StatefulWidget {
 }
 
 class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
-
+  TextEditingController searchTextController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     double statusBarHeight = MediaQuery.of(context).padding.top;
@@ -25,7 +26,6 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
           child: Scaffold(
               backgroundColor: Colors.white,
               body: ListView(children: <Widget>[
-
                 SizedBox(
                   height: 20,
                 ),
@@ -41,22 +41,55 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
                     physics: ClampingScrollPhysics(),
                     children: <Widget>[
                       NavigationPillWidget(),
-                      Center(child: Text('Messages', style: Styles.textHeading)),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Center(
+                              child: Text('Messages',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                  ))),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              IconButton(
+                                alignment: Alignment.bottomRight,
+                                icon: Icon(Icons.search),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              searchScreen()));
+                                },
+                              ),
+                              IconButton(
+                                alignment: Alignment.bottomRight,
+                                icon: Icon(Icons.settings),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              SettingScreen()));
+                                },
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
                       SizedBox(
                         height: 20,
                       ),
                     ],
-
                   ),
                 ),
-
-
                 ListView.separated(
                   shrinkWrap: true,
                   physics: ClampingScrollPhysics(),
                   itemCount: 5,
                   separatorBuilder: (context, index) => Padding(
-                      padding: EdgeInsets.only(left: 75,right: 20),
+                      padding: EdgeInsets.only(left: 75, right: 20),
                       child: Divider(
                         color: Palette.accentColor,
                       )),
@@ -66,5 +99,9 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
                 )
               ]))),
     );
+  }
+
+  emptyTextFormField() {
+    searchTextController.clear();
   }
 }

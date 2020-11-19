@@ -20,12 +20,12 @@ class InputWidget extends StatelessWidget {
                   child: new IconButton(
                     icon: new Icon(Icons.face),
                     color: Palette.accentColor,
+                    // ignore: sdk_version_set_literal
                     onPressed: () => {
                       showModalBottomSheet(
                           context: context,
                           builder: (BuildContext bc) {
                             return Container(
-
                               child: ConversationBottomSheet(),
                             );
                           })
@@ -39,16 +39,16 @@ class InputWidget extends StatelessWidget {
               Flexible(
                 child: Material(
                     child: Container(
-                      child: TextField(
-                        style:
-                        TextStyle(color: Palette.primaryTextColor, fontSize: 15.0),
-                        controller: textEditingController,
-                        decoration: InputDecoration.collapsed(
-                          hintText: 'Type a message',
-                          hintStyle: TextStyle(color: Palette.greyColor),
-                        ),
-                      ),
-                    )),
+                  child: TextField(
+                    style: TextStyle(
+                        color: Palette.primaryTextColor, fontSize: 15.0),
+                    controller: textEditingController,
+                    decoration: InputDecoration.collapsed(
+                      hintText: 'Type a message',
+                      hintStyle: TextStyle(color: Palette.greyColor),
+                    ),
+                  ),
+                )),
               ),
 
               // Send Message Button

@@ -5,14 +5,19 @@ import 'package:flash_chat/pages/ConversationBottomSheet.dart';
 import 'package:flash_chat/widgets/InputWidget.dart';
 
 class ConversationPageSlide extends StatefulWidget {
+  final String currentUserId;
+
+  ConversationPageSlide({
+    Key key,
+    @required this.currentUserId,
+  }) : super(key: key);
 
   @override
   _ConversationPageSlideState createState() => _ConversationPageSlideState();
-
-  const ConversationPageSlide();
 }
 
-class _ConversationPageSlideState extends State<ConversationPageSlide> with SingleTickerProviderStateMixin {
+class _ConversationPageSlideState extends State<ConversationPageSlide>
+    with SingleTickerProviderStateMixin {
   var controller;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -26,7 +31,6 @@ class _ConversationPageSlideState extends State<ConversationPageSlide> with Sing
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       key: _scaffoldKey,
       body: SafeArea(
@@ -42,20 +46,21 @@ class _ConversationPageSlideState extends State<ConversationPageSlide> with Sing
               ),
             ),
             Container(
-                child: GestureDetector(
-                    child: InputWidget(),
-                    onPanUpdate: (details) {
-                      if (details.delta.dy < 0) {
-                        _scaffoldKey.currentState
-                            .showBottomSheet<Null>((BuildContext context) {
-                          return ConversationBottomSheet();
-                        });
-                      }
-                    },),),
+              child: GestureDetector(
+                child: InputWidget(),
+                onPanUpdate: (details) {
+                  if (details.delta.dy < 0) {
+                    _scaffoldKey.currentState
+                        .showBottomSheet<Null>((BuildContext context) {
+                      return ConversationBottomSheet();
+                    });
+                  }
+                },
+              ),
+            ),
           ],
         ),
       ),
     );
-
   }
 }

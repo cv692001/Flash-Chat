@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:flash_chat/config/assets.dart';
+
 import 'package:flash_chat/config/style.dart';
 
 class ChatRowWidget extends StatelessWidget {
@@ -25,14 +25,14 @@ class ChatRowWidget extends StatelessWidget {
                     ),
                     Container(
                         child: Column(
-                          children: <Widget>[
-                            Text('Chirag Vaishnav', style: Styles.subHeading),
-                            Text(
-                              'What\'s up?',
-                              style: Styles.subText,
-                            )
-                          ],
-                        ))
+                      children: <Widget>[
+                        Text('Chirag Vaishnav', style: Styles.subHeading),
+                        Text(
+                          'What\'s up?',
+                          style: Styles.subText,
+                        )
+                      ],
+                    ))
                   ],
                 ),
               ),
