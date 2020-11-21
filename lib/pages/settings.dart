@@ -1,82 +1,45 @@
-import 'dart:html';
-
+import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flash_chat/widgets/ProgressWidget.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'RegisterPage.dart';
 import 'package:flash_chat/widgets/NumberPicker.dart';
 import 'package:flash_chat/config/style.dart';
 import 'package:flash_chat/config/color_palette.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SettingScreen extends StatefulWidget {
   @override
   _SettingScreenState createState() => _SettingScreenState();
 }
 
-class _SettingScreenState extends State<SettingScreen>
-    with TickerProviderStateMixin, WidgetsBindingObserver {
+class _SettingScreenState extends State<SettingScreen> {
   SharedPreferences preferences;
 
-  AnimationController usernameFieldAnimationController;
-  Animation profilePicHeightAnimation,
-      usernameAnimation,
-      ageAnimation,
-      picAnimation;
-  FocusNode usernameFocusNode = FocusNode();
-  var isKeyboardOpen = false;
-  int age = 18;
-  AnimationController controller;
-  Animation animation;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
 
-  Alignment begin = Alignment.center;
-  Alignment end = Alignment.bottomRight;
+  Future<Null> logoutUser() async {
+    await FirebaseAuth.instance.signOut();
+    await googleSignIn.disconnect();
+    await googleSignIn.signOut();
+
+    this.setState(() {
+      isLoading = false;
+    });
+
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => RegisterPage()),
+        (Route<dynamic> route) => false);
+  }
 
   @override
   void initState() {
-    WidgetsBinding.instance.addObserver(this);
-    usernameFieldAnimationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
-
-    profilePicHeightAnimation =
-        Tween(begin: 100.0, end: 0.0).animate(usernameFieldAnimationController)
-          ..addListener(() {
-            setState(() {});
-          });
-    usernameAnimation =
-        Tween(begin: 30.0, end: 0.0).animate(usernameFieldAnimationController)
-          ..addListener(() {
-            setState(() {});
-          });
-    ageAnimation =
-        Tween(begin: 80.0, end: 35.0).animate(usernameFieldAnimationController)
-          ..addListener(() {
-            setState(() {});
-          });
-
-    picAnimation =
-        Tween(begin: 60.0, end: 45.0).animate(usernameFieldAnimationController)
-          ..addListener(() {
-            setState(() {});
-          });
-
-    usernameFocusNode.addListener(() {
-      if (usernameFocusNode.hasFocus) {
-        usernameFieldAnimationController.forward();
-      } else {
-        usernameFieldAnimationController.reverse();
-      }
-    });
-
-    controller = AnimationController(
-      duration: Duration(seconds: 1),
-      vsync: this,
-    );
-
-    controller.forward();
-
-    controller.addListener(() {
-      setState(() {});
-    });
-
     super.initState();
 
     readDataFromLocal();
@@ -91,6 +54,8 @@ class _SettingScreenState extends State<SettingScreen>
   String photourl = "";
   File imageFileAvatar;
   bool isLoading = false;
+  final FocusNode nicknameFocusNide = FocusNode();
+  final FocusNode aboutMeFocusNode = FocusNode();
 
   void readDataFromLocal() async {
     preferences = await SharedPreferences.getInstance();
@@ -111,137 +76,287 @@ class _SettingScreenState extends State<SettingScreen>
     setState(() {});
   }
 
+  Future getImage() async {
+    File newImageFile =
+        await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    if (newImageFile != null) {
+      setState(() {
+        this.imageFileAvatar = newImageFile;
+        isLoading = true;
+      });
+    }
+
+    uploadImageToFireStoreAndStorage();
+  }
+
+  Future uploadImageToFireStoreAndStorage() async {
+    String mFileName = id;
+    StorageReference storageReference =
+        FirebaseStorage.instance.ref().child(mFileName);
+
+    StorageUploadTask storageUplaodTask =
+        storageReference.putFile(imageFileAvatar);
+
+    StorageTaskSnapshot storageTaskSnapshot;
+
+    storageUplaodTask.onComplete.then((value) {
+      if (value.error == null) {
+        storageTaskSnapshot = value;
+
+        storageTaskSnapshot.ref.getDownloadURL().then((newImageDownloadUrl) {
+          photourl = newImageDownloadUrl;
+
+          Firestore.instance.collection("users").document(id).updateData({
+            "photourl": photourl,
+          }).then((data) async {
+            await preferences.setString("photourl", photourl);
+
+            setState(() {
+              isLoading = false;
+            });
+
+            Fluttertoast.showToast(msg: "Updated Sucessfully");
+          });
+        }, onError: (errormsg) {
+          setState(() {
+            isLoading = false;
+          });
+
+          Fluttertoast.showToast(msg: "Error occured in getting DownloadUrl");
+        });
+      }
+    }, onError: (errorMsg) {
+      setState(() {
+        isLoading = false;
+      });
+
+      Fluttertoast.showToast(msg: errorMsg.toString());
+    });
+  }
+
+  void updateData() {
+    nicknameFocusNide.unfocus();
+    aboutMeFocusNode.unfocus();
+
+    setState(() {
+      isLoading = false;
+    });
+
+    Firestore.instance.collection("users").document(id).updateData({
+      "photourl": photourl,
+      "aboutMe": aboutMe,
+      "nickname": nickname,
+    }).then((data) async {
+      await preferences.setString("photourl", photourl);
+      await preferences.setString("nickname", nickname);
+      await preferences.setString("aboutMe", aboutMe);
+
+      setState(() {
+        isLoading = false;
+      });
+
+      Fluttertoast.showToast(msg: "Updated Sucessfully");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [
-              Colors.blue[600],
-              Colors.blue[200],
-            ],
-          ),
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.white,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(height: profilePicHeightAnimation.value * .6),
-            Container(
-                child: Flexible(
-              child: CircleAvatar(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(
-                      Icons.camera,
-                      color: Colors.white,
-                      size: 15,
+        backgroundColor: Colors.lightBlue,
+        title: Text(
+          "Account Settings",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+      ),
+      body: Stack(
+        children: <Widget>[
+          SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  child: Center(
+                    child: Stack(
+                      children: <Widget>[
+                        (imageFileAvatar == null)
+                            ? (photourl != null)
+                                ? Material(
+                                    // display the old image
+                                    child: CachedNetworkImage(
+                                      placeholder: (context, url) => Container(
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.lightBlueAccent),
+                                          strokeWidth: 2.0,
+                                        ),
+                                        height: 200,
+                                        width: 200,
+                                        padding: EdgeInsets.all(20.0),
+                                      ),
+                                      imageUrl: photourl,
+                                      height: 200,
+                                      width: 200,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(125.0)),
+                                    clipBehavior: Clip.hardEdge,
+                                  )
+                                : Icon(
+                                    Icons.account_circle,
+                                    size: 90,
+                                    color: Colors.grey,
+                                  )
+                            : Material(
+                                child: Image.file(
+                                  imageFileAvatar,
+                                  width: 200,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.camera_alt,
+                            size: 100,
+                            color: Colors.white54.withOpacity(0.3),
+                          ),
+                          onPressed: () {
+                            getImage();
+                          },
+                          padding: EdgeInsets.all(0.0),
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.grey,
+                          iconSize: 200,
+                        ),
+                      ],
                     ),
-                    Text(
-                      'Set Profile Picture',
-                      textAlign: TextAlign.center,
+                  ),
+                  width: double.infinity,
+                  margin: EdgeInsets.all(20.0),
+                ),
+                Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(1.0),
+                      child: isLoading ? circularProgress() : Container(),
+                    ),
+                    Container(
+                      child: Text(
+                        "Profile Name:",
+                        style: TextStyle(
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.lightBlueAccent,
+                        ),
+                      ),
+                      margin: EdgeInsets.only(left: 10, top: 10, bottom: 5.0),
+                    ),
+                    Container(
+                      child: Theme(
+                        data: Theme.of(context).copyWith(
+                          primaryColor: Colors.lightBlueAccent,
+                        ),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: "e.g. Chirag Vaishnav",
+                            contentPadding: EdgeInsets.all(5.0),
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                            ),
+                          ),
+                          controller: nicknameTextEditingController,
+                          onChanged: (value) {
+                            nickname = value;
+                          },
+                          focusNode: nicknameFocusNide,
+                        ),
+                      ),
+                      margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                    ),
+                    Container(
+                      child: Text(
+                        "About Me:",
+                        style: TextStyle(
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.lightBlueAccent,
+                        ),
+                      ),
+                      margin: EdgeInsets.only(left: 10, top: 10, bottom: 5.0),
+                    ),
+                    Container(
+                      child: Theme(
+                        data: Theme.of(context).copyWith(
+                          primaryColor: Colors.lightBlueAccent,
+                        ),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: "e.g. Bio",
+                            contentPadding: EdgeInsets.all(5.0),
+                            hintStyle: TextStyle(
+                              color: Colors.grey,
+                            ),
+                          ),
+                          controller: aboutMeTextEditingController,
+                          onChanged: (value) {
+                            aboutMe = value;
+                          },
+                          focusNode: aboutMeFocusNode,
+                        ),
+                      ),
+                      margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                    ),
+                  ],
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+                Container(
+                  child: FlatButton(
+                    onPressed: () {
+                      print("jkl");
+                      updateData();
+                    },
+                    child: Text(
+                      "Update",
+                      style: TextStyle(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                    color: Colors.lightBlueAccent,
+                    highlightColor: Colors.grey,
+                    splashColor: Colors.transparent,
+                    textColor: Colors.white,
+                    padding: EdgeInsets.fromLTRB(30, 10, 30.0, 10.0),
+                  ),
+                  margin: EdgeInsets.only(top: 50.0, bottom: 1.0),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 50, right: 50),
+                  child: RaisedButton(
+                    color: Colors.red,
+                    child: Text(
+                      "Logout",
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 10,
+                        fontSize: 14.0,
                       ),
-                    )
-                  ],
+                    ),
+                    onPressed: () {
+                      logoutUser();
+                    },
+                  ),
                 ),
-                backgroundImage: Image.asset('images/user.jpg').image,
-                radius: picAnimation.value,
-              ),
-            )),
-            SizedBox(
-              height: ageAnimation.value,
+              ],
             ),
-            Container(
-              child: Text(
-                'Choose a username',
-                style: Styles.questionLight,
-              ),
-            ),
-            TextField(
-              textAlign: TextAlign.center,
-              style: Styles.subHeadingLight,
-              focusNode: usernameFocusNode,
-              decoration: InputDecoration(
-                hintText: '@username',
-                hintStyle: Styles.hintTextLight,
-                contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                focusedBorder: OutlineInputBorder(
-                  borderSide:
-                      BorderSide(color: Palette.primaryColor, width: 0.1),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide:
-                      BorderSide(color: Palette.primaryColor, width: 0.1),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: ageAnimation.value,
-            ),
-            Container(
-              child: Text(
-                'Choose a username',
-                style: Styles.questionLight,
-              ),
-            ),
-            TextField(
-              textAlign: TextAlign.center,
-              style: Styles.subHeadingLight,
-              focusNode: usernameFocusNode,
-              decoration: InputDecoration(
-                hintText: '@username',
-                hintStyle: Styles.hintTextLight,
-                contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                focusedBorder: OutlineInputBorder(
-                  borderSide:
-                      BorderSide(color: Palette.primaryColor, width: 0.1),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide:
-                      BorderSide(color: Palette.primaryColor, width: 0.1),
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    usernameFieldAnimationController.dispose();
-    usernameFocusNode.dispose();
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didChangeMetrics() {
-    final value = MediaQuery.of(context).viewInsets.bottom;
-    if (value > 0) {
-      if (isKeyboardOpen) {
-        onKeyboardChanged(false);
-      }
-      isKeyboardOpen = false;
-    } else {
-      isKeyboardOpen = true;
-      onKeyboardChanged(true);
-    }
-  }
-
-  onKeyboardChanged(bool isVisible) {
-    if (!isVisible) {
-      FocusScope.of(context).requestFocus(FocusNode());
-      usernameFieldAnimationController.reverse();
-    }
   }
 }

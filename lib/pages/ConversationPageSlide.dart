@@ -13,13 +13,20 @@ class ConversationPageSlide extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ConversationPageSlideState createState() => _ConversationPageSlideState();
+  _ConversationPageSlideState createState() =>
+      _ConversationPageSlideState(currentUserId: currentUserId);
 }
 
 class _ConversationPageSlideState extends State<ConversationPageSlide>
     with SingleTickerProviderStateMixin {
+  _ConversationPageSlideState({
+    Key key,
+    this.currentUserId,
+  });
+
   var controller;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final String currentUserId;
 
   @override
   void initState() {
@@ -52,7 +59,9 @@ class _ConversationPageSlideState extends State<ConversationPageSlide>
                   if (details.delta.dy < 0) {
                     _scaffoldKey.currentState
                         .showBottomSheet<Null>((BuildContext context) {
-                      return ConversationBottomSheet();
+                      return ConversationBottomSheet(
+                        currentUser: currentUserId,
+                      );
                     });
                   }
                 },

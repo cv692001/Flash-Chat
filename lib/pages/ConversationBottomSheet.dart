@@ -7,15 +7,24 @@ import 'package:flash_chat/pages/settings.dart';
 import 'serachPage.dart';
 
 class ConversationBottomSheet extends StatefulWidget {
+  final String currentUser;
+
+  ConversationBottomSheet({
+    this.currentUser,
+  });
   @override
   _ConversationBottomSheetState createState() =>
-      _ConversationBottomSheetState();
-
-  const ConversationBottomSheet();
+      _ConversationBottomSheetState(currentUser: currentUser);
 }
 
 class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
   TextEditingController searchTextController = TextEditingController();
+
+  _ConversationBottomSheetState({
+    Key key,
+    this.currentUser,
+  });
+  final String currentUser;
   @override
   Widget build(BuildContext context) {
     double statusBarHeight = MediaQuery.of(context).padding.top;
@@ -59,8 +68,9 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              searchScreen()));
+                                          builder: (context) => searchScreen(
+                                                currentUser: currentUser,
+                                              )));
                                 },
                               ),
                               IconButton(
