@@ -10,7 +10,7 @@ class ChatListWidget extends StatelessWidget {
       itemBuilder: (context, index) =>
           ChatItemWidget(text: "This is a message", INT: index),
       itemCount: 20,
-      reverse: true,
+      reverse: true, //
       controller: listScrollController,
     );
   }

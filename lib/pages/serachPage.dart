@@ -6,7 +6,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat/pages/settings.dart';
+import 'ConversationPageList.dart';
 import 'package:intl/intl.dart';
+import 'package:flash_chat/pages/ChatPage.dart';
 
 // ignore: camel_case_types
 class searchScreen extends StatefulWidget {
@@ -189,6 +191,7 @@ class UserResult extends StatelessWidget {
       child: Column(
         children: <Widget>[
           GestureDetector(
+            onTap: () => sendUserToChatPage(context),
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: Colors.black,
@@ -218,5 +221,16 @@ class UserResult extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  sendUserToChatPage(BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (value) => chat(
+                  recieverId: eachUser.id,
+                  recieverName: eachUser.nickname,
+                  recieverAvatar: eachUser.photourl,
+                )));
   }
 }
