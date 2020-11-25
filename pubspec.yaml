@@ -50,6 +50,7 @@ flutter:
 
   assets:
     - images/launcher/logo.png
+    - images/img_not_available.jpeg
     - images/google.png
     - images/user.jpg
     - images/mimi1.gif

@@ -3,6 +3,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flash_chat/widgets/ChatAppBar.dart';
+import 'package:intl/intl.dart';
+import 'fullImageWidget.dart';
 import 'package:flash_chat/widgets/ProgressWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -207,7 +209,9 @@ class _ChatScreenState extends State<ChatScreen> {
           Row(
             children: <Widget>[
               FlatButton(
-                onPressed: () => onSendMessage("mimi1", 2),
+                onPressed: () => onSendMessage(
+                    "https://media.giphy.com/media/BMPSCLh0SQxvGQ81uP/giphy.gif",
+                    2),
                 child: Image.network(
                   'https://media.giphy.com/media/BMPSCLh0SQxvGQ81uP/giphy.gif',
                   loadingBuilder: (context, child, progress) {
@@ -221,7 +225,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage("mimi1", 2),
+                onPressed: () => onSendMessage(
+                    "https://media.giphy.com/media/RfXmmUJf9G26Za3dLB/giphy.gif",
+                    2),
                 child: Image.network(
                   'https://media.giphy.com/media/RfXmmUJf9G26Za3dLB/giphy.gif',
                   loadingBuilder: (context, child, progress) {
@@ -235,7 +241,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage("mimi1", 2),
+                onPressed: () => onSendMessage(
+                    "https://media.giphy.com/media/5adFM0HmVdP8s/giphy.gif", 2),
                 child: Image.network(
                   'https://media.giphy.com/media/5adFM0HmVdP8s/giphy.gif',
                   loadingBuilder: (context, child, progress) {
@@ -254,7 +261,9 @@ class _ChatScreenState extends State<ChatScreen> {
           Row(
             children: <Widget>[
               FlatButton(
-                onPressed: () => onSendMessage("mimi1", 2),
+                onPressed: () => onSendMessage(
+                    "https://media.giphy.com/media/pVVKJJuEQre3219fLh/giphy.gif",
+                    2),
                 child: Image.network(
                   'https://media.giphy.com/media/pVVKJJuEQre3219fLh/giphy.gif',
                   loadingBuilder: (context, child, progress) {
@@ -268,7 +277,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage("mimi1", 2),
+                onPressed: () => onSendMessage(
+                    "https://media.giphy.com/media/X7sdcJ1kA5u41SWEqa/giphy.gif",
+                    2),
                 child: Image.network(
                   'https://media.giphy.com/media/X7sdcJ1kA5u41SWEqa/giphy.gif',
                   loadingBuilder: (context, child, progress) {
@@ -282,7 +293,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage("mimi1", 2),
+                onPressed: () => onSendMessage(
+                    "https://media.giphy.com/media/3FjuotitkhOffmPamc/giphy.gif",
+                    2),
                 child: Image.network(
                   'https://media.giphy.com/media/3FjuotitkhOffmPamc/giphy.gif',
                   loadingBuilder: (context, child, progress) {
@@ -302,7 +315,8 @@ class _ChatScreenState extends State<ChatScreen> {
           Row(
             children: <Widget>[
               FlatButton(
-                onPressed: () => onSendMessage("mimi1", 2),
+                onPressed: () => onSendMessage(
+                    "https://media.giphy.com/media/z1RIYMGmxZjwc/giphy.gif", 2),
                 child: Image.network(
                   'https://media.giphy.com/media/z1RIYMGmxZjwc/giphy.gif',
                   loadingBuilder: (context, child, progress) {
@@ -316,7 +330,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage("mimi1", 2),
+                onPressed: () => onSendMessage(
+                    "https://media.giphy.com/media/LThD8JVDd19hm/giphy.gif", 2),
                 child: Image.network(
                   'https://media.giphy.com/media/LThD8JVDd19hm/giphy.gif',
                   loadingBuilder: (context, child, progress) {
@@ -330,7 +345,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage("mimi1", 2),
+                onPressed: () => onSendMessage(
+                    "https://media.giphy.com/media/xUOxf9qA9iupNWfT3y/giphy.gif",
+                    2),
                 child: Image.network(
                   'https://media.giphy.com/media/xUOxf9qA9iupNWfT3y/giphy.gif',
                   loadingBuilder: (context, child, progress) {
@@ -403,16 +420,271 @@ class _ChatScreenState extends State<ChatScreen> {
 
                     return ListView.builder(
                       padding: EdgeInsets.all(10.0),
-                      //  itemBuilder: (context, index) {
-                      //      createItam(index , snapshots , data , documents[index] );
-
-                      //    },
+                      itemBuilder: (context, index) =>
+                          createItem(index, snapshots.data.documents[index]),
                       itemCount: snapshots.data.documents.length,
                       reverse: true,
                       controller: listScrollController,
                     );
                   }
                 }));
+  }
+
+  bool isLastMessageLeft(int index) {
+    if ((index > 0 &&
+            listMessage != null &&
+            listMessage[index - 1]["idFrom"] == id) ||
+        index == 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool isLastMessageRight(int index) {
+    if ((index > 0 &&
+            listMessage != null &&
+            listMessage[index - 1]["idFrom"] != id) ||
+        index == 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  createItem(int index, DocumentSnapshot document) {
+    if (document["idFrom"] == id) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          document['type'] == 0
+              ? Container(
+                  child: Text(
+                    document["content"],
+                    textAlign: TextAlign.end,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                  width: 200.0,
+                  decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8)),
+                  margin: EdgeInsets.only(
+                      bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                      right: 10.0),
+                )
+              : document['type'] == 1
+                  ? Container(
+                      child: FlatButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => FullPhoto(
+                                        url: document['content'],
+                                      )));
+                        },
+                        child: Material(
+                          child: CachedNetworkImage(
+                            placeholder: (context, url) => Container(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation(
+                                    Colors.lightBlueAccent),
+                              ),
+                              width: 200,
+                              height: 200,
+                              padding: EdgeInsets.all(70.0),
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(8.0),
+                                ),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Material(
+                              child: Image.asset(
+                                "images/img_not_available.jpeg",
+                                height: 200,
+                                width: 200,
+                                fit: BoxFit.cover,
+                              ),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(8.0),
+                              ),
+                              clipBehavior: Clip.hardEdge,
+                            ),
+                            imageUrl: document['content'],
+                            height: 200,
+                            width: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      margin: EdgeInsets.only(
+                          bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                          right: 10.0),
+                    )
+                  : Container(
+                      child: Image.network(
+                        document['content'],
+                        loadingBuilder: (context, child, progress) {
+                          return progress == null
+                              ? child
+                              : CircularProgressIndicator();
+                        },
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      ),
+                      margin: EdgeInsets.only(
+                          bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                          right: 10.0),
+                    )
+        ],
+      );
+    } else {
+      return Container(
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                isLastMessageLeft(index)
+                    ? Material(
+                        child: CachedNetworkImage(
+                          placeholder: (context, url) => Container(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation(
+                                  Colors.lightBlueAccent),
+                            ),
+                            width: 35,
+                            height: 35,
+                            padding: EdgeInsets.all(10.0),
+                          ),
+                          imageUrl: recieverAvatar,
+                          width: 35,
+                          height: 35,
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(18.0),
+                        ),
+                        clipBehavior: Clip.hardEdge,
+                      )
+                    : Container(
+                        width: 35.0,
+                      ),
+                document['type'] == 0
+                    ? Container(
+                        child: Text(
+                          document["content"],
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                        width: 200.0,
+                        decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8)),
+                        margin: EdgeInsets.only(
+                            bottom: isLastMessageLeft(index) ? 20.0 : 10.0,
+                            right: 10.0),
+                      )
+                    : document['type'] == 1
+                        ? Container(
+                            child: FlatButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => FullPhoto(
+                                              url: document['content'],
+                                            )));
+                              },
+                              child: Material(
+                                child: CachedNetworkImage(
+                                  placeholder: (context, url) => Container(
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation(
+                                          Colors.lightBlueAccent),
+                                    ),
+                                    width: 200,
+                                    height: 200,
+                                    padding: EdgeInsets.all(70.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(8.0),
+                                      ),
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      Material(
+                                    child: Image.asset(
+                                      "images/img_not_available.jpeg",
+                                      height: 200,
+                                      width: 200,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(8.0),
+                                    ),
+                                    clipBehavior: Clip.hardEdge,
+                                  ),
+                                  imageUrl: document['content'],
+                                  height: 200,
+                                  width: 200,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            margin: EdgeInsets.only(
+                                bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                                right: 10.0),
+                          )
+                        : Container(
+                            child: Image.network(
+                              document['content'],
+                              loadingBuilder: (context, child, progress) {
+                                return progress == null
+                                    ? child
+                                    : CircularProgressIndicator();
+                              },
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                            margin: EdgeInsets.only(
+                                bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                                right: 10.0),
+                          )
+              ],
+            ),
+            isLastMessageLeft(index)
+                ? Container(
+                    child: Text(
+                      DateFormat("dd MMMM, yyyy - hh:mm:aa").format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                              int.parse(document['timestamp']))),
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12.0,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    margin: EdgeInsets.only(bottom: 5.0, left: 20.0, top: 0.0),
+                  )
+                : Container()
+          ],
+          crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+        margin: EdgeInsets.only(bottom: 10.0),
+      );
+    }
   }
 
   createInput() {
