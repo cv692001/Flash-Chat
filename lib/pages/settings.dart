@@ -6,21 +6,32 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'RegisterPage.dart';
-import 'package:flash_chat/widgets/NumberPicker.dart';
-import 'package:flash_chat/config/style.dart';
-import 'package:flash_chat/config/color_palette.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class SettingScreen extends StatefulWidget {
+  final String currentUser;
+
+  SettingScreen({
+    Key key,
+    this.currentUser,
+  });
   @override
-  _SettingScreenState createState() => _SettingScreenState();
+  _SettingScreenState createState() =>
+      _SettingScreenState(currentUser: currentUser);
 }
 
 class _SettingScreenState extends State<SettingScreen> {
   SharedPreferences preferences;
+
+  _SettingScreenState({
+    Key key,
+    this.currentUser,
+  });
+
+  final String currentUser;
 
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
@@ -220,6 +231,9 @@ class _SettingScreenState extends State<SettingScreen> {
                                   height: 200,
                                   fit: BoxFit.cover,
                                 ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(125.0)),
+                                clipBehavior: Clip.hardEdge,
                               ),
                         IconButton(
                           icon: Icon(

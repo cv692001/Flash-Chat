@@ -1,5 +1,9 @@
 import 'dart:ffi';
-
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat/widgets/CircleIndicator.dart';
 import 'package:flutter/cupertino.dart';
@@ -254,7 +258,85 @@ class _RegisterPageState extends State<RegisterPage>
     );
   }
 
+  String id = "";
+  String nickname = "";
+  String aboutMe = "";
+  String photourl = "";
+  File imageFileAvatar;
+  TextEditingController nicknameTextEditor = TextEditingController();
+
+  void readDataFromLocal() async {
+    preferences = await SharedPreferences.getInstance();
+
+    id = preferences.getString("id");
+
+    aboutMe = preferences.getString("aboutMe");
+    photourl = preferences.getString("photourl");
+
+    setState(() {});
+  }
+
+  Future getImage() async {
+    File newImageFile =
+        await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    if (newImageFile != null) {
+      setState(() {
+        this.imageFileAvatar = newImageFile;
+        isLoading = true;
+      });
+    }
+
+    uploadImageToFireStoreAndStorage();
+  }
+
+  Future uploadImageToFireStoreAndStorage() async {
+    String mFileName = id;
+    StorageReference storageReference =
+        FirebaseStorage.instance.ref().child(mFileName);
+
+    StorageUploadTask storageUplaodTask =
+        storageReference.putFile(imageFileAvatar);
+
+    StorageTaskSnapshot storageTaskSnapshot;
+
+    storageUplaodTask.onComplete.then((value) {
+      if (value.error == null) {
+        storageTaskSnapshot = value;
+
+        storageTaskSnapshot.ref.getDownloadURL().then((newImageDownloadUrl) {
+          photourl = newImageDownloadUrl;
+
+          Firestore.instance.collection("users").document(id).updateData({
+            "photourl": photourl,
+          }).then((data) async {
+            await preferences.setString("photourl", newImageDownloadUrl);
+
+            setState(() {
+              isLoading = false;
+            });
+
+            Fluttertoast.showToast(msg: "Updated Sucessfully");
+          });
+        }, onError: (errormsg) {
+          setState(() {
+            isLoading = false;
+          });
+
+          Fluttertoast.showToast(msg: "Error occured in getting DownloadUrl");
+        });
+      }
+    }, onError: (errorMsg) {
+      setState(() {
+        isLoading = false;
+      });
+
+      Fluttertoast.showToast(msg: errorMsg.toString());
+    });
+  }
+
   buildPageTwo() {
+    readDataFromLocal();
     return InkWell(
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
@@ -266,27 +348,73 @@ class _RegisterPageState extends State<RegisterPage>
               SizedBox(height: profilePicHeightAnimation.value * .3),
               Container(
                   child: Flexible(
-                child: CircleAvatar(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(
-                        Icons.camera,
-                        color: Colors.white,
-                        size: 15,
-                      ),
-                      Text(
-                        'Set Profile Picture',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
+                child: GestureDetector(
+                  onTap: () {
+                    getImage();
+                  },
+                  child: CircleAvatar(
+                    child: Stack(
+                      children: <Widget>[
+                        (imageFileAvatar == null)
+                            ? (photourl != null)
+                                ? Material(
+                                    // display the old image
+                                    child: CachedNetworkImage(
+                                      placeholder: (context, url) => Container(
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.lightBlueAccent),
+                                          strokeWidth: 2.0,
+                                        ),
+                                        height: 200,
+                                        width: 200,
+                                        padding: EdgeInsets.all(20.0),
+                                      ),
+                                      imageUrl: photourl,
+                                      height: 200,
+                                      width: 200,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(125.0)),
+                                    clipBehavior: Clip.hardEdge,
+                                  )
+                                : Icon(
+                                    Icons.account_circle,
+                                    size: 90,
+                                    color: Colors.grey,
+                                  )
+                            : Material(
+                                child: Image.file(
+                                  imageFileAvatar,
+                                  width: 200,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(125.0)),
+                                clipBehavior: Clip.hardEdge,
+                              ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.camera,
+                            size: 50,
+                            color: Colors.white54.withOpacity(0.3),
+                          ),
+                          onPressed: () {
+                            getImage();
+                          },
+                          padding: EdgeInsets.all(0.0),
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.grey,
+                          iconSize: 200,
                         ),
-                      )
-                    ],
+                        isLoading ? circularProgress() : Container(),
+                      ],
+                    ),
+                    radius: picAnimation.value,
                   ),
-                  backgroundImage: Image.asset('images/user.jpg').image,
-                  radius: picAnimation.value,
                 ),
               )),
               SizedBox(
@@ -326,6 +454,7 @@ class _RegisterPageState extends State<RegisterPage>
                   margin: EdgeInsets.only(top: 20),
                   width: 120,
                   child: TextField(
+                    controller: nicknameTextEditor,
                     textAlign: TextAlign.center,
                     style: Styles.subHeadingLight,
                     focusNode: usernameFocusNode,
@@ -361,10 +490,7 @@ class _RegisterPageState extends State<RegisterPage>
   Future<bool> onWillPop() {
     if (currentPage == 1) {
       //go to first page if currently on second page
-      pageController.previousPage(
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+
       return Future.value(false);
     }
     return Future.value(true);
@@ -405,6 +531,26 @@ class _RegisterPageState extends State<RegisterPage>
   }
 
   navigateToHome() {
+    usernameFocusNode.unfocus();
+
+    setState(() {
+      isLoading = false;
+    });
+
+    Firestore.instance.collection("users").document(id).updateData({
+      "age": age.toString(),
+      "nickname": nicknameTextEditor.text,
+    }).then((data) async {
+      await preferences.setString("nickname", nicknameTextEditor.text);
+      await preferences.setString("age", age.toString());
+
+      setState(() {
+        isLoading = false;
+      });
+
+      Fluttertoast.showToast(msg: "Updated Sucessfully");
+    });
+
     Navigator.push(
       context,
       SlideLeftRoute(
@@ -419,7 +565,6 @@ class _RegisterPageState extends State<RegisterPage>
 
     this.setState(() {
       isLoading = true;
-      //updatePageState(1);
     });
 
     GoogleSignInAccount googleUser = await googledignin.signIn();
@@ -452,7 +597,7 @@ class _RegisterPageState extends State<RegisterPage>
           "photourl": firebaseUser.photoUrl,
           "id": firebaseUser.uid,
           "age": "18",
-          "aboutMe": "using application created by Chirag Vaishnav",
+          "aboutMe": "Doing Great",
           "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
           "chattingWith": null,
         });
@@ -461,8 +606,7 @@ class _RegisterPageState extends State<RegisterPage>
         await preferences.setString("id", currentuser.uid);
         await preferences.setString("photourl", currentuser.photoUrl);
         await preferences.setString("nickname", currentuser.displayName);
-        await preferences.setString(
-            "aboutMe", "using application created by Chirag Vaishnav");
+        await preferences.setString("aboutMe", "Doing Great");
       } else {
         currentuser = firebaseUser;
         await preferences.setString("id", documentSnapshots[0]["id"]);
@@ -478,11 +622,14 @@ class _RegisterPageState extends State<RegisterPage>
         isLoading = false;
       });
 
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ConversationPageSlide(
-                  currentUserId: preferences.getString("id"))));
+      this.setState(() {
+        updatePageState(1);
+      });
+      // Navigator.push(
+      //     context,
+      //     MaterialPageRoute(
+      //         builder: (context) => ConversationPageSlide(
+      //             currentUserId: preferences.getString("id"))));
     } else {
       Fluttertoast.showToast(msg: "Try Again , Sign In Failed");
       this.setState(() {

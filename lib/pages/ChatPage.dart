@@ -173,9 +173,15 @@ class _ChatScreenState extends State<ChatScreen> {
           children: <Widget>[
             Column(
               children: <Widget>[
-                createListMessagaes(),
-                (isDisplayStickers ? createStickers() : Container()),
-                createInput(),
+                Expanded(
+                  child: Column(
+                    children: <Widget>[
+                      createListMessagaes(),
+                      (isDisplayStickers ? createStickers() : Container()),
+                      createInput(),
+                    ],
+                  ),
+                ),
               ],
             ),
             createLoading(),
