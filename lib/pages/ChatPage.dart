@@ -1,9 +1,17 @@
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash_chat/pages/RegisterPage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flash_chat/widgets/ChatAppBar.dart';
+import 'package:flash_chat/config/style.dart';
 import 'package:intl/intl.dart';
+import 'package:flash_chat/config/color_palette.dart';
 import 'fullImageWidget.dart';
 import 'package:flash_chat/widgets/ProgressWidget.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +20,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class chat extends StatelessWidget {
+  final String recieverAbout;
   final String recieverId;
   final String recieverAvatar;
   final String recieverName;
 
   chat({
     Key key,
+    this.recieverAbout,
     @required this.recieverAvatar,
     @required this.recieverId,
     @required this.recieverName,
@@ -26,30 +36,97 @@ class chat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.lightBlueAccent,
-        actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: CircleAvatar(
-              backgroundImage: CachedNetworkImageProvider(recieverAvatar),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(70),
+          child: Material(
+            child: Container(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.lightBlue[100],
+                  borderRadius: new BorderRadius.vertical(
+                      bottom: new Radius.elliptical(
+                          MediaQuery.of(context).size.width, 20.0)),
+                  boxShadow: kElevationToShadow[50],
+                ),
+                //color: Palette.primaryBackgroundColor,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (value) => UserProfileScreen(
+                                  recieverAbout: recieverAbout,
+                                  recieverAvatar: recieverAvatar,
+                                  recieverId: recieverId,
+                                  recieverName: recieverName,
+                                )));
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      Expanded(flex: 2, child: Container()),
+                      Expanded(
+                        flex: 7,
+                        child: Center(
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                flex: 6,
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(horizontal: 20),
+                                  child: Container(
+                                    padding: EdgeInsets.only(top: 25),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        Text(
+                                            recieverName[0].toUpperCase() +
+                                                recieverName.substring(1),
+                                            // recieverName.toUpperCas5e(),
+                                            textAlign: TextAlign.end,
+                                            style: Styles.textHeading),
+                                        Text(
+                                            recieverAbout[0].toUpperCase() +
+                                                recieverAbout.substring(1),
+                                            textAlign: TextAlign.end,
+                                            style: Styles.subHeading)
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: Container(
+                          child: Center(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 20),
+                              child: CircleAvatar(
+                                radius: 32,
+                                backgroundImage:
+                                    CachedNetworkImageProvider(recieverAvatar),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
-        ],
-        iconTheme: IconThemeData(
-          color: Colors.white,
         ),
-        title: Text(
-          recieverName,
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: ChatScreen(recieverAvatar: recieverAvatar, recieverId: recieverId),
-    );
+        body:
+            ChatScreen(recieverAvatar: recieverAvatar, recieverId: recieverId));
   }
 }
 
@@ -464,23 +541,29 @@ class _ChatScreenState extends State<ChatScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           document['type'] == 0
-              ? Container(
-                  child: Text(
-                    document["content"],
-                    textAlign: TextAlign.end,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
+              ? Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Material(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
+                      topLeft: Radius.circular(30),
+                    ),
+                    elevation: 5,
+                    color: Palette.selfMessageBackgroundColor,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      child: Text(
+                        document['content'],
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontStyle: FontStyle.normal,
+                        ),
+                      ),
                     ),
                   ),
-                  padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-                  width: 200.0,
-                  decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(8)),
-                  margin: EdgeInsets.only(
-                      bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                      right: 10.0),
                 )
               : document['type'] == 1
                   ? Container(
@@ -583,22 +666,34 @@ class _ChatScreenState extends State<ChatScreen> {
                         width: 35.0,
                       ),
                 document['type'] == 0
-                    ? Container(
-                        child: Text(
-                          document["content"],
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                          ),
+                    ? Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Material(
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(30),
+                                bottomRight: Radius.circular(30),
+                                topRight: Radius.circular(30),
+                              ),
+                              elevation: 5,
+                              color: Palette.otherMessageBackgroundColor,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 10),
+                                child: Text(
+                                  document['content'],
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontStyle: FontStyle.normal,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-                        width: 200.0,
-                        decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(8)),
-                        margin: EdgeInsets.only(
-                            bottom: isLastMessageLeft(index) ? 20.0 : 10.0,
-                            right: 10.0),
                       )
                     : document['type'] == 1
                         ? Container(
@@ -673,16 +768,17 @@ class _ChatScreenState extends State<ChatScreen> {
             isLastMessageLeft(index)
                 ? Container(
                     child: Text(
-                      DateFormat("dd MMMM, yyyy - hh:mm:aa").format(
-                          DateTime.fromMillisecondsSinceEpoch(
-                              int.parse(document['timestamp']))),
+                      "Last Seen :" +
+                          DateFormat("dd MM yyyy - hh:mm:aa").format(
+                              DateTime.fromMillisecondsSinceEpoch(
+                                  int.parse(document['timestamp']))),
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 12.0,
                         fontStyle: FontStyle.italic,
                       ),
                     ),
-                    margin: EdgeInsets.only(bottom: 5.0, left: 20.0, top: 0.0),
+                    margin: EdgeInsets.only(bottom: 5.0, left: 50.0, top: 0.0),
                   )
                 : Container()
           ],
@@ -727,6 +823,13 @@ class _ChatScreenState extends State<ChatScreen> {
               color: Colors.white,
             ),
             Flexible(
+                child: GestureDetector(
+              onVerticalDragEnd: (details) {
+                print('Dragged Down');
+                if (details.primaryVelocity < 50) {
+                  Navigator.pop(context);
+                }
+              },
               child: Container(
                 child: TextField(
                   focusNode: focusNode,
@@ -742,7 +845,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
               ),
-            ),
+            )),
             Material(
               child: Container(
                 margin: EdgeInsets.symmetric(horizontal: 8.0),
@@ -804,5 +907,132 @@ class _ChatScreenState extends State<ChatScreen> {
 
       Fluttertoast.showToast(msg: "Error : " + error);
     });
+  }
+}
+
+class UserProfileScreen extends StatefulWidget {
+  final String recieverAbout;
+  final String recieverId;
+  final String recieverAvatar;
+  final String recieverName;
+
+  UserProfileScreen({
+    Key key,
+    this.recieverAbout,
+    this.recieverAvatar,
+    this.recieverId,
+    this.recieverName,
+  }) : super(key: key);
+  @override
+  _UserProfileScreenState createState() => _UserProfileScreenState(
+        recieverAbout,
+        recieverId,
+        recieverAvatar,
+        recieverName,
+      );
+}
+
+class _UserProfileScreenState extends State<UserProfileScreen> {
+  final String recieverAbout;
+  final String recieverId;
+  final String recieverAvatar;
+  final String recieverName;
+
+  _UserProfileScreenState(
+    this.recieverAbout,
+    this.recieverId,
+    this.recieverAvatar,
+    this.recieverName,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: Container(),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(35),
+          ),
+        ),
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ),
+        backgroundColor: Colors.blue[100],
+        title: Text(
+          recieverName[0].toUpperCase() +
+              recieverName.substring(1) +
+              "s Profile",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
+        ),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: <Widget>[
+          SizedBox(
+            height: 50,
+          ),
+          Center(
+            child: Material(
+              borderRadius: BorderRadius.all(
+                Radius.circular(18.0),
+              ),
+              clipBehavior: Clip.hardEdge,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FullPhoto(
+                                url: recieverAvatar,
+                              )));
+                },
+                child: CachedNetworkImage(
+                  placeholder: (context, url) => Container(
+                    child: CircularProgressIndicator(
+                      valueColor:
+                          AlwaysStoppedAnimation(Colors.lightBlueAccent),
+                    ),
+                    width: 170,
+                    height: 170,
+                    padding: EdgeInsets.all(10.0),
+                  ),
+                  imageUrl: recieverAvatar,
+                  width: 170,
+                  height: 170,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 50,
+          ),
+          Column(
+            children: <Widget>[
+              Icon(Icons.person),
+              SizedBox(
+                width: 50,
+              ),
+              Text(
+                recieverName[0].toUpperCase() + recieverName.substring(1),
+                style: TextStyle(fontSize: 25, fontStyle: FontStyle.italic),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              Icon(Icons.info_outline),
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                recieverAbout[0].toUpperCase() + recieverAbout.substring(1),
+                style: TextStyle(fontSize: 15, fontStyle: FontStyle.normal),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
   }
 }

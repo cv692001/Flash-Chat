@@ -5,12 +5,14 @@ class User {
   final String nickname;
   final String photourl;
   final String createdAt;
+  final String aboutMe;
 
   User({
     this.id,
     this.nickname,
     this.photourl,
     this.createdAt,
+    this.aboutMe,
   });
 
   factory User.fromDocument(DocumentSnapshot doc) {
@@ -19,6 +21,7 @@ class User {
       photourl: doc['photourl'],
       nickname: doc['nickname'],
       createdAt: doc['createdAt'],
+      aboutMe: doc['aboutMe'],
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flash_chat/config/style.dart';
 import 'package:flash_chat/models/user.dart';
 import 'package:flash_chat/widgets/ProgressWidget.dart';
 import 'package:flutter/material.dart';
@@ -45,61 +46,70 @@ class _searchScreenState extends State<searchScreen> {
   final FocusNode searchFocusNode = FocusNode();
   @override
   Widget build(BuildContext context) {
+    double statusBarHeight = MediaQuery.of(context).padding.top;
+
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(
-                Icons.settings,
-                size: 30,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (value) => SettingScreen()));
-              }),
-        ],
-        backgroundColor: Colors.lightBlue,
-        title: Container(
-          margin: EdgeInsets.fromLTRB(0, 0, 0, 4),
-          child: TextField(
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.black,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(104),
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: statusBarHeight,
             ),
-            controller: searchTextController,
-            autofocus: true,
-            focusNode: searchFocusNode,
-            autocorrect: true,
-            decoration: InputDecoration(
-              hintText: 'Type Text Here...',
-              hintStyle: TextStyle(color: Colors.grey),
-              filled: true,
-              fillColor: Colors.white70,
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                borderSide: BorderSide(color: Colors.blueAccent, width: 2),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                borderSide: BorderSide(color: Colors.white),
-              ),
-              prefixIcon: Icon(
-                Icons.person,
-                color: Colors.black87,
-                size: 30.0,
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  Icons.clear,
-                  color: Colors.black87,
+            AppBar(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(35),
                 ),
-                onPressed: emptyTextFormField(),
+              ),
+              automaticallyImplyLeading: false,
+              actions: <Widget>[
+                IconButton(
+                    icon: Icon(
+                      Icons.settings,
+                      size: 30,
+                      color: Colors.black54,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (value) => SettingScreen()));
+                    }),
+              ],
+              backgroundColor: Colors.lightBlue[100],
+              title: TextField(
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+                controller: searchTextController,
+                autofocus: true,
+                focusNode: searchFocusNode,
+                autocorrect: true,
+                decoration: InputDecoration(
+                  //fillColor: Colors.green
+
+                  hintText: 'Type Text Here...',
+                  hintStyle: TextStyle(color: Colors.grey),
+                  // filled: true,
+                  //fillColor: Colors.blue[100],
+                  prefixIcon: Icon(
+                    Icons.person,
+                    color: Colors.black54,
+                    size: 30.0,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      Icons.clear,
+                      color: Colors.black54,
+                    ),
+                    onPressed: emptyTextFormField(),
+                  ),
+                ),
+                onSubmitted: controlSearching,
               ),
             ),
-            onSubmitted: controlSearching,
-          ),
+          ],
         ),
       ),
       body: futureSearchResults == null
@@ -113,24 +123,27 @@ class _searchScreenState extends State<searchScreen> {
 
     return Container(
       child: Center(
-        child: ListView(
-          children: <Widget>[
-            Icon(
+          child: Column(
+        children: <Widget>[
+          Center(
+            child: Icon(
               Icons.group,
-              color: Colors.grey,
-              size: 150,
+              color: Colors.amber,
+              size: 100,
             ),
-            Text(
+          ),
+          Center(
+            child: Text(
               "Search Users",
               style: TextStyle(
-                color: Colors.lightBlueAccent,
-                fontWeight: FontWeight.w500,
-                fontSize: 50,
+                color: Colors.green,
+                fontWeight: FontWeight.normal,
+                fontSize: 30,
               ),
-            )
-          ],
-        ),
-      ),
+            ),
+          ),
+        ],
+      )),
     );
   }
 
@@ -150,7 +163,6 @@ class _searchScreenState extends State<searchScreen> {
 
           if (currentUser != document["id"]) {
             searchUserResult.add(userResult);
-            print("not same");
           }
         });
 
@@ -192,30 +204,42 @@ class UserResult extends StatelessWidget {
         children: <Widget>[
           GestureDetector(
             onTap: () => sendUserToChatPage(context),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.black,
-                backgroundImage: CachedNetworkImageProvider(eachUser.photourl),
-              ),
-              title: Text(
-                eachUser.nickname,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
+            child: Column(
+              children: <Widget>[
+                ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.black,
+                    backgroundImage:
+                        CachedNetworkImageProvider(eachUser.photourl),
+                    radius: 30,
+                  ),
+                  title: Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(
+                        eachUser.nickname[0].toUpperCase() +
+                            eachUser.nickname.substring(1),
+                        style: Styles.text),
+                  ),
+                  subtitle: Text(
+                    // eachUser.aboutMe,
+                    "joined " +
+                        DateFormat("dd MM yyyy - hh:mm").format(
+                            DateTime.fromMillisecondsSinceEpoch(
+                                int.parse(eachUser.createdAt))),
+                    style: Styles.subText,
+
+                    // ),
+                  ),
                 ),
-              ),
-              subtitle: Text(
-                "joined" +
-                    DateFormat("dd MMMM, yyyy - hh:mm:ss").format(
-                        DateTime.fromMillisecondsSinceEpoch(
-                            int.parse(eachUser.createdAt))),
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 14,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 70, vertical: 0),
+                  child: Divider(
+                    color: Colors.black12,
+                    thickness: 1.3,
+                  ),
+                )
+              ],
             ),
           ),
         ],
@@ -231,6 +255,7 @@ class UserResult extends StatelessWidget {
                   recieverId: eachUser.id,
                   recieverName: eachUser.nickname,
                   recieverAvatar: eachUser.photourl,
+                  recieverAbout: eachUser.aboutMe,
                 )));
   }
 }

@@ -23,41 +23,52 @@ class ChatItemWidget extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
-            crossAxisAlignment: INT % 2 == 0
-                ? CrossAxisAlignment.end
-                : CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(bottom: 2),
-                child: Text(
-                  DateFormat('dd MMM kk:mm').format(
-                      DateTime.fromMillisecondsSinceEpoch(1565888474278)),
-                  style: Styles.date,
-                ),
-              ),
               Material(
-                borderRadius: INT % 2 == 0
-                    ? BorderRadius.only(
-                        bottomLeft: Radius.circular(30),
-                        bottomRight: Radius.circular(30),
-                        topLeft: Radius.circular(30),
-                      )
-                    : BorderRadius.only(
-                        bottomLeft: Radius.circular(30),
-                        bottomRight: Radius.circular(30),
-                        topRight: Radius.circular(30),
-                      ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
+                  topLeft: Radius.circular(30),
+                ),
                 elevation: 5,
-                color: INT % 2 == 0
-                    ? Palette.selfMessageBackgroundColor
-                    : Palette.otherMessageBackgroundColor,
+                color: Palette.selfMessageBackgroundColor,
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Text(
                     text,
                     style: TextStyle(
-                      color: INT % 2 == 0 ? Colors.white : Colors.black,
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontStyle: FontStyle.normal,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Material(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
+                  topLeft: Radius.circular(30),
+                ),
+                elevation: 5,
+                color: Palette.otherMessageBackgroundColor,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                      color: Colors.black,
                       fontSize: 14,
                       fontStyle: FontStyle.normal,
                     ),

@@ -9,8 +9,13 @@ class FullPhoto extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.lightBlue,
-        iconTheme: IconThemeData(color: Colors.white),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(35),
+          ),
+        ),
+        backgroundColor: Colors.red,
+        //iconTheme: IconThemeData(color: Colors.white),
         title: Text(
           'Full Image',
           style: TextStyle(

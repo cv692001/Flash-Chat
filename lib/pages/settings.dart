@@ -175,13 +175,19 @@ class _SettingScreenState extends State<SettingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Container(),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(35),
+          ),
+        ),
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
-        backgroundColor: Colors.lightBlue,
+        backgroundColor: Colors.blue[100],
         title: Text(
           "Account Settings",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
         ),
         centerTitle: true,
       ),
@@ -267,10 +273,10 @@ class _SettingScreenState extends State<SettingScreen> {
                         style: TextStyle(
                           fontStyle: FontStyle.italic,
                           fontWeight: FontWeight.bold,
-                          color: Colors.lightBlueAccent,
+                          color: Colors.black54,
                         ),
                       ),
-                      margin: EdgeInsets.only(left: 10, top: 10, bottom: 5.0),
+                      margin: EdgeInsets.only(left: 10, top: 10, bottom: 0.0),
                     ),
                     Container(
                       child: Theme(
@@ -279,8 +285,17 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                         child: TextField(
                           decoration: InputDecoration(
+                            prefixIcon: Icon(
+                              Icons.person,
+                              color: Colors.black54,
+                              size: 25.0,
+                            ),
+                            suffixIcon: Icon(
+                              Icons.edit,
+                              color: Colors.black54,
+                            ),
                             hintText: "e.g. Chirag Vaishnav",
-                            contentPadding: EdgeInsets.all(5.0),
+                            contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                             hintStyle: TextStyle(
                               color: Colors.grey,
                             ),
@@ -292,7 +307,8 @@ class _SettingScreenState extends State<SettingScreen> {
                           focusNode: nicknameFocusNide,
                         ),
                       ),
-                      margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                      margin:
+                          EdgeInsets.only(left: 30.0, right: 30.0, bottom: 10),
                     ),
                     Container(
                       child: Text(
@@ -300,10 +316,10 @@ class _SettingScreenState extends State<SettingScreen> {
                         style: TextStyle(
                           fontStyle: FontStyle.italic,
                           fontWeight: FontWeight.bold,
-                          color: Colors.lightBlueAccent,
+                          color: Colors.black54,
                         ),
                       ),
-                      margin: EdgeInsets.only(left: 10, top: 10, bottom: 5.0),
+                      margin: EdgeInsets.only(left: 10, top: 10, bottom: 0.0),
                     ),
                     Container(
                       child: Theme(
@@ -312,8 +328,17 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                         child: TextField(
                           decoration: InputDecoration(
+                            prefixIcon: Icon(
+                              Icons.info_outline,
+                              color: Colors.black54,
+                              size: 25.0,
+                            ),
+                            suffixIcon: Icon(
+                              Icons.edit,
+                              color: Colors.black54,
+                            ),
                             hintText: "e.g. Bio",
-                            contentPadding: EdgeInsets.all(5.0),
+                            contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                             hintStyle: TextStyle(
                               color: Colors.grey,
                             ),
@@ -330,41 +355,56 @@ class _SettingScreenState extends State<SettingScreen> {
                   ],
                   crossAxisAlignment: CrossAxisAlignment.start,
                 ),
-                Container(
-                  child: FlatButton(
-                    onPressed: () {
-                      print("jkl");
-                      updateData();
-                    },
-                    child: Text(
-                      "Update",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                      ),
-                    ),
-                    color: Colors.lightBlueAccent,
-                    highlightColor: Colors.grey,
-                    splashColor: Colors.transparent,
-                    textColor: Colors.white,
-                    padding: EdgeInsets.fromLTRB(30, 10, 30.0, 10.0),
-                  ),
-                  margin: EdgeInsets.only(top: 50.0, bottom: 1.0),
+                SizedBox(
+                  height: 25,
                 ),
-                Padding(
-                  padding: EdgeInsets.only(left: 50, right: 50),
-                  child: RaisedButton(
-                    color: Colors.red,
-                    child: Text(
-                      "Logout",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14.0,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    FlatButton(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              color: Colors.blue,
+                              width: 1,
+                              style: BorderStyle.solid),
+                          borderRadius: BorderRadius.circular(50)),
+                      clipBehavior: Clip.hardEdge,
+                      onPressed: () {
+                        updateData();
+                      },
+                      child: Text(
+                        "  Update  ",
+                        style: TextStyle(
+                          fontStyle: FontStyle.italic,
+                          fontSize: 16.0,
+                        ),
                       ),
+                      color: Colors.lightBlueAccent,
+                      highlightColor: Colors.grey,
+                      splashColor: Colors.transparent,
+                      textColor: Colors.white,
                     ),
-                    onPressed: () {
-                      logoutUser();
-                    },
-                  ),
+                    RaisedButton(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              color: Colors.blue,
+                              width: 1,
+                              style: BorderStyle.solid),
+                          borderRadius: BorderRadius.circular(50)),
+                      color: Colors.red,
+                      child: Text(
+                        "  Logout  ",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                      onPressed: () {
+                        logoutUser();
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),

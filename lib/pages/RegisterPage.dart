@@ -1,6 +1,7 @@
 import 'dart:ffi';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flash_chat/pages/ConversationBottomSheet.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'settings.dart';
@@ -133,8 +134,10 @@ class _RegisterPageState extends State<RegisterPage>
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => ConversationPageSlide(
-                  currentUserId: preferences.getString("id"))));
+              builder: (context) => ConversationBottomSheet(
+                    currentUser: preferences.getString("id"),
+                    first_entry: false,
+                  )));
     }
 
     this.setState(() {
@@ -552,12 +555,12 @@ class _RegisterPageState extends State<RegisterPage>
     });
 
     Navigator.push(
-      context,
-      SlideLeftRoute(
-          page: ConversationPageSlide(
-        currentUserId: preferences.getString("id"),
-      )),
-    );
+        context,
+        MaterialPageRoute(
+            builder: (context) => ConversationBottomSheet(
+                  currentUser: preferences.getString("id"),
+                  first_entry: false,
+                )));
   }
 
   Future<Null> controlSignIn() async {
@@ -625,11 +628,6 @@ class _RegisterPageState extends State<RegisterPage>
       this.setState(() {
         updatePageState(1);
       });
-      // Navigator.push(
-      //     context,
-      //     MaterialPageRoute(
-      //         builder: (context) => ConversationPageSlide(
-      //             currentUserId: preferences.getString("id"))));
     } else {
       Fluttertoast.showToast(msg: "Try Again , Sign In Failed");
       this.setState(() {
