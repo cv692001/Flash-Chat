@@ -19,17 +19,22 @@ dependencies:
   image_picker: ^0.6.4
   shared_preferences: ^0.5.3+4
   firebase_storage: ^3.0.6
-  cached_network_image: 2.0.0-rc.1
+  cached_network_image: ^2.5.0
   intl: ^0.15.7
   firebase_messaging: 6.0.13
   flutter_local_notifications: 1.4.0
   photo_view: ^0.5.0
   giffy_dialog: ^1.8.0
-
+  flutter_image_compress: ^0.7.0
+  like_button: ^1.0.4
   cupertino_icons: ^0.1.3
 
   rubber: ^0.4.0
   infinite_listview: ^1.0.0
+  modal_bottom_sheet: ^1.0.0+1
+  cupertino_radio_choice: 1.0.0+1
+  numberpicker: ^1.3.0
+  shimmer: ^1.1.2
 
 
 dev_dependencies:
@@ -51,6 +56,7 @@ flutter:
 
   assets:
     - images/launcher/logo.png
+    - images/launcher/logo1.png
     - images/img_not_available.jpeg
     - images/google.png
     - images/user.jpg

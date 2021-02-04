@@ -6,6 +6,7 @@ class User {
   final String photourl;
   final String createdAt;
   final String aboutMe;
+  final int likes;
 
   User({
     this.id,
@@ -13,6 +14,7 @@ class User {
     this.photourl,
     this.createdAt,
     this.aboutMe,
+    this.likes,
   });
 
   factory User.fromDocument(DocumentSnapshot doc) {
@@ -22,6 +24,7 @@ class User {
       nickname: doc['nickname'],
       createdAt: doc['createdAt'],
       aboutMe: doc['aboutMe'],
+      likes: doc['likes'],
     );
   }
 }

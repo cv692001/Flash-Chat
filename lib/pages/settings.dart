@@ -10,6 +10,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class SettingScreen extends StatefulWidget {
   final String currentUser;
@@ -89,11 +90,28 @@ class _SettingScreenState extends State<SettingScreen> {
 
   Future getImage() async {
     File newImageFile =
-        await ImagePicker.pickImage(source: ImageSource.gallery);
+        await ImagePicker.pickImage(source: ImageSource.gallery,
+          imageQuality: 10,
+        );
 
-    if (newImageFile != null) {
+    final filePath = newImageFile.absolute.path;
+
+    // Create output file path
+    // eg:- "Volume/VM/abcd_out.jpeg"
+    final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
+    final splitted = filePath.substring(0, (lastIndex));
+    final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
+
+    File compressedImage = await FlutterImageCompress.compressAndGetFile(
+        filePath,
+        outPath,
+        quality: 25);
+
+
+
+    if (compressedImage != null) {
       setState(() {
-        this.imageFileAvatar = newImageFile;
+        this.imageFileAvatar = compressedImage;
         isLoading = true;
       });
     }

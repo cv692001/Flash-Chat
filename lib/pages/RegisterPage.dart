@@ -20,6 +20,9 @@ import 'package:flash_chat/widgets/ProgressWidget.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key key}) : super(key: key);
@@ -147,6 +150,7 @@ class _RegisterPageState extends State<RegisterPage>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return WillPopScope(
         onWillPop: onWillPop, //user to override the back button press
         child: Scaffold(
@@ -156,8 +160,8 @@ class _RegisterPageState extends State<RegisterPage>
               child: Container(
                   decoration: BoxDecoration(
                       gradient: LinearGradient(begin: begin, end: end, colors: [
-                    Colors.lightBlue,
-                    Palette.gradientEndColor
+                    Colors.white,
+                   Colors.orangeAccent
                   ])),
                   child: Stack(
                       alignment: AlignmentDirectional.bottomCenter,
@@ -165,6 +169,7 @@ class _RegisterPageState extends State<RegisterPage>
                         AnimatedContainer(
                             duration: Duration(milliseconds: 1500),
                             child: PageView(
+
                                 controller: pageController,
                                 physics: NeverScrollableScrollPhysics(),
                                 onPageChanged: (int page) =>
@@ -179,6 +184,7 @@ class _RegisterPageState extends State<RegisterPage>
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
+
                               for (int i = 0; i < 2; i++)
                                 CircleIndicator(i == currentPage),
                             ],
@@ -198,10 +204,10 @@ class _RegisterPageState extends State<RegisterPage>
                                     FloatingActionButton(
                                       onPressed: () => navigateToHome(),
                                       elevation: 0,
-                                      backgroundColor: Palette.primaryColor,
+                                      backgroundColor: Colors.orange,
                                       child: Icon(
                                         Icons.done,
-                                        color: Palette.accentColor,
+                                        color: Colors.white,
                                       ),
                                     )
                                   ],
@@ -228,30 +234,55 @@ class _RegisterPageState extends State<RegisterPage>
                     margin: EdgeInsets.only(top: 35),
                     child: Text('Flash Chat',
                         style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.orange,
                             fontWeight: FontWeight.w500,
                             fontStyle: FontStyle.italic,
                             fontSize: 30))),
               ),
             ],
           ),
-          Container(
-              margin: EdgeInsets.only(top: 125),
-              child: ButtonTheme(
-                  height: 40,
-                  child: FlatButton.icon(
-                      onPressed: () => controlSignIn(),
-                      color: Colors.transparent,
-                      icon: Image.asset(
-                        'images/google.png',
-                        height: 28,
-                      ),
-                      label: Text(
-                        'Sign In with Google',
-                        style: TextStyle(
-                            color: Palette.primaryTextColorLight,
-                            fontWeight: FontWeight.w800),
-                      )))),
+          GestureDetector(
+            onTap: (){
+               controlSignIn();
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(top: 105),
+              child: Container(
+
+                width: 225,
+                height: 35,
+
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.orange,
+                  boxShadow: [
+                    BoxShadow(color: Colors.orange, spreadRadius: 3),
+                  ],
+                ),
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                         Image.asset(
+                          'images/google.png',
+                          height: 28,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          'Sign In with Google',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800),
+                        )
+
+                      ],
+                    ),
+                  ),
+              ),
+            ),
+          ),
           Padding(
             padding: EdgeInsets.all(8),
             child: isLoading ? circularProgress() : Container(),
@@ -265,6 +296,7 @@ class _RegisterPageState extends State<RegisterPage>
   String nickname = "";
   String aboutMe = "";
   String photourl = "";
+  int likes = 0;
   File imageFileAvatar;
   TextEditingController nicknameTextEditor = TextEditingController();
 
@@ -272,6 +304,7 @@ class _RegisterPageState extends State<RegisterPage>
     preferences = await SharedPreferences.getInstance();
 
     id = preferences.getString("id");
+    likes = preferences.get("likes");
 
     aboutMe = preferences.getString("aboutMe");
     photourl = preferences.getString("photourl");
@@ -281,16 +314,56 @@ class _RegisterPageState extends State<RegisterPage>
 
   Future getImage() async {
     File newImageFile =
-        await ImagePicker.pickImage(source: ImageSource.gallery);
+        await ImagePicker.pickImage(source: ImageSource.gallery,
+        imageQuality: 10,
+        );
 
-    if (newImageFile != null) {
+
+
+
+      final filePath = newImageFile.absolute.path;
+
+      // Create output file path
+      // eg:- "Volume/VM/abcd_out.jpeg"
+      final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
+      final splitted = filePath.substring(0, (lastIndex));
+      final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
+
+      File compressedImage = await FlutterImageCompress.compressAndGetFile(
+          filePath,
+          outPath,
+          quality: 25);
+
+
+
+
+    if (compressedImage != null) {
       setState(() {
-        this.imageFileAvatar = newImageFile;
+        this.imageFileAvatar = compressedImage;
         isLoading = true;
       });
     }
 
     uploadImageToFireStoreAndStorage();
+  }
+
+  int _radioValue = 0;
+  bool selected ;
+
+  void _handleRadioValueChange(int value) {
+    setState(() {
+      _radioValue = value;
+     // selected = true;
+
+      switch (_radioValue) {
+        case 0:
+          break;
+        case 1:
+          break;
+        case 2:
+          break;
+      }
+    });
   }
 
   Future uploadImageToFireStoreAndStorage() async {
@@ -337,147 +410,490 @@ class _RegisterPageState extends State<RegisterPage>
       Fluttertoast.showToast(msg: errorMsg.toString());
     });
   }
+  int _currentValue =0;
+  String dropdownValue;
+  bool _datefilled = false;
+  DateTime _datetime;
 
   buildPageTwo() {
+
+
+
     readDataFromLocal();
+
     return InkWell(
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
         },
         child: Container(
+          color: Colors.orange,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              SizedBox(height: profilePicHeightAnimation.value * .3),
-              Container(
-                  child: Flexible(
-                child: GestureDetector(
-                  onTap: () {
-                    getImage();
-                  },
-                  child: CircleAvatar(
-                    child: Stack(
-                      children: <Widget>[
-                        (imageFileAvatar == null)
-                            ? (photourl != null)
-                                ? Material(
-                                    // display the old image
-                                    child: CachedNetworkImage(
-                                      placeholder: (context, url) => Container(
-                                        child: CircularProgressIndicator(
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                  Colors.lightBlueAccent),
-                                          strokeWidth: 2.0,
-                                        ),
-                                        height: 200,
-                                        width: 200,
-                                        padding: EdgeInsets.all(20.0),
-                                      ),
-                                      imageUrl: photourl,
-                                      height: 200,
-                                      width: 200,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(125.0)),
-                                    clipBehavior: Clip.hardEdge,
-                                  )
-                                : Icon(
-                                    Icons.account_circle,
-                                    size: 90,
-                                    color: Colors.grey,
-                                  )
-                            : Material(
-                                child: Image.file(
-                                  imageFileAvatar,
-                                  width: 200,
-                                  height: 200,
-                                  fit: BoxFit.cover,
-                                ),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(125.0)),
-                                clipBehavior: Clip.hardEdge,
-                              ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.camera,
-                            size: 50,
-                            color: Colors.white54.withOpacity(0.3),
-                          ),
-                          onPressed: () {
-                            getImage();
-                          },
-                          padding: EdgeInsets.all(0.0),
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.grey,
-                          iconSize: 200,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20,top: 20, bottom: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Welcome !",
+
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 21,
+
                         ),
-                        isLoading ? circularProgress() : Container(),
+
+                        ),
+                        Text("We need some basic information .",
+
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 15,
+
+                          ),
+
+                        ),
                       ],
                     ),
-                    radius: picAnimation.value,
-                  ),
-                ),
-              )),
-              SizedBox(
-                height: ageAnimation.value,
-              ),
-              Text(
-                'How old are you?',
-                style: Styles.questionLight,
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  NumberPicker.horizontal(
-                      initialValue: age,
-                      minValue: 15,
-                      maxValue: 100,
-                      highlightSelectedValue: true,
-                      onChanged: (num value) {
-                        setState(() {
-                          age = value;
-                        });
-                        //   print(age);
-                      }),
-                  Text('Years', style: Styles.textLight)
-                ],
-              ),
-              SizedBox(
-                height: usernameAnimation.value,
-              ),
-              Container(
-                child: Text(
-                  'Choose a username',
-                  style: Styles.questionLight,
+
+                  ],
                 ),
               ),
-              Container(
-                  margin: EdgeInsets.only(top: 20),
-                  width: 120,
-                  child: TextField(
-                    controller: nicknameTextEditor,
-                    textAlign: TextAlign.center,
-                    style: Styles.subHeadingLight,
-                    focusNode: usernameFocusNode,
-                    decoration: InputDecoration(
-                      hintText: '@username',
-                      hintStyle: Styles.hintTextLight,
-                      contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Palette.primaryColor, width: 0.1),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Palette.primaryColor, width: 0.1),
-                      ),
+              Expanded(
+                child: Container(
+
+                  width:  MediaQuery. of(context). size. width,
+
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 50),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Column(
+                            children: [
+                              Container(
+
+                                child: GestureDetector(
+                                  onTap: (){
+                                    getImage();
+                                  },
+                                  child: Stack(
+                                    children: [
+                                      Positioned( // will be positioned in the top right of the container
+                                        top: 0,
+                                        right: 0,
+                                        child: Icon(
+                                          Icons.add_a_photo,
+                                          color: Colors.orange,
+                                        ),
+                                      ),
+                                     imageFileAvatar==null ? Padding(
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: Icon(
+                                          Icons.person,
+                                          size: 80,
+                                          color: Colors.orange,
+                                        ),
+                                      ) : Material(
+                                       child: Image.file(
+                                         imageFileAvatar,
+                                         width: 130,
+                                         height: 130,
+                                         fit: BoxFit.cover,
+                                       ),
+                                       borderRadius:
+                                       BorderRadius.circular(150),
+                                       clipBehavior: Clip.hardEdge,
+                                     ),
+                                    ],
+                                  ),
+                                ),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  boxShadow: [BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 5.0,
+                                ),]
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 16),
+                                child: Text("Add Profile Picture",
+                                style: TextStyle(
+                                  color: Colors.orange,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                ),),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20,top: 20),
+                                  child: Text("Gender*",
+                                  style: TextStyle(
+                                    color: Colors.orange,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 18,
+                                  ),),
+                                )
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+
+                                children: [
+                                  Row(
+                                    children: [
+                                      new Radio(
+                                        hoverColor: Colors.orange,
+                                        activeColor: Colors.orange,
+                                        focusColor: Colors.orange,
+                                        value: 0,
+                                         groupValue: _radioValue,
+                                        onChanged: _handleRadioValueChange,
+                                      ),
+                                      Text(
+                                        'Male',
+                                        style: TextStyle(
+                                          color: _radioValue ==0 ? Colors.orange : Colors.blueGrey,
+                                          fontWeight:  _radioValue ==0 ?FontWeight.w400 : FontWeight.w200,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    width: 20,
+                                  ),
+                                  Row(
+                                    children: [
+                                      new Radio(
+                                        hoverColor: Colors.orange,
+                                        activeColor: Colors.orange,
+                                        focusColor: Colors.orange,
+                                        value: 1,
+                                        groupValue: _radioValue,
+                                        onChanged: _handleRadioValueChange,
+                                      ),
+                                      Text(
+                                        'Female',
+                                        style: TextStyle(
+                                          color: _radioValue ==1 ? Colors.orange : Colors.blueGrey,
+                                          fontWeight:  _radioValue ==1 ?FontWeight.w400 : FontWeight.w200,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  SizedBox(
+                                    width: 20,
+                                  ),
+                                  Row(
+                                    children: [
+                                      new Radio(
+                                        hoverColor: Colors.orange,
+                                        activeColor: Colors.orange,
+                                        focusColor: Colors.orange,
+                                        value: 2,
+                                        groupValue: _radioValue,
+                                        onChanged: _handleRadioValueChange,
+                                      ),
+                                      Text(
+                                        'None',
+                                        style: TextStyle(
+                                          color: _radioValue ==2 ? Colors.orange : Colors.blueGrey,
+                                          fontWeight:  _radioValue ==2 ?FontWeight.w400 : FontWeight.w200,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
+                                  child: Text("Name*",
+                                    style: TextStyle(
+                                      color: Colors.orange,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 18,
+                                    ),),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20,top: 0 , right: 40),
+                                  child: Container(
+                                      width :  MediaQuery. of(context). size. width - 70,
+                                      decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          border: Border.all(
+                                            color: Colors.white
+                                          ),
+                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                      ),
+
+                                      margin: EdgeInsets.only(top: 20),
+
+                                      child: TextField(
+                                        controller: nicknameTextEditor,
+                                        textAlign: TextAlign.start,
+                                        //style: Styles.subHeadingLight,
+                                        focusNode: usernameFocusNode,
+                                        decoration: InputDecoration(
+                                          hintText: 'Enter Your Name Here',
+                                          contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: new BorderRadius.circular(25.0),
+                                            borderSide:
+                                            BorderSide(width: 0.1,
+                                            ),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderSide:
+                                            BorderSide(color: Palette.primaryColor, width: 0.1),
+                                          ),
+                                        ),
+                                      )),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Column(
+
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
+                                  child: Text("Age*",
+                                    style: TextStyle(
+                                      color: Colors.orange,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 18,
+                                    ),),
+                                ),
+
+                              ],
+                            ),
+
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20,bottom: 10 , top: 10),
+                              child: GestureDetector(
+                                onTap: (){
+
+                                  setState(() {
+                                    _datefilled = true;
+                                  });
+
+                                  FocusScopeNode currentFocus = FocusScope.of(context);
+
+                                  if (!currentFocus.hasPrimaryFocus) {
+                                    currentFocus.unfocus();
+                                  }
+                                  showDatePicker(context: context,
+
+                                      initialDate: _datetime == null ? DateTime.now() : _datetime,
+                                      builder: (BuildContext context, Widget child) {
+                                        return Theme(
+                                          data: ThemeData.light().copyWith(
+                                            primaryColor: Colors.orange,
+                                            accentColor: Colors.orange,
+                                            colorScheme: ColorScheme.light(primary: Colors.orange),
+                                            buttonTheme: ButtonThemeData(
+                                                textTheme: ButtonTextTheme.primary
+                                            ),
+                                          ),
+                                          child: child,
+                                        );
+                                      },
+                                      firstDate: DateTime(1961),
+                                      lastDate:DateTime.now()).then((date) {
+                                    setState(() {
+                                      _datetime = date;
+                                    });
+                                  });
+                                },
+                                child: Container(
+                                  width: MediaQuery. of(context). size. width - 70,
+                                  decoration: BoxDecoration(
+                                      color: Colors.grey.shade200,
+                                      border: Border.all(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                      borderRadius: BorderRadius.all(Radius.circular(10))
+                                  ),
+                                  height: 40,
+
+
+                                  child: Row(
+
+                                    children: [
+                                      Text(
+
+                                        "  Birth Date :  "
+
+                                        ,
+                                        style: TextStyle(
+
+                                          fontSize: 15,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                      Text(_datetime == null ? "Please Pick Date" : _datetime.toLocal().toString().split(" ")[0]),
+
+                                    ],
+                                  ),
+
+                                ),
+                              ),
+                            ),
+
+
+
+
+
+
+
+
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
+                                  child: Text("State*",
+                                    style: TextStyle(
+                                      color: Colors.orange,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 18,
+                                    ),),
+                                ),
+
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20 , top: 10),
+                              child: Container(
+
+                                height: 40,
+                                width: MediaQuery. of(context). size. width - 70,
+                                decoration: BoxDecoration(
+                                    color: Colors.grey.shade200,
+                                    border: Border.all(
+                                      color: Colors.grey.shade300,
+                                    ),
+                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                ),
+                                child: DropdownButton<String>(
+                                  value: dropdownValue,
+
+                                  icon: Icon(Icons.keyboard_arrow_down_rounded,
+
+                                  ),
+                                  iconSize: 30,
+                                  elevation: 16,
+                                  style: TextStyle(color: Colors.teal),
+                                  underline: Container(
+                                    height: 0,
+                                    color: Colors.black,
+                                  ),
+                                  onChanged: (String newValue) {
+                                    setState(() {
+                                      dropdownValue = newValue;
+                                    });
+                                  },
+                                  items: <String>[
+                                    '  Arunachal Pradesh','  Assam','  Andaman & Nicobar','  Andhra Pradhesh','  Assam','  Bihar','  Chandigarh','  Chattishgarh',
+                                    '  Dadar & Nagar Haveli'
+                                     ,'  Daman & Deep','  Delhi','  Lakshadweep','  Puducherry','  Goa','  Guuhrat','  Haryana','  Himachal Pradesh','  Jammu & Kashmir',
+                                    '  Jharkhand','  Karnataka','  Kerela','  Madhya Pradesh','  Maharashtra','  Manipur','  Meghalaya','  Mizoram','  Nagaland','  Odisha',
+                                    '  Punjab','  Rajasthan','  Sikkim','  Tamil Nadu','  Telangana','  Tripura','  Uttar Pradesh','  Uttarakhand','  West Bengal'
+
+
+
+                                  ]
+                                      .map<DropdownMenuItem<String>>((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Row(
+                                        children: [
+
+                                          Text(value,
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.black
+                                          )),
+                                          SizedBox(
+                                            width: MediaQuery. of(context). size. width - 280,
+                                          ),
+
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                      ],
                     ),
-                  ))
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(30.0),
+                      topLeft: Radius.circular(30.0),
+                      bottomLeft: Radius.circular(0),
+                      bottomRight: Radius.circular(0),
+                    )
+                  ),
+
+                ),
+              )
+
+
             ],
-          ),
-        ));
+          )
+        )
+    );
   }
 
   updatePageState(index) {
@@ -509,9 +925,6 @@ class _RegisterPageState extends State<RegisterPage>
     isLoading = false;
   }
 
-  ///
-  /// This routine is invoked when the window metrics have changed.
-  ///
   @override
   void didChangeMetrics() {
     final value = MediaQuery.of(context).viewInsets.bottom;
@@ -600,6 +1013,7 @@ class _RegisterPageState extends State<RegisterPage>
           "photourl": firebaseUser.photoUrl,
           "id": firebaseUser.uid,
           "age": "18",
+          "likes": 0,
           "aboutMe": "Doing Great",
           "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
           "chattingWith": null,
@@ -610,6 +1024,7 @@ class _RegisterPageState extends State<RegisterPage>
         await preferences.setString("photourl", currentuser.photoUrl);
         await preferences.setString("nickname", currentuser.displayName);
         await preferences.setString("aboutMe", "Doing Great");
+        await preferences.setInt("likes", 0);
       } else {
         currentuser = firebaseUser;
         await preferences.setString("id", documentSnapshots[0]["id"]);
@@ -618,6 +1033,7 @@ class _RegisterPageState extends State<RegisterPage>
         await preferences.setString(
             "nickname", documentSnapshots[0]["nickname"]);
         await preferences.setString("aboutMe", documentSnapshots[0]["aboutMe"]);
+        await preferences.setInt("likes", documentSnapshots[0]["likes"]  );
       }
 
       Fluttertoast.showToast(msg: "Congratulations , Sign In Successful !!");
