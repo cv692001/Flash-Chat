@@ -10,6 +10,7 @@ import 'package:flash_chat/pages/settings.dart';
 import 'ConversationPageList.dart';
 import 'package:intl/intl.dart';
 import 'package:flash_chat/pages/ChatPage.dart';
+import 'package:flash_chat/pages/UserResult.dart';
 
 // ignore: camel_case_types
 class searchScreen extends StatefulWidget {
@@ -186,76 +187,5 @@ class _searchScreenState extends State<searchScreen> {
     setState(() {
       futureSearchResults = allFoundUsers;
     });
-  }
-}
-
-class UserResult extends StatelessWidget {
-  final User eachUser;
-
-  UserResult({
-    @required this.eachUser,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Column(
-        children: <Widget>[
-          GestureDetector(
-            onTap: () => sendUserToChatPage(context),
-            child: Column(
-              children: <Widget>[
-                ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.black,
-                    backgroundImage:
-                        CachedNetworkImageProvider(eachUser.photourl),
-                    radius: 30,
-                  ),
-                  title: Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Text(
-                        eachUser.nickname[0].toUpperCase() +
-                            eachUser.nickname.substring(1),
-                        style: Styles.text),
-                  ),
-                  subtitle: Text(
-                    // eachUser.aboutMe,
-                    "joined " +
-                        DateFormat("dd MM yyyy - hh:mm").format(
-                            DateTime.fromMillisecondsSinceEpoch(
-                                int.parse(eachUser.createdAt))),
-                    style: Styles.subText,
-
-                    // ),
-                  ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 70, vertical: 0),
-                  child: Divider(
-                    color: Colors.black12,
-                    thickness: 1.3,
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  sendUserToChatPage(BuildContext context) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (value) => chat(
-                  recieverId: eachUser.id,
-                  recieverName: eachUser.nickname,
-                  recieverAvatar: eachUser.photourl,
-                  recieverAbout: eachUser.aboutMe,
-                )));
   }
 }

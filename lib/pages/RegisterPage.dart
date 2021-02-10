@@ -45,10 +45,10 @@ class _RegisterPageState extends State<RegisterPage>
   int currentPage = 0;
   int age = 18;
   var isKeyboardOpen =
-      false; //this variable keeps track of the keyboard, when its shown and when its hidden
+  false; //this variable keeps track of the keyboard, when its shown and when its hidden
 
   PageController pageController =
-      PageController(); // this is the controller of the page. This is used to navigate back and forth between the pages
+  PageController(); // this is the controller of the page. This is used to navigate back and forth between the pages
 
   //Fields related to animation of the gradient
   Alignment begin = Alignment.center;
@@ -72,26 +72,26 @@ class _RegisterPageState extends State<RegisterPage>
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
 
     profilePicHeightAnimation =
-        Tween(begin: 100.0, end: 0.0).animate(usernameFieldAnimationController)
-          ..addListener(() {
-            setState(() {});
-          });
+    Tween(begin: 100.0, end: 0.0).animate(usernameFieldAnimationController)
+      ..addListener(() {
+        setState(() {});
+      });
     usernameAnimation =
-        Tween(begin: 30.0, end: 0.0).animate(usernameFieldAnimationController)
-          ..addListener(() {
-            setState(() {});
-          });
+    Tween(begin: 30.0, end: 0.0).animate(usernameFieldAnimationController)
+      ..addListener(() {
+        setState(() {});
+      });
     ageAnimation =
-        Tween(begin: 80.0, end: 0.0).animate(usernameFieldAnimationController)
-          ..addListener(() {
-            setState(() {});
-          });
+    Tween(begin: 80.0, end: 0.0).animate(usernameFieldAnimationController)
+      ..addListener(() {
+        setState(() {});
+      });
 
     picAnimation =
-        Tween(begin: 60.0, end: 45.0).animate(usernameFieldAnimationController)
-          ..addListener(() {
-            setState(() {});
-          });
+    Tween(begin: 60.0, end: 45.0).animate(usernameFieldAnimationController)
+      ..addListener(() {
+        setState(() {});
+      });
 
     usernameFocusNode.addListener(() {
       if (usernameFocusNode.hasFocus) {
@@ -101,7 +101,7 @@ class _RegisterPageState extends State<RegisterPage>
       }
     });
     pageController.addListener(
-      () {
+          () {
         setState(() {
           begin = Alignment(pageController.page, pageController.page);
           end = Alignment(1 - pageController.page, 1 - pageController.page);
@@ -138,9 +138,9 @@ class _RegisterPageState extends State<RegisterPage>
           context,
           MaterialPageRoute(
               builder: (context) => ConversationBottomSheet(
-                    currentUser: preferences.getString("id"),
-                    first_entry: false,
-                  )));
+                currentUser: preferences.getString("id"),
+                first_entry: false,
+              )));
     }
 
     this.setState(() {
@@ -160,9 +160,9 @@ class _RegisterPageState extends State<RegisterPage>
               child: Container(
                   decoration: BoxDecoration(
                       gradient: LinearGradient(begin: begin, end: end, colors: [
-                    Colors.white,
-                   Colors.orangeAccent
-                  ])),
+                        Colors.white,
+                        Colors.orangeAccent
+                      ])),
                   child: Stack(
                       alignment: AlignmentDirectional.bottomCenter,
                       children: <Widget>[
@@ -225,7 +225,7 @@ class _RegisterPageState extends State<RegisterPage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
-                  //margin: EdgeInsets.only(top: 150),
+                //margin: EdgeInsets.only(top: 150),
                   child: Image.asset('images/launcher/logo.png',
                       height: controller.value * 130)),
               Padding(
@@ -243,7 +243,7 @@ class _RegisterPageState extends State<RegisterPage>
           ),
           GestureDetector(
             onTap: (){
-               controlSignIn();
+              controlSignIn();
             },
             child: Padding(
               padding: const EdgeInsets.only(top: 105),
@@ -259,27 +259,27 @@ class _RegisterPageState extends State<RegisterPage>
                     BoxShadow(color: Colors.orange, spreadRadius: 3),
                   ],
                 ),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                         Image.asset(
-                          'images/google.png',
-                          height: 28,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          'Sign In with Google',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w800),
-                        )
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'images/google.png',
+                        height: 28,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        'Sign In with Google',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800),
+                      )
 
-                      ],
-                    ),
+                    ],
                   ),
+                ),
               ),
             ),
           ),
@@ -293,10 +293,11 @@ class _RegisterPageState extends State<RegisterPage>
   }
 
   String id = "";
+  int likes =0;
   String nickname = "";
   String aboutMe = "";
   String photourl = "";
-  int likes = 0;
+  List likedby =[ ];
   File imageFileAvatar;
   TextEditingController nicknameTextEditor = TextEditingController();
 
@@ -314,25 +315,25 @@ class _RegisterPageState extends State<RegisterPage>
 
   Future getImage() async {
     File newImageFile =
-        await ImagePicker.pickImage(source: ImageSource.gallery,
-        imageQuality: 10,
-        );
+    await ImagePicker.pickImage(source: ImageSource.gallery,
+      imageQuality: 10,
+    );
 
 
 
 
-      final filePath = newImageFile.absolute.path;
+    final filePath = newImageFile.absolute.path;
 
-      // Create output file path
-      // eg:- "Volume/VM/abcd_out.jpeg"
-      final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
-      final splitted = filePath.substring(0, (lastIndex));
-      final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
+    // Create output file path
+    // eg:- "Volume/VM/abcd_out.jpeg"
+    final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
+    final splitted = filePath.substring(0, (lastIndex));
+    final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
 
-      File compressedImage = await FlutterImageCompress.compressAndGetFile(
-          filePath,
-          outPath,
-          quality: 25);
+    File compressedImage = await FlutterImageCompress.compressAndGetFile(
+        filePath,
+        outPath,
+        quality: 25);
 
 
 
@@ -353,7 +354,7 @@ class _RegisterPageState extends State<RegisterPage>
   void _handleRadioValueChange(int value) {
     setState(() {
       _radioValue = value;
-     // selected = true;
+      // selected = true;
 
       switch (_radioValue) {
         case 0:
@@ -369,10 +370,10 @@ class _RegisterPageState extends State<RegisterPage>
   Future uploadImageToFireStoreAndStorage() async {
     String mFileName = id;
     StorageReference storageReference =
-        FirebaseStorage.instance.ref().child(mFileName);
+    FirebaseStorage.instance.ref().child(mFileName);
 
     StorageUploadTask storageUplaodTask =
-        storageReference.putFile(imageFileAvatar);
+    storageReference.putFile(imageFileAvatar);
 
     StorageTaskSnapshot storageTaskSnapshot;
 
@@ -426,331 +427,393 @@ class _RegisterPageState extends State<RegisterPage>
           FocusScope.of(context).requestFocus(FocusNode());
         },
         child: Container(
-          color: Colors.orange,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 20,top: 20, bottom: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Welcome !",
+            color: Colors.orange,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 20,top: 20, bottom: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Welcome !",
 
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 21,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 21,
 
-                        ),
-
-                        ),
-                        Text("We need some basic information .",
-
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 15,
+                            ),
 
                           ),
+                          Text("We need some basic information .",
 
-                        ),
-                      ],
-                    ),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 15,
 
-                  ],
+                            ),
+
+                          ),
+                        ],
+                      ),
+
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(
-                child: Container(
+                Expanded(
+                  child: Container(
 
-                  width:  MediaQuery. of(context). size. width,
+                    width:  MediaQuery. of(context). size. width,
 
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 50),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: Column(
-                            children: [
-                              Container(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 50),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Column(
+                              children: [
+                                Container(
 
-                                child: GestureDetector(
-                                  onTap: (){
-                                    getImage();
-                                  },
-                                  child: Stack(
-                                    children: [
-                                      Positioned( // will be positioned in the top right of the container
-                                        top: 0,
-                                        right: 0,
-                                        child: Icon(
-                                          Icons.add_a_photo,
-                                          color: Colors.orange,
+                                  child: GestureDetector(
+                                    onTap: (){
+                                      getImage();
+                                    },
+                                    child: Stack(
+                                      children: [
+                                        Positioned( // will be positioned in the top right of the container
+                                          top: 0,
+                                          right: 0,
+                                          child: Icon(
+                                            Icons.add_a_photo,
+                                            color: Colors.orange,
+                                          ),
                                         ),
-                                      ),
-                                     imageFileAvatar==null ? Padding(
-                                        padding: const EdgeInsets.all(12.0),
-                                        child: Icon(
-                                          Icons.person,
-                                          size: 80,
-                                          color: Colors.orange,
+                                        imageFileAvatar==null ? Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: Icon(
+                                            Icons.person,
+                                            size: 80,
+                                            color: Colors.orange,
+                                          ),
+                                        ) : Material(
+                                          child: Image.file(
+                                            imageFileAvatar,
+                                            width: 130,
+                                            height: 130,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          borderRadius:
+                                          BorderRadius.circular(150),
+                                          clipBehavior: Clip.hardEdge,
                                         ),
-                                      ) : Material(
-                                       child: Image.file(
-                                         imageFileAvatar,
-                                         width: 130,
-                                         height: 130,
-                                         fit: BoxFit.cover,
-                                       ),
-                                       borderRadius:
-                                       BorderRadius.circular(150),
-                                       clipBehavior: Clip.hardEdge,
-                                     ),
-                                    ],
+                                      ],
+                                    ),
+                                  ),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [BoxShadow(
+                                        color: Colors.grey,
+                                        blurRadius: 5.0,
+                                      ),]
                                   ),
                                 ),
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                  boxShadow: [BoxShadow(
-                                  color: Colors.grey,
-                                  blurRadius: 5.0,
-                                ),]
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 16),
+                                  child: Text("Add Profile Picture",
+                                    style: TextStyle(
+                                      color: Colors.orange,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                    ),),
                                 ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 20,top: 20),
+                                    child: Text("Gender*",
+                                      style: TextStyle(
+                                        color: Colors.orange,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 18,
+                                      ),),
+                                  )
+                                ],
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(top: 16),
-                                child: Text("Add Profile Picture",
-                                style: TextStyle(
-                                  color: Colors.orange,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                ),),
+                                padding: const EdgeInsets.only(left: 8),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+
+                                  children: [
+                                    Row(
+                                      children: [
+                                        new Radio(
+                                          hoverColor: Colors.orange,
+                                          activeColor: Colors.orange,
+                                          focusColor: Colors.orange,
+                                          value: 0,
+                                          groupValue: _radioValue,
+                                          onChanged: _handleRadioValueChange,
+                                        ),
+                                        Text(
+                                          'Male',
+                                          style: TextStyle(
+                                            color: _radioValue ==0 ? Colors.orange : Colors.blueGrey,
+                                            fontWeight:  _radioValue ==0 ?FontWeight.w400 : FontWeight.w200,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    Row(
+                                      children: [
+                                        new Radio(
+                                          hoverColor: Colors.orange,
+                                          activeColor: Colors.orange,
+                                          focusColor: Colors.orange,
+                                          value: 1,
+                                          groupValue: _radioValue,
+                                          onChanged: _handleRadioValueChange,
+                                        ),
+                                        Text(
+                                          'Female',
+                                          style: TextStyle(
+                                            color: _radioValue ==1 ? Colors.orange : Colors.blueGrey,
+                                            fontWeight:  _radioValue ==1 ?FontWeight.w400 : FontWeight.w200,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    Row(
+                                      children: [
+                                        new Radio(
+                                          hoverColor: Colors.orange,
+                                          activeColor: Colors.orange,
+                                          focusColor: Colors.orange,
+                                          value: 2,
+                                          groupValue: _radioValue,
+                                          onChanged: _handleRadioValueChange,
+                                        ),
+                                        Text(
+                                          'None',
+                                          style: TextStyle(
+                                            color: _radioValue ==2 ? Colors.orange : Colors.blueGrey,
+                                            fontWeight:  _radioValue ==2 ?FontWeight.w400 : FontWeight.w200,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+
+                                  ],
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 20,top: 20),
-                                  child: Text("Gender*",
-                                  style: TextStyle(
-                                    color: Colors.orange,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 18,
-                                  ),),
-                                )
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8),
-                              child: Row(
+                          Column(
+
+                            children: [
+                              Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
-
                                 children: [
-                                  Row(
-                                    children: [
-                                      new Radio(
-                                        hoverColor: Colors.orange,
-                                        activeColor: Colors.orange,
-                                        focusColor: Colors.orange,
-                                        value: 0,
-                                         groupValue: _radioValue,
-                                        onChanged: _handleRadioValueChange,
-                                      ),
-                                      Text(
-                                        'Male',
-                                        style: TextStyle(
-                                          color: _radioValue ==0 ? Colors.orange : Colors.blueGrey,
-                                          fontWeight:  _radioValue ==0 ?FontWeight.w400 : FontWeight.w200,
-                                          fontSize: 16,
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
+                                    child: Text("Name*",
+                                      style: TextStyle(
+                                        color: Colors.orange,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 18,
+                                      ),),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 20,top: 0 , right: 40),
+                                    child: Container(
+                                        width :  MediaQuery. of(context). size. width - 70,
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey.shade200,
+                                            border: Border.all(
+                                                color: Colors.white
+                                            ),
+                                            borderRadius: BorderRadius.all(Radius.circular(10))
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    width: 20,
-                                  ),
-                                  Row(
-                                    children: [
-                                      new Radio(
-                                        hoverColor: Colors.orange,
-                                        activeColor: Colors.orange,
-                                        focusColor: Colors.orange,
-                                        value: 1,
-                                        groupValue: _radioValue,
-                                        onChanged: _handleRadioValueChange,
-                                      ),
-                                      Text(
-                                        'Female',
-                                        style: TextStyle(
-                                          color: _radioValue ==1 ? Colors.orange : Colors.blueGrey,
-                                          fontWeight:  _radioValue ==1 ?FontWeight.w400 : FontWeight.w200,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
 
-                                  SizedBox(
-                                    width: 20,
-                                  ),
-                                  Row(
-                                    children: [
-                                      new Radio(
-                                        hoverColor: Colors.orange,
-                                        activeColor: Colors.orange,
-                                        focusColor: Colors.orange,
-                                        value: 2,
-                                        groupValue: _radioValue,
-                                        onChanged: _handleRadioValueChange,
-                                      ),
-                                      Text(
-                                        'None',
-                                        style: TextStyle(
-                                          color: _radioValue ==2 ? Colors.orange : Colors.blueGrey,
-                                          fontWeight:  _radioValue ==2 ?FontWeight.w400 : FontWeight.w200,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                        margin: EdgeInsets.only(top: 20),
 
+                                        child: TextField(
+                                          controller: nicknameTextEditor,
+                                          textAlign: TextAlign.start,
+                                          //style: Styles.subHeadingLight,
+                                          focusNode: usernameFocusNode,
+                                          decoration: InputDecoration(
+                                            hintText: 'Enter Your Name Here',
+                                            contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius: new BorderRadius.circular(25.0),
+                                              borderSide:
+                                              BorderSide(width: 0.1,
+                                              ),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide:
+                                              BorderSide(color: Palette.primaryColor, width: 0.1),
+                                            ),
+                                          ),
+                                        )),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Column(
+
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
+                                    child: Text("Age*",
+                                      style: TextStyle(
+                                        color: Colors.orange,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 18,
+                                      ),),
+                                  ),
 
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                        Column(
 
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
-                                  child: Text("Name*",
-                                    style: TextStyle(
-                                      color: Colors.orange,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 18,
-                                    ),),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 20,top: 0 , right: 40),
-                                  child: Container(
-                                      width :  MediaQuery. of(context). size. width - 70,
-                                      decoration: BoxDecoration(
-                                          color: Colors.grey.shade200,
-                                          border: Border.all(
-                                            color: Colors.white
-                                          ),
-                                          borderRadius: BorderRadius.all(Radius.circular(10))
-                                      ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 20,bottom: 10 , top: 10),
+                                child: GestureDetector(
+                                  onTap: (){
 
-                                      margin: EdgeInsets.only(top: 20),
+                                    setState(() {
+                                      _datefilled = true;
+                                    });
 
-                                      child: TextField(
-                                        controller: nicknameTextEditor,
-                                        textAlign: TextAlign.start,
-                                        //style: Styles.subHeadingLight,
-                                        focusNode: usernameFocusNode,
-                                        decoration: InputDecoration(
-                                          hintText: 'Enter Your Name Here',
-                                          contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: new BorderRadius.circular(25.0),
-                                            borderSide:
-                                            BorderSide(width: 0.1,
+                                    FocusScopeNode currentFocus = FocusScope.of(context);
+
+                                    if (!currentFocus.hasPrimaryFocus) {
+                                      currentFocus.unfocus();
+                                    }
+                                    showDatePicker(context: context,
+
+                                        initialDate: _datetime == null ? DateTime.now() : _datetime,
+                                        builder: (BuildContext context, Widget child) {
+                                          return Theme(
+                                            data: ThemeData.light().copyWith(
+                                              primaryColor: Colors.orange,
+                                              accentColor: Colors.orange,
+                                              colorScheme: ColorScheme.light(primary: Colors.orange),
+                                              buttonTheme: ButtonThemeData(
+                                                  textTheme: ButtonTextTheme.primary
+                                              ),
                                             ),
-                                          ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide:
-                                            BorderSide(color: Palette.primaryColor, width: 0.1),
+                                            child: child,
+                                          );
+                                        },
+                                        firstDate: DateTime(1961),
+                                        lastDate:DateTime.now()).then((date) {
+                                      setState(() {
+                                        _datetime = date;
+                                      });
+                                    });
+                                  },
+                                  child: Container(
+                                    width: MediaQuery. of(context). size. width - 70,
+                                    decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        border: Border.all(
+                                          color: Colors.grey.shade300,
+                                        ),
+                                        borderRadius: BorderRadius.all(Radius.circular(10))
+                                    ),
+                                    height: 40,
+
+
+                                    child: Row(
+
+                                      children: [
+                                        Text(
+
+                                          "  Birth Date :  "
+
+                                          ,
+                                          style: TextStyle(
+
+                                            fontSize: 15,
+                                            color: Colors.black54,
                                           ),
                                         ),
-                                      )),
+                                        Text(_datetime == null ? "Please Pick Date" : _datetime.toLocal().toString().split(" ")[0]),
+
+                                      ],
+                                    ),
+
+                                  ),
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Column(
+                              ),
 
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
-                                  child: Text("Age*",
-                                    style: TextStyle(
-                                      color: Colors.orange,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 18,
-                                    ),),
-                                ),
 
-                              ],
-                            ),
 
-                            Padding(
-                              padding: const EdgeInsets.only(left: 20,bottom: 10 , top: 10),
-                              child: GestureDetector(
-                                onTap: (){
 
-                                  setState(() {
-                                    _datefilled = true;
-                                  });
 
-                                  FocusScopeNode currentFocus = FocusScope.of(context);
 
-                                  if (!currentFocus.hasPrimaryFocus) {
-                                    currentFocus.unfocus();
-                                  }
-                                  showDatePicker(context: context,
 
-                                      initialDate: _datetime == null ? DateTime.now() : _datetime,
-                                      builder: (BuildContext context, Widget child) {
-                                        return Theme(
-                                          data: ThemeData.light().copyWith(
-                                            primaryColor: Colors.orange,
-                                            accentColor: Colors.orange,
-                                            colorScheme: ColorScheme.light(primary: Colors.orange),
-                                            buttonTheme: ButtonThemeData(
-                                                textTheme: ButtonTextTheme.primary
-                                            ),
-                                          ),
-                                          child: child,
-                                        );
-                                      },
-                                      firstDate: DateTime(1961),
-                                      lastDate:DateTime.now()).then((date) {
-                                    setState(() {
-                                      _datetime = date;
-                                    });
-                                  });
-                                },
+
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
+                                    child: Text("State*",
+                                      style: TextStyle(
+                                        color: Colors.orange,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 18,
+                                      ),),
+                                  ),
+
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 20 , top: 10),
                                 child: Container(
+
+                                  height: 40,
                                   width: MediaQuery. of(context). size. width - 70,
                                   decoration: BoxDecoration(
                                       color: Colors.grey.shade200,
@@ -759,139 +822,77 @@ class _RegisterPageState extends State<RegisterPage>
                                       ),
                                       borderRadius: BorderRadius.all(Radius.circular(10))
                                   ),
-                                  height: 40,
+                                  child: DropdownButton<String>(
+                                    value: dropdownValue,
 
+                                    icon: Icon(Icons.keyboard_arrow_down_rounded,
 
-                                  child: Row(
-
-                                    children: [
-                                      Text(
-
-                                        "  Birth Date :  "
-
-                                        ,
-                                        style: TextStyle(
-
-                                          fontSize: 15,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                      Text(_datetime == null ? "Please Pick Date" : _datetime.toLocal().toString().split(" ")[0]),
-
-                                    ],
-                                  ),
-
-                                ),
-                              ),
-                            ),
-
-
-
-
-
-
-
-
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
-                                  child: Text("State*",
-                                    style: TextStyle(
-                                      color: Colors.orange,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 18,
-                                    ),),
-                                ),
-
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 20 , top: 10),
-                              child: Container(
-
-                                height: 40,
-                                width: MediaQuery. of(context). size. width - 70,
-                                decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    border: Border.all(
-                                      color: Colors.grey.shade300,
                                     ),
-                                    borderRadius: BorderRadius.all(Radius.circular(10))
-                                ),
-                                child: DropdownButton<String>(
-                                  value: dropdownValue,
+                                    iconSize: 30,
+                                    elevation: 16,
+                                    style: TextStyle(color: Colors.teal),
+                                    underline: Container(
+                                      height: 0,
+                                      color: Colors.black,
+                                    ),
+                                    onChanged: (String newValue) {
+                                      setState(() {
+                                        dropdownValue = newValue;
+                                      });
+                                    },
+                                    items: <String>[
+                                      '  Arunachal Pradesh','  Assam','  Andaman & Nicobar','  Andhra Pradhesh','  Assam','  Bihar','  Chandigarh','  Chattishgarh',
+                                      '  Dadar & Nagar Haveli'
+                                      ,'  Daman & Deep','  Delhi','  Lakshadweep','  Puducherry','  Goa','  Guuhrat','  Haryana','  Himachal Pradesh','  Jammu & Kashmir',
+                                      '  Jharkhand','  Karnataka','  Kerela','  Madhya Pradesh','  Maharashtra','  Manipur','  Meghalaya','  Mizoram','  Nagaland','  Odisha',
+                                      '  Punjab','  Rajasthan','  Sikkim','  Tamil Nadu','  Telangana','  Tripura','  Uttar Pradesh','  Uttarakhand','  West Bengal'
 
-                                  icon: Icon(Icons.keyboard_arrow_down_rounded,
 
+
+                                    ]
+                                        .map<DropdownMenuItem<String>>((String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Row(
+                                          children: [
+
+                                            Text(value,
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black
+                                                )),
+                                            SizedBox(
+                                              width: MediaQuery. of(context). size. width - 280,
+                                            ),
+
+                                          ],
+                                        ),
+                                      );
+                                    }).toList(),
                                   ),
-                                  iconSize: 30,
-                                  elevation: 16,
-                                  style: TextStyle(color: Colors.teal),
-                                  underline: Container(
-                                    height: 0,
-                                    color: Colors.black,
-                                  ),
-                                  onChanged: (String newValue) {
-                                    setState(() {
-                                      dropdownValue = newValue;
-                                    });
-                                  },
-                                  items: <String>[
-                                    '  Arunachal Pradesh','  Assam','  Andaman & Nicobar','  Andhra Pradhesh','  Assam','  Bihar','  Chandigarh','  Chattishgarh',
-                                    '  Dadar & Nagar Haveli'
-                                     ,'  Daman & Deep','  Delhi','  Lakshadweep','  Puducherry','  Goa','  Guuhrat','  Haryana','  Himachal Pradesh','  Jammu & Kashmir',
-                                    '  Jharkhand','  Karnataka','  Kerela','  Madhya Pradesh','  Maharashtra','  Manipur','  Meghalaya','  Mizoram','  Nagaland','  Odisha',
-                                    '  Punjab','  Rajasthan','  Sikkim','  Tamil Nadu','  Telangana','  Tripura','  Uttar Pradesh','  Uttarakhand','  West Bengal'
-
-
-
-                                  ]
-                                      .map<DropdownMenuItem<String>>((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Row(
-                                        children: [
-
-                                          Text(value,
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            color: Colors.black
-                                          )),
-                                          SizedBox(
-                                            width: MediaQuery. of(context). size. width - 280,
-                                          ),
-
-                                        ],
-                                      ),
-                                    );
-                                  }).toList(),
                                 ),
-                              ),
-                            )
-                          ],
-                        )
-                      ],
+                              )
+                            ],
+                          )
+                        ],
+                      ),
                     ),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(30.0),
+                          topLeft: Radius.circular(30.0),
+                          bottomLeft: Radius.circular(0),
+                          bottomRight: Radius.circular(0),
+                        )
+                    ),
+
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(30.0),
-                      topLeft: Radius.circular(30.0),
-                      bottomLeft: Radius.circular(0),
-                      bottomRight: Radius.circular(0),
-                    )
-                  ),
-
-                ),
-              )
+                )
 
 
-            ],
-          )
+              ],
+            )
         )
     );
   }
@@ -971,9 +972,9 @@ class _RegisterPageState extends State<RegisterPage>
         context,
         MaterialPageRoute(
             builder: (context) => ConversationBottomSheet(
-                  currentUser: preferences.getString("id"),
-                  first_entry: false,
-                )));
+              currentUser: preferences.getString("id"),
+              first_entry: false,
+            )));
   }
 
   Future<Null> controlSignIn() async {
@@ -985,7 +986,7 @@ class _RegisterPageState extends State<RegisterPage>
 
     GoogleSignInAccount googleUser = await googledignin.signIn();
     GoogleSignInAuthentication googleAuthentication =
-        await googleUser.authentication;
+    await googleUser.authentication;
 
     final AuthCredential credential = GoogleAuthProvider.getCredential(
       idToken: googleAuthentication.idToken,
@@ -1017,6 +1018,7 @@ class _RegisterPageState extends State<RegisterPage>
           "aboutMe": "Doing Great",
           "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
           "chattingWith": null,
+          "likedby" : [ ],
         });
 
         currentuser = firebaseUser;
