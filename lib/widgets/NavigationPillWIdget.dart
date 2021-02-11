@@ -17,7 +17,7 @@ class NavigationPillWidget extends StatelessWidget {
                 margin: EdgeInsets.only(top: 10, bottom: 10),
                 height: 5,
                 decoration: new BoxDecoration(
-                  color: Palette.accentColor,
+                  color: Colors.white60,
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.all(Radius.circular(8.0)),
                 )),

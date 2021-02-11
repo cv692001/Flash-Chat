@@ -1,6 +1,9 @@
 
 import 'dart:math';
+import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flash_chat/pages/BottomNavigation.dart';
+import 'package:flash_chat/pages/RecentChats.dart';
 import 'package:flash_chat/pages/serachPage.dart';
 import 'RegisterPage.dart';
 import 'package:flash_chat/pages/UserResult.dart';
@@ -83,128 +86,136 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
         MaterialPageRoute(builder: (context) => RegisterPage()),
             (Route<dynamic> route) => false);
   }
+  int selectedIndex=0;
+
+
 
   @override
+
   Widget build(BuildContext context) {
+    List children = [
+      Stack(
+        children: [
+
+          SingleChildScrollView(
+            child: Column(children: <Widget>[
+
+              SizedBox(
+                height: 20,
+              ),
+              futureSearchResults == null
+                  ? displayNoSearchResultScreen()
+                  : displayUserFoundScreen(),
+            ]),
+          ),
+          Container(
+            decoration: new BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.vertical(
+                  bottom: Radius.elliptical(
+                      MediaQuery.of(context).size.width, 30.0)),
+            ),
+            child: ListView(
+              shrinkWrap: true,
+              physics: ClampingScrollPhysics(),
+              children: <Widget>[
+                NavigationPillWidget(),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+
+                      children: [
+                        Icon(
+                          Icons.flash_on_rounded,
+                          color: Colors.yellow.shade900,
+                          size: 30,
+                        ),
+                        Text('Flash Chat',
+                            style: TextStyle(
+                                fontSize:22,
+                                color: Colors.deepOrange
+                            )),
+                      ],
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      searchScreen(
+        currentUser: currentUser,
+      ),
+      RecentChats(),
+
+      SettingScreen()
+
+
+    ];
     double statusBarHeight = MediaQuery.of(context).padding.top;
 
     return Material(
         child: WillPopScope(
           onWillPop: () async => false,
           child: Scaffold(
-              floatingActionButton: SpeedDial(
-                backgroundColor: Colors.orange,
-                curve: Curves.bounceInOut,
-                // animatedIcon: AnimatedIcons.menu_close,
+            bottomNavigationBar: BottomNavyBar(
 
-                animatedIcon: AnimatedIcons.menu_close,
-                animatedIconTheme: IconThemeData(size: 22.0),
-
-
-                overlayOpacity: 0.5,
-
-                shape: CircleBorder(),
-                children: [
-                  SpeedDialChild(
-                      onTap: () {
-                        logoutUser();
-                      },
-                      child: Icon(
-                        Icons.exit_to_app,
-                        color: Colors.orange,
-                      ),
-                      label: "Log Out",
-                      labelStyle: TextStyle(
-                          color: Colors.deepOrange,
-                          fontSize:15
-                      ),
-
-                      backgroundColor: Colors.white),
-                  SpeedDialChild(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SettingScreen()));
-                      },
-                      child: Icon(
-                        Icons.settings,
-                        color: Colors.orange,
-                      ),
-                      label: "Your Profile",
-                      labelStyle: TextStyle(
-                          color: Colors.deepOrange,
-                          fontSize:15
-                      ),
-                      backgroundColor: Colors.white),
-                  SpeedDialChild(
-                    backgroundColor: Colors.white,
-                    child: Icon(
-                      Icons.search,
-                      color: Colors.orange,
-                    ),
-                    label: "Search User",
-                    labelStyle: TextStyle(
-                        color: Colors.deepOrange,
-                        fontSize:15
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => searchScreen(
-                                currentUser: currentUser,
-                              )));
-                    },
-                  ),
-                ],
-              ),
               backgroundColor: Colors.white,
-              body: Stack(
-                children: [
+              selectedIndex: selectedIndex,
+              showElevation: true, // use this to remove appBar's elevation
+              onItemSelected: (index) => setState(() {
+                selectedIndex = index;
 
-                  SingleChildScrollView(
-                    child: Column(children: <Widget>[
-
-                      SizedBox(
-                        height: 20,
+              }),
+              animationDuration: Duration(milliseconds: 600),
+              items: <BottomNavyBarItem> [
+                BottomNavyBarItem(
+                  icon: Icon(Icons.flash_on_rounded),
+                  title: Text('Flash Chat',
+                    style: TextStyle(
+                        color: Colors.deepOrange
+                    ),
+                  ),
+                  activeColor: Colors.orangeAccent,
+                ),
+                BottomNavyBarItem(
+                    icon: Icon(Icons.search),
+                    title: Text('Search',
+                      style: TextStyle(
+                          color: Colors.deepOrange
                       ),
-                      futureSearchResults == null
-                          ? displayNoSearchResultScreen()
-                          : displayUserFoundScreen(),
-                    ]),
-                  ),
-                  Container(
-                    decoration: new BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.vertical(
-                          bottom: Radius.elliptical(
-                              MediaQuery.of(context).size.width, 90.0)),
                     ),
-                    child: ListView(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      children: <Widget>[
-                        NavigationPillWidget(),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Center(
-                                child: Text('Messages',
-                                    style: TextStyle(
-                                        fontSize: 22,
-                                        color: Colors.white
-                                    ))),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 30,
-                        ),
-                      ],
+                    activeColor: Colors.orangeAccent
+                ),
+                BottomNavyBarItem(
+                    icon: Icon(Icons.message),
+                    title: Text('Chat',
+                      style: TextStyle(
+                          color: Colors.deepOrange
+                      ),
                     ),
-                  ),
-                ],
-              )
+                    activeColor: Colors.orangeAccent
+                ),
+                BottomNavyBarItem(
+                    icon: Icon(Icons.person),
+                    title: Text('User Profile',
+                      style: TextStyle(
+                          color: Colors.deepOrange
+                      ),
+                    ),
+                    activeColor: Colors.orangeAccent
+                ),
+              ],
+            ),
+
+              backgroundColor: Colors.white,
+              body: children[selectedIndex],
 
           ),
         ));
@@ -258,12 +269,16 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
         return Column(
           children: [
             SizedBox(
-              height: 70,
+              height: 50,
             ),
             GridView.count(
+              physics: const NeverScrollableScrollPhysics(),
               scrollDirection: Axis.vertical,
+              mainAxisSpacing: 18,
+              crossAxisSpacing: 8,
               shrinkWrap: true,
               crossAxisCount: 2,
+              childAspectRatio: (2/2.9 ),
 
               children: searchUserResult,
 

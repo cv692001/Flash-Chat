@@ -15,7 +15,7 @@ dependencies:
   firebase_auth: ^0.14.0+5
   google_sign_in: ^4.0.7
   cloud_firestore: ^0.12.9+5
-  fluttertoast: ^3.1.3
+  fluttertoast: ^7.1.6
   image_picker: ^0.6.4
   shared_preferences: ^0.5.3+4
   firebase_storage: ^3.0.6
@@ -27,6 +27,8 @@ dependencies:
   giffy_dialog: ^1.8.0
   flutter_image_compress: ^0.7.0
   like_button: ^1.0.4
+  bottom_navy_bar: ^5.6.0
+
   cupertino_icons: ^0.1.3
 
   rubber: ^0.4.0

@@ -9,6 +9,7 @@ class User {
   final int likes;
   final List likedby;
 
+
   User({
     this.id,
     this.nickname,

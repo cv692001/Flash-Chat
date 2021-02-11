@@ -292,6 +292,10 @@ class _RegisterPageState extends State<RegisterPage>
     );
   }
 
+  bool _validatefirstname = false;
+  bool _locationFilled = false;
+  bool _startedfillingfirstname=false;
+
   String id = "";
   int likes =0;
   String nickname = "";
@@ -316,7 +320,7 @@ class _RegisterPageState extends State<RegisterPage>
   Future getImage() async {
     File newImageFile =
     await ImagePicker.pickImage(source: ImageSource.gallery,
-      imageQuality: 10,
+      imageQuality: 30,
     );
 
 
@@ -333,7 +337,7 @@ class _RegisterPageState extends State<RegisterPage>
     File compressedImage = await FlutterImageCompress.compressAndGetFile(
         filePath,
         outPath,
-        quality: 25);
+        quality: 40);
 
 
 
@@ -412,9 +416,10 @@ class _RegisterPageState extends State<RegisterPage>
     });
   }
   int _currentValue =0;
-  String dropdownValue;
+  String dropdownValue = '  Please Pick State';
   bool _datefilled = false;
   DateTime _datetime;
+  bool imagePicked = false;
 
   buildPageTwo() {
 
@@ -483,6 +488,9 @@ class _RegisterPageState extends State<RegisterPage>
                                   child: GestureDetector(
                                     onTap: (){
                                       getImage();
+                                      setState(() {
+                                        imagePicked = true;
+                                      });
                                     },
                                     child: Stack(
                                       children: [
@@ -550,7 +558,7 @@ class _RegisterPageState extends State<RegisterPage>
                                       style: TextStyle(
                                         color: Colors.orange,
                                         fontWeight: FontWeight.w500,
-                                        fontSize: 18,
+                                        fontSize: 17,
                                       ),),
                                   )
                                 ],
@@ -647,7 +655,7 @@ class _RegisterPageState extends State<RegisterPage>
                                       style: TextStyle(
                                         color: Colors.orange,
                                         fontWeight: FontWeight.w500,
-                                        fontSize: 18,
+                                        fontSize: 17,
                                       ),),
                                   ),
                                 ],
@@ -688,6 +696,25 @@ class _RegisterPageState extends State<RegisterPage>
                                               BorderSide(color: Palette.primaryColor, width: 0.1),
                                             ),
                                           ),
+                                          onChanged: (text){
+
+                                            if(nicknameTextEditor.text == ""){
+
+                                              setState(() {
+                                                _startedfillingfirstname=false;
+                                              });
+                                              setState(() {
+                                                _validatefirstname = false;
+                                              });
+                                            }else{
+                                              setState(() {
+                                                _validatefirstname = true;
+                                              });
+                                              setState(() {
+                                                _startedfillingfirstname=true;
+                                              });
+                                            }
+                                          },
                                         )),
                                   ),
                                 ],
@@ -703,11 +730,11 @@ class _RegisterPageState extends State<RegisterPage>
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
-                                    child: Text("Age*",
+                                    child: Text("Birth Date*",
                                       style: TextStyle(
                                         color: Colors.orange,
                                         fontWeight: FontWeight.w500,
-                                        fontSize: 18,
+                                        fontSize: 17,
                                       ),),
                                   ),
 
@@ -803,7 +830,7 @@ class _RegisterPageState extends State<RegisterPage>
                                       style: TextStyle(
                                         color: Colors.orange,
                                         fontWeight: FontWeight.w500,
-                                        fontSize: 18,
+                                        fontSize: 17,
                                       ),),
                                   ),
 
@@ -823,6 +850,7 @@ class _RegisterPageState extends State<RegisterPage>
                                       borderRadius: BorderRadius.all(Radius.circular(10))
                                   ),
                                   child: DropdownButton<String>(
+                                    isExpanded: true,
                                     value: dropdownValue,
 
                                     icon: Icon(Icons.keyboard_arrow_down_rounded,
@@ -838,20 +866,24 @@ class _RegisterPageState extends State<RegisterPage>
                                     onChanged: (String newValue) {
                                       setState(() {
                                         dropdownValue = newValue;
+                                        _locationFilled = true;
+
                                       });
                                     },
                                     items: <String>[
-                                      '  Arunachal Pradesh','  Assam','  Andaman & Nicobar','  Andhra Pradhesh','  Assam','  Bihar','  Chandigarh','  Chattishgarh',
+                                      '  Arunachal Pradesh','  Assam','  Andaman & Nicobar','  Andhra Pradhesh','  Bihar','  Chandigarh','  Chattishgarh',
                                       '  Dadar & Nagar Haveli'
                                       ,'  Daman & Deep','  Delhi','  Lakshadweep','  Puducherry','  Goa','  Guuhrat','  Haryana','  Himachal Pradesh','  Jammu & Kashmir',
                                       '  Jharkhand','  Karnataka','  Kerela','  Madhya Pradesh','  Maharashtra','  Manipur','  Meghalaya','  Mizoram','  Nagaland','  Odisha',
-                                      '  Punjab','  Rajasthan','  Sikkim','  Tamil Nadu','  Telangana','  Tripura','  Uttar Pradesh','  Uttarakhand','  West Bengal'
+                                      '  Punjab','  Rajasthan','  Sikkim','  Tamil Nadu','  Telangana','  Tripura','  Uttar Pradesh','  Uttarakhand','  West Bengal',
+                                      '  Please Pick State'
 
 
 
                                     ]
                                         .map<DropdownMenuItem<String>>((String value) {
                                       return DropdownMenuItem<String>(
+
                                         value: value,
                                         child: Row(
                                           children: [
@@ -861,9 +893,8 @@ class _RegisterPageState extends State<RegisterPage>
                                                     fontSize: 15,
                                                     color: Colors.black
                                                 )),
-                                            SizedBox(
-                                              width: MediaQuery. of(context). size. width - 280,
-                                            ),
+
+                                            
 
                                           ],
                                         ),
@@ -916,6 +947,8 @@ class _RegisterPageState extends State<RegisterPage>
     return Future.value(true);
   }
 
+
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -954,27 +987,87 @@ class _RegisterPageState extends State<RegisterPage>
       isLoading = false;
     });
 
-    Firestore.instance.collection("users").document(id).updateData({
-      "age": age.toString(),
-      "nickname": nicknameTextEditor.text,
-    }).then((data) async {
-      await preferences.setString("nickname", nicknameTextEditor.text);
-      await preferences.setString("age", age.toString());
+
+    if(imagePicked == false){
+      Fluttertoast.showToast(
+          backgroundColor: Colors.black,
+          msg: "Please Pick Profile Image !!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1
+      );
+    } else if((_startedfillingfirstname == false ) || ( _validatefirstname==false) ){
+      Fluttertoast.showToast(
+          backgroundColor: Colors.black,
+          msg: "Please Fill Name",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1
+      );
+    }else if((_datefilled == false)){
+      Fluttertoast.showToast(
+          backgroundColor: Colors.black,
+          msg: "Please Pick Birth Date",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1
+      );
+    } else if (_locationFilled == false){
+      Fluttertoast.showToast(
+          backgroundColor: Colors.black,
+          msg: "Please Pick State",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1
+      );
+    } else if((DateTime.now().year - _datetime.year >=14 )&&(_validatefirstname==true) && (_locationFilled == true) && (imagePicked == true)){
+      print("Shi hai");
+
+      print("AGE");
+      print(DateTime.now().year - _datetime.year);
 
       setState(() {
-        isLoading = false;
+        age = (DateTime.now().year - _datetime.year);
+        _datefilled=false;
       });
 
-      Fluttertoast.showToast(msg: "Updated Sucessfully");
-    });
+      Firestore.instance.collection("users").document(id).updateData({
+        "age": age.toString(),
+        "nickname": nicknameTextEditor.text,
+      }).then((data) async {
+        await preferences.setString("nickname", nicknameTextEditor.text);
+        await preferences.setString("age", age.toString());
 
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ConversationBottomSheet(
-              currentUser: preferences.getString("id"),
-              first_entry: false,
-            )));
+        setState(() {
+          isLoading = false;
+        });
+
+        Fluttertoast.showToast(msg: "Updated Sucessfully");
+      });
+
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ConversationBottomSheet(
+                currentUser: preferences.getString("id"),
+                first_entry: false,
+              )
+          )
+      );
+
+    }else{
+      print("nhi bhai");
+      Fluttertoast.showToast(
+          backgroundColor: Colors.black,
+          msg: "User's age must be greater than 14",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1
+      );
+    }
+
+
+
   }
 
   Future<Null> controlSignIn() async {

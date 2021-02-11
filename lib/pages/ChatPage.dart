@@ -19,11 +19,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 class chat extends StatelessWidget {
   final String recieverAbout;
   final String recieverId;
   final String recieverAvatar;
   final String recieverName;
+  final String recieverAge;
+  final bool isLiked;
 
   chat({
     Key key,
@@ -31,6 +34,8 @@ class chat extends StatelessWidget {
     @required this.recieverAvatar,
     @required this.recieverId,
     @required this.recieverName,
+    @required this.recieverAge,
+    @required this.isLiked,
   });
 
   @override
@@ -59,6 +64,7 @@ class chat extends StatelessWidget {
                                   recieverAvatar: recieverAvatar,
                                   recieverId: recieverId,
                                   recieverName: recieverName,
+                                  recieverAge: recieverAge,
                                 )));
                   },
                   child: Row(
@@ -90,8 +96,15 @@ class chat extends StatelessWidget {
                                             textAlign: TextAlign.end,
                                             style: Styles.textHeading),
                                         Text(
-                                            recieverAbout[0].toUpperCase() +
-                                                recieverAbout.substring(1),
+
+
+
+                                            (recieverAbout[0].toUpperCase() +
+                                                recieverAbout.substring(1)).length <= 15 ?  (recieverAbout[0].toUpperCase() +
+                                                recieverAbout.substring(1)) :
+                                            (recieverAbout[0].toUpperCase() +
+                                                recieverAbout.substring(1)).replaceRange(15,  (recieverAbout[0].toUpperCase() +
+                                                recieverAbout.substring(1)).length, '...'),
                                             textAlign: TextAlign.end,
                                             style: Styles.subHeading)
                                       ],
@@ -133,11 +146,13 @@ class chat extends StatelessWidget {
 class ChatScreen extends StatefulWidget {
   final String recieverAvatar;
   final String recieverId;
+  final bool isLiked;
 
   ChatScreen({
     Key key,
     @required this.recieverAvatar,
     @required this.recieverId,
+    @required this.isLiked,
   }) : super(key: key);
   @override
   _ChatScreenState createState() =>
@@ -147,11 +162,13 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final String recieverAvatar;
   final String recieverId;
+  final bool isLiked;
 
   _ChatScreenState({
     Key key,
     @required this.recieverAvatar,
     @required this.recieverId,
+    @required this.isLiked,
   });
 
   readLocal() async {
@@ -915,6 +932,8 @@ class UserProfileScreen extends StatefulWidget {
   final String recieverId;
   final String recieverAvatar;
   final String recieverName;
+  final String recieverAge;
+  final bool isLiked;
 
   UserProfileScreen({
     Key key,
@@ -922,6 +941,8 @@ class UserProfileScreen extends StatefulWidget {
     this.recieverAvatar,
     this.recieverId,
     this.recieverName,
+    this.recieverAge,
+    this.isLiked,
   }) : super(key: key);
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState(
@@ -929,6 +950,8 @@ class UserProfileScreen extends StatefulWidget {
         recieverId,
         recieverAvatar,
         recieverName,
+        recieverAge,
+        isLiked,
       );
 }
 
@@ -937,100 +960,329 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final String recieverId;
   final String recieverAvatar;
   final String recieverName;
+  final String recieverAge;
+   bool isLiked;
 
   _UserProfileScreenState(
     this.recieverAbout,
     this.recieverId,
     this.recieverAvatar,
     this.recieverName,
+      this.recieverAge,
+      this.isLiked,
   );
+
+  int likes =0;
+
+  @override
+  void initState() {
+    super.initState();
+    // TODO: implement initState
+    //likes = eachUser.likes;
+    readDataFromLocal();
+
+  }
+
+  List a;
+
+  SharedPreferences preferences;
+
+  String id = "";
+
+  void readDataFromLocal() async {
+
+    preferences = await SharedPreferences.getInstance();
+
+    id = preferences.getString("id");
+
+
+    Firestore.instance.collection("users").document(recieverId).get().then((value){
+      List a = value.data["likedby"];
+      setState(() {
+        likes = a.length;
+        for(int i =0; i< a.length; i++){
+          print(a[i]);
+          print("Id $id");
+          if(a[i] == id){
+            print("I AM IN");
+            isLiked = true;
+            break;
+          }else{
+            isLiked = false;
+          }
+        }
+
+      });
+    });
+
+
+
+
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
-        leading: Container(),
+
+        leading: GestureDetector(
+          onTap: (){
+            Navigator.pop(context);
+
+          },
+          child: Icon(
+            Icons.arrow_back_ios,
+            color: Colors.deepOrange,
+            
+          ),
+        ),
+
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(35),
+            bottom: Radius.circular(5),
           ),
         ),
         iconTheme: IconThemeData(
           color: Colors.white,
         ),
-        backgroundColor: Colors.blue[100],
+        backgroundColor: Colors.white,
         title: Text(
-          recieverName[0].toUpperCase() +
-              recieverName.substring(1) +
-              "s Profile",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
+          "Flash Chat " ,
+          style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.normal),
         ),
         centerTitle: true,
       ),
+
+
+
+
+
+
+
+
+
+
+
       body: Column(
         children: <Widget>[
-          SizedBox(
-            height: 50,
-          ),
-          Center(
-            child: Material(
-              borderRadius: BorderRadius.all(
-                Radius.circular(18.0),
-              ),
-              clipBehavior: Clip.hardEdge,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => FullPhoto(
-                                url: recieverAvatar,
-                              )));
-                },
-                child: CachedNetworkImage(
-                  placeholder: (context, url) => Container(
-                    child: CircularProgressIndicator(
-                      valueColor:
-                          AlwaysStoppedAnimation(Colors.lightBlueAccent),
-                    ),
-                    width: 170,
-                    height: 170,
-                    padding: EdgeInsets.all(10.0),
+
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 3,
+              right: 3,
+
+            ),
+            child: Container(
+
+              height: 430,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                  border: Border.all(
+                    color: Colors.orange,
                   ),
-                  imageUrl: recieverAvatar,
-                  width: 170,
-                  height: 170,
-                  fit: BoxFit.cover,
-                ),
+                  borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(50),
+                  ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+
+              ),
+
+              child: Column(
+                children: [
+                  Container(
+                    height: 350,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        bottomRight: Radius.circular(80),
+                      ),
+                      boxShadow: [
+
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          spreadRadius: 2,
+                          blurRadius: 7,
+                          offset: Offset(0, 3), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      borderRadius: BorderRadius.only(
+                        bottomRight: Radius.circular(80),
+                      ),
+
+                      clipBehavior: Clip.hardEdge,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => FullPhoto(
+                                        url: recieverAvatar,
+                                      )));
+                        },
+                        child: CachedNetworkImage(
+                          placeholder: (context, url) => Container(
+                            child: CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation(Colors.lightBlueAccent),
+                            ),
+                            width: 150,
+                            height: 150,
+                            padding: EdgeInsets.all(10.0),
+                          ),
+                          imageUrl: recieverAvatar,
+
+                          width: MediaQuery.of(context).size.width,
+                          height: 350,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Row(
+
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                    children: [
+                      Column(
+
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left:20, top: 20),
+                            child: Row(
+
+                              children: [
+                                Text(
+                                  recieverName[0].toUpperCase() + recieverName.substring(1)  + ", ",
+
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                    color: Colors.deepOrange,
+                                    fontWeight: FontWeight.w500,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+
+                                Text(
+                                  recieverAge,
+
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                    color: Colors.deepOrange,
+                                    fontWeight: FontWeight.w500,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+
+                              ],
+                            ),
+
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          right: 30,
+                          top: 10,
+                        ),
+                        child: Column(
+                          children: [
+                            isLiked==true ?Icon(
+                              Icons.favorite,
+                              size: 35,
+                              color: Colors.red.shade700,
+                            ): Icon(
+                              Icons.favorite,
+                              color: Palette.greyColor,
+                              size: 35,
+
+                            ),
+                            Text(" $likes Likes",
+                            style: TextStyle(
+                              color: Colors.deepOrange,
+                            ),
+                            textAlign: TextAlign.right,
+                            ),
+
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
-          SizedBox(
-            height: 50,
+          Padding(
+            padding: const EdgeInsets.only(
+          top: 40,
+          left: 20,
+    right: 20,
           ),
-          Column(
-            children: <Widget>[
-              Icon(Icons.person),
-              SizedBox(
-                width: 50,
-              ),
-              Text(
-                recieverName[0].toUpperCase() + recieverName.substring(1),
-                style: TextStyle(fontSize: 25, fontStyle: FontStyle.italic),
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              Icon(Icons.info_outline),
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                recieverAbout[0].toUpperCase() + recieverAbout.substring(1),
-                style: TextStyle(fontSize: 15, fontStyle: FontStyle.normal),
-              ),
-            ],
-          )
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+             // mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+
+                  "About",
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+
+                      fontSize: 26,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.deepOrange,
+                      fontStyle: FontStyle.italic
+
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 20,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              //crossAxisAlignment: CrossAxisAlignment.end,
+              //mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  constraints: new BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width - 84),
+                  child: Text(
+
+
+    (recieverAbout[0].toUpperCase() +
+    recieverAbout.substring(1)),
+
+                    textAlign: TextAlign.start,
+
+                    style: TextStyle(
+
+                        fontSize: 17,
+                        color: Colors.orange,
+                        fontStyle: FontStyle.italic
+
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

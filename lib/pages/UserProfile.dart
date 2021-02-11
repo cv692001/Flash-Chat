@@ -72,6 +72,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               backgroundImage: CachedNetworkImageProvider(recieverAvatar),
             ),
           ),
+
         ],
       ),
     );
