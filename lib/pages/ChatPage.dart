@@ -4,7 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat/pages/RegisterPage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -42,97 +43,117 @@ class chat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(70),
+          preferredSize: Size.fromHeight(80),
           child: Material(
-            child: Container(
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (value) => UserProfileScreen(
+                          recieverAbout: recieverAbout,
+                          recieverAvatar: recieverAvatar,
+                          recieverId: recieverId,
+                          recieverName: recieverName,
+                          recieverAge: recieverAge,
+                        )));
+              },
               child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.lightBlue[100],
-                  borderRadius: new BorderRadius.vertical(
-                      bottom: new Radius.elliptical(
-                          MediaQuery.of(context).size.width, 20.0)),
-                  boxShadow: kElevationToShadow[50],
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      spreadRadius: 3,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
+
                 ),
                 //color: Palette.primaryBackgroundColor,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (value) => UserProfileScreen(
-                                  recieverAbout: recieverAbout,
-                                  recieverAvatar: recieverAvatar,
-                                  recieverId: recieverId,
-                                  recieverName: recieverName,
-                                  recieverAge: recieverAge,
-                                )));
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Expanded(flex: 2, child: Container()),
-                      Expanded(
-                        flex: 7,
-                        child: Center(
-                          child: Row(
-                            children: <Widget>[
-                              Expanded(
-                                flex: 6,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+
+                    Expanded(flex: 2, child: Container(
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top
+                          ),
+                          child: CircleAvatar(
+                            radius: 35,
+                            backgroundImage:
+                            CachedNetworkImageProvider(recieverAvatar),
+                          ),
+                        ),
+                      ),
+                    ),),
+                    Expanded(
+                      flex: 8,
+                      child: Center(
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              flex: 6,
+                              child: Container(
+                                margin: EdgeInsets.symmetric(horizontal: 40),
                                 child: Container(
-                                  margin: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Container(
-                                    padding: EdgeInsets.only(top: 25),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        Text(
-                                            recieverName[0].toUpperCase() +
-                                                recieverName.substring(1),
-                                            // recieverName.toUpperCas5e(),
-                                            textAlign: TextAlign.end,
-                                            style: Styles.textHeading),
-                                        Text(
+                                  padding: EdgeInsets.only(top: 25),
+                                  child: Column(
+
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Text(
+
+                                        (recieverName[0].toUpperCase() +
+                                            recieverName.substring(1)).length <= 15 ?  (recieverName[0].toUpperCase() +
+                                            recieverName.substring(1)) :
+                                        (recieverName[0].toUpperCase() +
+                                            recieverName.substring(1)).replaceRange(15,  (recieverName[0].toUpperCase() +
+                                            recieverName.substring(1)).length, '...'),
+                                          textAlign: TextAlign.start,
+                                          style:  GoogleFonts.quicksand(
+                                              textStyle: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize:22
+
+                                              )
+                                          ),
+                                      ),
+                                      Text(
 
 
 
-                                            (recieverAbout[0].toUpperCase() +
-                                                recieverAbout.substring(1)).length <= 15 ?  (recieverAbout[0].toUpperCase() +
-                                                recieverAbout.substring(1)) :
-                                            (recieverAbout[0].toUpperCase() +
-                                                recieverAbout.substring(1)).replaceRange(15,  (recieverAbout[0].toUpperCase() +
-                                                recieverAbout.substring(1)).length, '...'),
-                                            textAlign: TextAlign.end,
-                                            style: Styles.subHeading)
-                                      ],
-                                    ),
+                                          (recieverAbout[0].toUpperCase() +
+                                              recieverAbout.substring(1)).length <= 25 ?  (recieverAbout[0].toUpperCase() +
+                                              recieverAbout.substring(1)) :
+                                          (recieverAbout[0].toUpperCase() +
+                                              recieverAbout.substring(1)).replaceRange(25,  (recieverAbout[0].toUpperCase() +
+                                              recieverAbout.substring(1)).length, '...'),
+                                          textAlign: TextAlign.start,
+                                          maxLines: 1,
+                                          style:  GoogleFonts.quicksand(
+                                              textStyle: TextStyle(
+                                                  color: Colors.black54,
+                                                  fontSize:15
+                                              )
+                                          )
+                                      )
+                                    ],
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Container(
-                          child: Center(
-                            child: Padding(
-                              padding: EdgeInsets.only(top: 20),
-                              child: CircleAvatar(
-                                radius: 32,
-                                backgroundImage:
-                                    CachedNetworkImageProvider(recieverAvatar),
-                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+
+                  ],
                 ),
               ),
             ),
@@ -196,6 +217,7 @@ class _ChatScreenState extends State<ChatScreen> {
   ScrollController listScrollController = ScrollController();
 
   File imageFile;
+  File imageFile1;
   String imageUrl;
 
   String chatId;
@@ -231,6 +253,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
     if (contentMsg != "") {
       textEditingController.clear();
+
+
+      Firestore.instance.collection("users").document(id).updateData({
+
+        "activeChat": FieldValue.arrayUnion([recieverId]),
+      });
+      Firestore.instance.collection("users").document(recieverId).updateData({
+
+        "activeChat": FieldValue.arrayUnion([id]),
+      });
 
       var docRef = Firestore.instance
           .collection("messages")
@@ -559,25 +591,29 @@ class _ChatScreenState extends State<ChatScreen> {
         children: <Widget>[
           document['type'] == 0
               ? Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.only(
+          top: 10,bottom: 10,right: 17
+      ),
                   child: Material(
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(30),
                       bottomRight: Radius.circular(30),
                       topLeft: Radius.circular(30),
                     ),
-                    elevation: 5,
+                    elevation: 3,
+                    shadowColor: Colors.grey.shade400,
                     color: Palette.selfMessageBackgroundColor,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 10),
                       child: Text(
                         document['content'],
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontStyle: FontStyle.normal,
-                        ),
+                        style: GoogleFonts.quicksand(
+                            textStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize:15
+                            )
+                        )
                       ),
                     ),
                   ),
@@ -631,7 +667,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       margin: EdgeInsets.only(
                           bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                          right: 10.0),
+                          right: 0.0),
                     )
                   : Container(
                       child: Image.network(
@@ -647,7 +683,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       margin: EdgeInsets.only(
                           bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                          right: 10.0),
+                          right: 17.0),
                     )
         ],
       );
@@ -694,18 +730,20 @@ class _ChatScreenState extends State<ChatScreen> {
                                 bottomRight: Radius.circular(30),
                                 topRight: Radius.circular(30),
                               ),
-                              elevation: 5,
+                              elevation: 3,
+                              shadowColor: Colors.grey.shade400,
                               color: Palette.otherMessageBackgroundColor,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 20, vertical: 10),
                                 child: Text(
                                   document['content'],
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                    fontStyle: FontStyle.normal,
-                                  ),
+                                  style: GoogleFonts.quicksand(
+                                      textStyle: TextStyle(
+                                          color: Colors.black,
+                                          fontSize:15
+                                      )
+                                  )
                                 ),
                               ),
                             ),
@@ -789,11 +827,12 @@ class _ChatScreenState extends State<ChatScreen> {
                           DateFormat("dd MM yyyy - hh:mm:aa").format(
                               DateTime.fromMillisecondsSinceEpoch(
                                   int.parse(document['timestamp']))),
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12.0,
-                        fontStyle: FontStyle.italic,
-                      ),
+                      style: GoogleFonts.quicksand(
+                          textStyle: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize:12
+                          )
+                      )
                     ),
                     margin: EdgeInsets.only(bottom: 5.0, left: 50.0, top: 0.0),
                   )
@@ -810,35 +849,30 @@ class _ChatScreenState extends State<ChatScreen> {
     return Container(
         child: Row(
           children: <Widget>[
-            Material(
-              child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 1.0),
-                child: IconButton(
-                    icon: Icon(
-                      Icons.image,
-                      color: Colors.lightBlueAccent,
-                    ),
-                    onPressed: () {
-                      getImage();
-                    }),
-              ),
-              color: Colors.white,
+            Padding(
+              padding: const EdgeInsets.all(0.0),
+              child: IconButton(
+                  icon: Icon(
+                    Icons.image,
+                    color: Colors.lightBlueAccent,
+                  ),
+                  onPressed: () {
+                    getImage();
+                  }),
             ),
-            Material(
-              child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 1.0),
-                child: IconButton(
-                    icon: Icon(
-                      Icons.insert_emoticon,
-                      color: Colors.lightBlueAccent,
-                    ),
-                    onPressed: () {
-                      print("yes1");
-                      getSticker();
-                    }),
-              ),
-              color: Colors.white,
+            Padding(
+              padding: const EdgeInsets.all(0.0),
+              child: IconButton(
+                  icon: Icon(
+                    Icons.insert_emoticon,
+                    color: Colors.lightBlueAccent,
+                  ),
+                  onPressed: () {
+                    print("yes1");
+                    getSticker();
+                  }),
             ),
+
             Flexible(
                 child: GestureDetector(
               onVerticalDragEnd: (details) {
@@ -849,17 +883,31 @@ class _ChatScreenState extends State<ChatScreen> {
               },
               child: Container(
                 child: TextField(
+                  cursorColor: Colors.blue,
+
                   focusNode: focusNode,
+
+                  textAlign: TextAlign.center,
                   controller: textEditingController,
                   decoration: InputDecoration(
-                      hintText: "Write here..",
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                      )),
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 15.0,
-                  ),
+
+                      border: InputBorder.none,
+                      hintText: "Write here...",
+                      alignLabelWithHint: true,
+                      hintStyle: GoogleFonts.quicksand(
+                        textStyle: TextStyle(
+                          color: Colors.grey,
+                          fontSize:16
+                        )
+                      )
+
+    ),
+                  style: GoogleFonts.quicksand(
+                      textStyle: TextStyle(
+                          color: Colors.black54,
+                          fontSize:17
+                      )
+                  )
                 ),
               ),
             )),
@@ -886,13 +934,46 @@ class _ChatScreenState extends State<ChatScreen> {
               top: BorderSide(
             color: Colors.grey,
             width: 0.5,
-          )),
+          ),
+            bottom:  BorderSide(
+              color: Colors.grey,
+              width: 0.5,
+            )
+          ),
           color: Colors.white,
         ));
   }
 
   Future getImage() async {
-    imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
+    imageFile1 = await ImagePicker.pickImage(source: ImageSource.gallery,
+    imageQuality: 30,
+    );
+
+
+    final filePath = imageFile1.absolute.path;
+
+    // Create output file path
+    // eg:- "Volume/VM/abcd_out.jpeg"
+    final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
+    final splitted = filePath.substring(0, (lastIndex));
+    final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
+
+    File compressedImage = await FlutterImageCompress.compressAndGetFile(
+        filePath,
+        outPath,
+        quality: 40);
+
+
+
+
+    if (compressedImage != null) {
+      setState(() {
+        this.imageFile = compressedImage;
+        isLoading = true;
+      });
+    }
+
+
 
     if (imageFile != null) {
       isLoading = true;
@@ -1026,35 +1107,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(
-
-        leading: GestureDetector(
-          onTap: (){
-            Navigator.pop(context);
-
-          },
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.deepOrange,
-            
-          ),
-        ),
-
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(5),
-          ),
-        ),
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        backgroundColor: Colors.white,
-        title: Text(
-          "Flash Chat " ,
-          style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.normal),
-        ),
-        centerTitle: true,
-      ),
 
 
 
@@ -1066,219 +1118,282 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
 
 
-      body: Column(
-        children: <Widget>[
 
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 3,
-              right: 3,
+      body: Stack(
+        children: [
+          Column(
+            children: <Widget>[
 
-            ),
-            child: Container(
 
-              height: 430,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                  border: Border.all(
-                    color: Colors.orange,
-                  ),
-                  borderRadius: BorderRadius.only(
-                    bottomRight: Radius.circular(50),
-                  ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: Offset(0, 3), // changes position of shadow
-                  ),
-                ],
-
+              SizedBox(
+                height: 150,
               ),
 
-              child: Column(
-                children: [
-                  Container(
-                    height: 350,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        bottomRight: Radius.circular(80),
-                      ),
-                      boxShadow: [
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 3,
+                  right: 3,
 
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
-                          spreadRadius: 2,
-                          blurRadius: 7,
-                          offset: Offset(0, 3), // changes position of shadow
-                        ),
-                      ],
+                ),
+                child: Container(
+
+                  height: 430,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      color: Colors.orange,
                     ),
-                    child: Material(
-                      borderRadius: BorderRadius.only(
-                        bottomRight: Radius.circular(80),
+                    borderRadius: BorderRadius.only(
+                      bottomRight: Radius.circular(50),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: Offset(0, 3), // changes position of shadow
                       ),
+                    ],
 
-                      clipBehavior: Clip.hardEdge,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => FullPhoto(
+                  ),
+
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 350,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            bottomRight: Radius.circular(80),
+                          ),
+                          boxShadow: [
+
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              spreadRadius: 2,
+                              blurRadius: 7,
+                              offset: Offset(0, 3), // changes position of shadow
+                            ),
+                          ],
+                        ),
+                        child: Material(
+                          borderRadius: BorderRadius.only(
+                            bottomRight: Radius.circular(80),
+                          ),
+
+                          clipBehavior: Clip.hardEdge,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => FullPhoto(
                                         url: recieverAvatar,
                                       )));
-                        },
-                        child: CachedNetworkImage(
-                          placeholder: (context, url) => Container(
-                            child: CircularProgressIndicator(
-                              valueColor:
+                            },
+                            child: CachedNetworkImage(
+                              placeholder: (context, url) => Container(
+                                child: CircularProgressIndicator(
+                                  valueColor:
                                   AlwaysStoppedAnimation(Colors.lightBlueAccent),
-                            ),
-                            width: 150,
-                            height: 150,
-                            padding: EdgeInsets.all(10.0),
-                          ),
-                          imageUrl: recieverAvatar,
+                                ),
+                                width: 150,
+                                height: 150,
+                                padding: EdgeInsets.all(10.0),
+                              ),
+                              imageUrl: recieverAvatar,
 
-                          width: MediaQuery.of(context).size.width,
-                          height: 350,
-                          fit: BoxFit.cover,
+                              width: MediaQuery.of(context).size.width,
+                              height: 350,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  Row(
+                      Row(
 
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                    children: [
-                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                         children: [
-                          Padding(
-                            padding: EdgeInsets.only(left:20, top: 20),
-                            child: Row(
+                          Column(
 
-                              children: [
-                                Text(
-                                  recieverName[0].toUpperCase() + recieverName.substring(1)  + ", ",
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left:20, top: 20),
+                                child: Row(
 
-                                  style: TextStyle(
-                                    fontSize: 30,
-                                    color: Colors.deepOrange,
-                                    fontWeight: FontWeight.w500,
-                                    fontStyle: FontStyle.italic,
-                                  ),
+                                  children: [
+                                    Text(
+                                      recieverName[0].toUpperCase() + recieverName.substring(1)  + ", ",
+
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        color: Colors.deepOrange,
+                                        fontWeight: FontWeight.w500,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+
+                                    Text(
+                                      recieverAge,
+
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.deepOrange,
+                                        fontWeight: FontWeight.w500,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+
+                                  ],
                                 ),
 
-                                Text(
-                                  recieverAge,
+                              ),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              right: 30,
+                              top: 10,
+                            ),
+                            child: Column(
+                              children: [
+                                isLiked==true ?Icon(
+                                  Icons.favorite,
+                                  size: 35,
+                                  color: Colors.red.shade700,
+                                ): Icon(
+                                  Icons.favorite,
+                                  color: Palette.greyColor,
+                                  size: 35,
 
+                                ),
+                                Text(" $likes Likes",
                                   style: TextStyle(
-                                    fontSize: 30,
                                     color: Colors.deepOrange,
-                                    fontWeight: FontWeight.w500,
-                                    fontStyle: FontStyle.italic,
                                   ),
+                                  textAlign: TextAlign.right,
                                 ),
 
                               ],
                             ),
-
                           ),
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          right: 30,
-                          top: 10,
-                        ),
-                        child: Column(
-                          children: [
-                            isLiked==true ?Icon(
-                              Icons.favorite,
-                              size: 35,
-                              color: Colors.red.shade700,
-                            ): Icon(
-                              Icons.favorite,
-                              color: Palette.greyColor,
-                              size: 35,
-
-                            ),
-                            Text(" $likes Likes",
-                            style: TextStyle(
-                              color: Colors.deepOrange,
-                            ),
-                            textAlign: TextAlign.right,
-                            ),
-
-                          ],
-                        ),
-                      ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: 40,
+                  left: 20,
+                  right: 20,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  // mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+
+                      "About",
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+
+                          fontSize: 26,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.deepOrange,
+                          fontStyle: FontStyle.italic
+
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  top: 20,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  //crossAxisAlignment: CrossAxisAlignment.end,
+                  //mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      constraints: new BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width - 84),
+                      child: Text(
+
+
+                        (recieverAbout[0].toUpperCase() +
+                            recieverAbout.substring(1)),
+
+                        textAlign: TextAlign.start,
+
+                        style: TextStyle(
+
+                            fontSize: 17,
+                            color: Colors.orange,
+                            fontStyle: FontStyle.italic
+
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(
-          top: 40,
-          left: 20,
-    right: 20,
-          ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-             // mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-
-                  "About",
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-
-                      fontSize: 26,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.deepOrange,
-                      fontStyle: FontStyle.italic
-
-                  ),
+          Container(
+            decoration: new BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  spreadRadius: 3,
+                  blurRadius: 7,
+                  offset: Offset(0, 3), // changes position of shadow
                 ),
               ],
+
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 20,
-              right: 20,
-              top: 20,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              //crossAxisAlignment: CrossAxisAlignment.end,
-              //mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  constraints: new BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width - 84),
-                  child: Text(
+            child: ListView(
+              shrinkWrap: true,
+              physics: ClampingScrollPhysics(),
+              children: <Widget>[
+                SizedBox(
+                  height: 10,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
 
+                      children: [
+                        Icon(
+                          Icons.flash_on_rounded,
+                          color: Colors.yellow.shade900,
+                          size: 30,
+                        ),
+                        Text('Flash Chat',
+                          style: GoogleFonts.quicksand(
+                              textStyle: TextStyle(
+                                fontSize: 22,
+                                letterSpacing: 3,
+                                color: Colors.black,
 
-    (recieverAbout[0].toUpperCase() +
-    recieverAbout.substring(1)),
+                              )
+                          ),
 
-                    textAlign: TextAlign.start,
-
-                    style: TextStyle(
-
-                        fontSize: 17,
-                        color: Colors.orange,
-                        fontStyle: FontStyle.italic
-
+                        ),
+                      ],
                     ),
-                  ),
+                  ],
+                ),
+                SizedBox(
+                  height: 12,
                 ),
               ],
             ),

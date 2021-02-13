@@ -28,7 +28,7 @@ dependencies:
   flutter_image_compress: ^0.7.0
   like_button: ^1.0.4
   bottom_navy_bar: ^5.6.0
-
+  google_fonts: ^1.1.2
   cupertino_icons: ^0.1.3
 
   rubber: ^0.4.0

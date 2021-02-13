@@ -8,6 +8,7 @@ import 'settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat/widgets/CircleIndicator.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -161,7 +162,7 @@ class _RegisterPageState extends State<RegisterPage>
                   decoration: BoxDecoration(
                       gradient: LinearGradient(begin: begin, end: end, colors: [
                         Colors.white,
-                        Colors.orangeAccent
+                        Colors.blueAccent
                       ])),
                   child: Stack(
                       alignment: AlignmentDirectional.bottomCenter,
@@ -170,10 +171,13 @@ class _RegisterPageState extends State<RegisterPage>
                             duration: Duration(milliseconds: 1500),
                             child: PageView(
 
+
+
                                 controller: pageController,
                                 physics: NeverScrollableScrollPhysics(),
                                 onPageChanged: (int page) =>
                                     updatePageState(page),
+                                
                                 children: <Widget>[
                                   buildPageOne(),
                                   buildPageTwo()
@@ -204,7 +208,7 @@ class _RegisterPageState extends State<RegisterPage>
                                     FloatingActionButton(
                                       onPressed: () => navigateToHome(),
                                       elevation: 0,
-                                      backgroundColor: Colors.orange,
+                                      backgroundColor: Colors.blueAccent,
                                       child: Icon(
                                         Icons.done,
                                         color: Colors.white,
@@ -218,77 +222,98 @@ class _RegisterPageState extends State<RegisterPage>
 
   buildPageOne() {
     return Container(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
+      child : Stack(
+        children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Container(
-                //margin: EdgeInsets.only(top: 150),
-                  child: Image.asset('images/launcher/logo.png',
-                      height: controller.value * 130)),
-              Padding(
-                padding: const EdgeInsets.only(left: 0),
-                child: Container(
-                    margin: EdgeInsets.only(top: 35),
-                    child: Text('Flash Chat',
-                        style: TextStyle(
-                            color: Colors.orange,
-                            fontWeight: FontWeight.w500,
-                            fontStyle: FontStyle.italic,
-                            fontSize: 30))),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                      margin: EdgeInsets.only(top: 150),
+                      child: Image.asset('images/launcher/logo.png',
+                          height: controller.value * 130)),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 0),
+                    child: Container(
+                        margin: EdgeInsets.only(top: 35),
+                        child: Text('Flash Chat',
+                            style: GoogleFonts.quicksand(
+                                textStyle: TextStyle(
+                                    fontSize: 30,
+                                    letterSpacing: 2
+
+                                )
+                            )
+                        )),
+                  ),
+                ],
               ),
-            ],
-          ),
-          GestureDetector(
-            onTap: (){
-              controlSignIn();
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(top: 105),
-              child: Container(
+              GestureDetector(
+                onTap: (){
+                  controlSignIn();
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 225),
+                  child: Container(
 
-                width: 225,
-                height: 35,
 
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.orange,
-                  boxShadow: [
-                    BoxShadow(color: Colors.orange, spreadRadius: 3),
-                  ],
-                ),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'images/google.png',
-                        height: 28,
+                    height: 45,
+                    width: 270,
+
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10
                       ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        'Sign In with Google',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800),
-                      )
+                      color: Colors.white,
 
-                    ],
+
+                      boxShadow: [
+                        BoxShadow(color: Colors.transparent, spreadRadius: 3),
+                      ],
+                    ),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'images/google.png',
+
+
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                              'Sign In with Google',
+                              style: GoogleFonts.quicksand(
+                                  textStyle: TextStyle(
+                                      fontSize: 18,
+                                      letterSpacing: 1
+                                  )
+                              )
+                          )
+
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: isLoading ? circularProgress() : Container(),
+              )
+            ],
           ),
           Padding(
             padding: EdgeInsets.all(8),
             child: isLoading ? circularProgress() : Container(),
           )
         ],
-      ),
+      )
+
+
     );
   }
 
@@ -302,6 +327,7 @@ class _RegisterPageState extends State<RegisterPage>
   String aboutMe = "";
   String photourl = "";
   List likedby =[ ];
+  List activeChat = [];
   File imageFileAvatar;
   TextEditingController nicknameTextEditor = TextEditingController();
 
@@ -420,6 +446,7 @@ class _RegisterPageState extends State<RegisterPage>
   bool _datefilled = false;
   DateTime _datetime;
   bool imagePicked = false;
+  bool greaterthan20 = false;
 
   buildPageTwo() {
 
@@ -432,7 +459,7 @@ class _RegisterPageState extends State<RegisterPage>
           FocusScope.of(context).requestFocus(FocusNode());
         },
         child: Container(
-            color: Colors.orange,
+            color: Colors.blue.shade800,
             child: Column(
               children: [
                 Padding(
@@ -445,22 +472,31 @@ class _RegisterPageState extends State<RegisterPage>
                         children: [
                           Text("Welcome !",
 
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 21,
+                            style: GoogleFonts.quicksand(
+                              textStyle: TextStyle(
+                                color: Colors.white,
 
+                                fontWeight: FontWeight.w500,
+                                fontSize: 21,
+
+                              ),
                             ),
+
+
 
                           ),
                           Text("We need some basic information .",
 
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w400,
-                              fontSize: 15,
+                            style: GoogleFonts.quicksand(
+                              textStyle: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 15,
 
+                              ),
                             ),
+
+
 
                           ),
                         ],
@@ -499,7 +535,7 @@ class _RegisterPageState extends State<RegisterPage>
                                           right: 0,
                                           child: Icon(
                                             Icons.add_a_photo,
-                                            color: Colors.orange,
+                                            color: Colors.blueAccent,
                                           ),
                                         ),
                                         imageFileAvatar==null ? Padding(
@@ -507,7 +543,7 @@ class _RegisterPageState extends State<RegisterPage>
                                           child: Icon(
                                             Icons.person,
                                             size: 80,
-                                            color: Colors.orange,
+                                            color: Colors.lightBlueAccent,
                                           ),
                                         ) : Material(
                                           child: Image.file(
@@ -535,11 +571,16 @@ class _RegisterPageState extends State<RegisterPage>
                                 Padding(
                                   padding: const EdgeInsets.only(top: 16),
                                   child: Text("Add Profile Picture",
-                                    style: TextStyle(
-                                      color: Colors.orange,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),),
+                                    style: GoogleFonts.quicksand(
+                                      textStyle:  TextStyle(
+                                        color: Colors.blue.shade700,
+                                        fontSize: 16,
+
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    )
+
+                                   ),
                                 ),
                               ],
                             ),
@@ -555,11 +596,15 @@ class _RegisterPageState extends State<RegisterPage>
                                   Padding(
                                     padding: const EdgeInsets.only(left: 20,top: 20),
                                     child: Text("Gender*",
-                                      style: TextStyle(
-                                        color: Colors.orange,
+                                      style: GoogleFonts.quicksand(
+                                      textStyle: TextStyle(
+                                        color: Colors.blue.shade600,
+
                                         fontWeight: FontWeight.w500,
-                                        fontSize: 17,
-                                      ),),
+                                        fontSize: 16,
+                                      )
+                                      )
+                                      ),
                                   )
                                 ],
                               ),
@@ -572,20 +617,24 @@ class _RegisterPageState extends State<RegisterPage>
                                     Row(
                                       children: [
                                         new Radio(
-                                          hoverColor: Colors.orange,
-                                          activeColor: Colors.orange,
-                                          focusColor: Colors.orange,
+                                          hoverColor: Colors.lightBlueAccent,
+                                          activeColor: Colors.lightBlueAccent,
+                                          focusColor: Colors.lightBlueAccent,
                                           value: 0,
                                           groupValue: _radioValue,
                                           onChanged: _handleRadioValueChange,
                                         ),
                                         Text(
                                           'Male',
-                                          style: TextStyle(
-                                            color: _radioValue ==0 ? Colors.orange : Colors.blueGrey,
-                                            fontWeight:  _radioValue ==0 ?FontWeight.w400 : FontWeight.w200,
-                                            fontSize: 16,
-                                          ),
+                                          style: GoogleFonts.quicksand(
+                                            textStyle:  TextStyle(
+                                              color: _radioValue ==0 ? Colors.lightBlueAccent : Colors.blueGrey,
+                                              fontWeight:  _radioValue ==0 ?FontWeight.w500 : FontWeight.w200,
+                                              fontSize: 16,
+                                            ),
+                                          )
+
+
                                         ),
                                       ],
                                     ),
@@ -595,20 +644,22 @@ class _RegisterPageState extends State<RegisterPage>
                                     Row(
                                       children: [
                                         new Radio(
-                                          hoverColor: Colors.orange,
-                                          activeColor: Colors.orange,
-                                          focusColor: Colors.orange,
+                                          hoverColor: Colors.lightBlueAccent,
+                                          activeColor: Colors.lightBlueAccent,
+                                          focusColor: Colors.lightBlueAccent,
                                           value: 1,
                                           groupValue: _radioValue,
                                           onChanged: _handleRadioValueChange,
                                         ),
                                         Text(
                                           'Female',
-                                          style: TextStyle(
-                                            color: _radioValue ==1 ? Colors.orange : Colors.blueGrey,
-                                            fontWeight:  _radioValue ==1 ?FontWeight.w400 : FontWeight.w200,
-                                            fontSize: 16,
-                                          ),
+                                          style: GoogleFonts.quicksand(
+                                            textStyle:   TextStyle(
+                                              color: _radioValue ==1 ? Colors.blue : Colors.blueGrey,
+                                              fontWeight:  _radioValue ==1 ?FontWeight.w500 : FontWeight.w200,
+                                              fontSize: 16,
+                                            ),
+                                          )
                                         ),
                                       ],
                                     ),
@@ -619,20 +670,22 @@ class _RegisterPageState extends State<RegisterPage>
                                     Row(
                                       children: [
                                         new Radio(
-                                          hoverColor: Colors.orange,
-                                          activeColor: Colors.orange,
-                                          focusColor: Colors.orange,
+                                          hoverColor: Colors.lightBlueAccent,
+                                          activeColor: Colors.lightBlueAccent,
+                                          focusColor: Colors.lightBlueAccent,
                                           value: 2,
                                           groupValue: _radioValue,
                                           onChanged: _handleRadioValueChange,
                                         ),
                                         Text(
                                           'None',
-                                          style: TextStyle(
-                                            color: _radioValue ==2 ? Colors.orange : Colors.blueGrey,
-                                            fontWeight:  _radioValue ==2 ?FontWeight.w400 : FontWeight.w200,
-                                            fontSize: 16,
-                                          ),
+                                          style: GoogleFonts.quicksand(
+                                            textStyle: TextStyle(
+                                              color: _radioValue ==2 ? Colors.blue : Colors.blueGrey,
+                                              fontWeight:  _radioValue ==2 ?FontWeight.w500 : FontWeight.w200,
+                                              fontSize: 16,
+                                            ),
+                                          )
                                         ),
                                       ],
                                     ),
@@ -652,11 +705,16 @@ class _RegisterPageState extends State<RegisterPage>
                                   Padding(
                                     padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
                                     child: Text("Name*",
-                                      style: TextStyle(
-                                        color: Colors.orange,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 17,
-                                      ),),
+                                      style: GoogleFonts.sourceSansPro(
+                                        textStyle:  TextStyle(
+                                          color: Colors.blue.shade600,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 17,
+                                        ),
+                                      )
+                                    ),
+
+
                                   ),
                                 ],
                               ),
@@ -678,6 +736,13 @@ class _RegisterPageState extends State<RegisterPage>
                                         margin: EdgeInsets.only(top: 20),
 
                                         child: TextField(
+                                          style: GoogleFonts.
+                                          quicksand(
+                                            textStyle: TextStyle(
+                                              fontSize: 16,
+
+                                            )
+                                          ),
                                           controller: nicknameTextEditor,
                                           textAlign: TextAlign.start,
                                           //style: Styles.subHeadingLight,
@@ -686,7 +751,7 @@ class _RegisterPageState extends State<RegisterPage>
                                             hintText: 'Enter Your Name Here',
                                             contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 5),
                                             focusedBorder: OutlineInputBorder(
-                                              borderRadius: new BorderRadius.circular(25.0),
+
                                               borderSide:
                                               BorderSide(width: 0.1,
                                               ),
@@ -706,9 +771,21 @@ class _RegisterPageState extends State<RegisterPage>
                                               setState(() {
                                                 _validatefirstname = false;
                                               });
-                                            }else{
+                                            }else if(nicknameTextEditor.text.length > 20){
+                                              setState(() {
+                                                greaterthan20 = true;
+                                              });
                                               setState(() {
                                                 _validatefirstname = true;
+
+                                              });
+                                              setState(() {
+                                                _startedfillingfirstname=true;
+                                              });
+                                            } else{
+                                              setState(() {
+                                                _validatefirstname = true;
+                                                greaterthan20 = false;
                                               });
                                               setState(() {
                                                 _startedfillingfirstname=true;
@@ -731,11 +808,15 @@ class _RegisterPageState extends State<RegisterPage>
                                   Padding(
                                     padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
                                     child: Text("Birth Date*",
-                                      style: TextStyle(
-                                        color: Colors.orange,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 17,
-                                      ),),
+                                      style: GoogleFonts.quicksand(
+                                        textStyle: TextStyle(
+                                          color: Colors.blue.shade600,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                        ),
+                                      )
+
+                                      ),
                                   ),
 
                                 ],
@@ -761,9 +842,9 @@ class _RegisterPageState extends State<RegisterPage>
                                         builder: (BuildContext context, Widget child) {
                                           return Theme(
                                             data: ThemeData.light().copyWith(
-                                              primaryColor: Colors.orange,
-                                              accentColor: Colors.orange,
-                                              colorScheme: ColorScheme.light(primary: Colors.orange),
+                                              primaryColor: Colors.lightBlueAccent,
+                                              accentColor: Colors.blue,
+                                              colorScheme: ColorScheme.light(primary: Colors.blue),
                                               buttonTheme: ButtonThemeData(
                                                   textTheme: ButtonTextTheme.primary
                                               ),
@@ -798,13 +879,22 @@ class _RegisterPageState extends State<RegisterPage>
                                           "  Birth Date :  "
 
                                           ,
-                                          style: TextStyle(
+                                          style: GoogleFonts.quicksand(
+                                            textStyle: TextStyle(
 
-                                            fontSize: 15,
-                                            color: Colors.black54,
-                                          ),
+                                              fontSize: 15,
+                                              color: Colors.black54,
+                                            ),
+                                          )
                                         ),
-                                        Text(_datetime == null ? "Please Pick Date" : _datetime.toLocal().toString().split(" ")[0]),
+                                        Text(_datetime == null ? "Please Pick Date" : _datetime.toLocal().toString().split(" ")[0],
+                                        style: GoogleFonts.quicksand(
+                                          textStyle: TextStyle(
+                                            fontSize: 15,
+                                          )
+                                        ),
+                                        ),
+
 
                                       ],
                                     ),
@@ -828,9 +918,9 @@ class _RegisterPageState extends State<RegisterPage>
                                     padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
                                     child: Text("State*",
                                       style: TextStyle(
-                                        color: Colors.orange,
+                                        color: Colors.blue.shade600,
                                         fontWeight: FontWeight.w500,
-                                        fontSize: 17,
+                                        fontSize: 16,
                                       ),),
                                   ),
 
@@ -861,7 +951,7 @@ class _RegisterPageState extends State<RegisterPage>
                                     style: TextStyle(color: Colors.teal),
                                     underline: Container(
                                       height: 0,
-                                      color: Colors.black,
+                                      color: Colors.black54,
                                     ),
                                     onChanged: (String newValue) {
                                       setState(() {
@@ -891,7 +981,7 @@ class _RegisterPageState extends State<RegisterPage>
                                             Text(value,
                                                 style: TextStyle(
                                                     fontSize: 15,
-                                                    color: Colors.black
+                                                    color: Colors.black54
                                                 )),
 
                                             
@@ -1004,7 +1094,17 @@ class _RegisterPageState extends State<RegisterPage>
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1
       );
-    }else if((_datefilled == false)){
+    } else if ( greaterthan20 == true ){
+      Fluttertoast.showToast(
+          backgroundColor: Colors.black,
+          msg: "Please Enter name < 20 chars",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1
+      );
+    }
+
+    else if((_datefilled == false)){
       Fluttertoast.showToast(
           backgroundColor: Colors.black,
           msg: "Please Pick Birth Date",
@@ -1112,6 +1212,7 @@ class _RegisterPageState extends State<RegisterPage>
           "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
           "chattingWith": null,
           "likedby" : [ ],
+          "activeChat": [ ]
         });
 
         currentuser = firebaseUser;

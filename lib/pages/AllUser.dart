@@ -13,30 +13,32 @@ import 'package:intl/intl.dart';
 import 'package:flash_chat/pages/ChatPage.dart';
 import 'package:flash_chat/pages/UserResult.dart';
 import 'package:google_fonts/google_fonts.dart';
-// ignore: camel_case_types
-class searchScreen extends StatefulWidget {
-  final String currentUser;
 
-  searchScreen({
-    Key key,
+
+class AllUsers extends StatefulWidget {
+  final String currentUser;
+  final bool first_entry;
+
+    AllUsers({
     this.currentUser,
-  });
+      this.first_entry,
+});
   @override
-  _searchScreenState createState() =>
-      _searchScreenState(currentUser: currentUser);
+  _AllUsersState createState() => _AllUsersState(
+    currentUser:currentUser,
+  );
 }
 
-// ignore: camel_case_types
-class _searchScreenState extends State<searchScreen> {
+class _AllUsersState extends State<AllUsers> {
   TextEditingController searchTextController = TextEditingController();
   Future<QuerySnapshot> futureSearchResults;
   Future<QuerySnapshot> futureSearchResultsfirst;
 
-  _searchScreenState({
+  _AllUsersState({
     Key key,
-    this.currentUser,
-  });
 
+    this.currentUser,
+});
   final String currentUser;
 
   @override
@@ -54,117 +56,59 @@ class _searchScreenState extends State<searchScreen> {
 
     return Scaffold(
 
-      body: Stack(
-        children: [
-          futureSearchResults == null
-              ? displayNoUserResultScreen()
-              : displayUserFoundScreen(),
-          Container(
-            decoration: new BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.3),
-                  spreadRadius: 3,
-                  blurRadius: 7,
-                  offset: Offset(0, 3), // changes position of shadow
-                ),
-              ],
+        body: Stack(
+          children: [
+            futureSearchResults == null
+                ? displayNoUserResultScreen()
+                : displayUserFoundScreen(),
+            Container(
+              decoration: new BoxDecoration(
+                color: Colors.white,
 
-            ),
-            child: ListView(
-              shrinkWrap: true,
-              physics: ClampingScrollPhysics(),
-              children: <Widget>[
-                SizedBox(
-                  height: 10,
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
 
-                      children: [
-                        Icon(
-                          Icons.flash_on_rounded,
-                          color: Colors.yellow.shade900,
-                          size: 30,
-                        ),
-                        Text('Flash Chat',
-                          style: GoogleFonts.quicksand(
-                              textStyle: TextStyle(
-                                fontSize: 22,
-                                letterSpacing: 3,
-                                color: Colors.black,
+              ),
+              child: ListView(
+                shrinkWrap: true,
+                physics: ClampingScrollPhysics(),
+                children: <Widget>[
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
 
-                              )
+                        children: [
+                          Icon(
+                            Icons.flash_on_rounded,
+                            color: Colors.yellow.shade900,
+                            size: 30,
                           ),
+                          Text('Flash Chat',
+                            style: GoogleFonts.quicksand(
+                                textStyle: TextStyle(
+                                  fontSize: 22,
+                                  letterSpacing: 3,
+                                  color: Colors.black,
 
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-
-                Column(
-                  children: [
-                    Container(
-
-                      decoration: BoxDecoration(
-
-
-                      ),
-
-
-
-                      child: TextField(
-
-                        style: GoogleFonts.quicksand(
-                          textStyle:  TextStyle(
-                            fontSize: 18,
-                            letterSpacing: 1
-                          ),
-                        ),
-
-
-                        controller: searchTextController,
-
-                        focusNode: searchFocusNode,
-                        textAlign: TextAlign.center,
-
-                        decoration: InputDecoration(
-
-                          //fillColor: Colors.green
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              Icons.search,
-                              color: Colors.black54,
+                                )
                             ),
-                              onPressed: (){
-                                controlSearching;
-                              }
 
                           ),
-                          hintText: '',
-
-                          hintStyle: TextStyle(color: Colors.grey),
-                          // filled: true,
-                          //fillColor: Colors.blue[100],
-
-
-                        ),
-                        onSubmitted: controlSearching,
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+                    ],
+                  ),
 
-        ],
-      )
+
+                ],
+              ),
+            ),
+
+          ],
+        )
 
 
 
@@ -176,14 +120,14 @@ class _searchScreenState extends State<searchScreen> {
       future: futureSearchResultsfirst,
       builder: (context, datasnapshot) {
         if (!datasnapshot.hasData) {
-          return  Center(
+          return Center(
             child: Container(
-                height: 110,
-                width: 110,
-                child:  CircularProgressIndicator(
+              height: 110,
+              width: 110,
+              child:  CircularProgressIndicator(
 
-                  strokeWidth: 1,
-                )
+                strokeWidth: 1,
+              )
             ),
           );
         }
@@ -203,7 +147,7 @@ class _searchScreenState extends State<searchScreen> {
           child: Column(
             children: [
               SizedBox(
-                height: 110,
+                height: 75,
               ),
               GridView.count(
                 physics: const NeverScrollableScrollPhysics(),
@@ -236,16 +180,7 @@ class _searchScreenState extends State<searchScreen> {
       future: futureSearchResults,
       builder: (context, datasnapshot) {
         if (!datasnapshot.hasData) {
-          return  Center(
-            child: Container(
-                height: 110,
-                width: 110,
-                child:  CircularProgressIndicator(
-
-                  strokeWidth: 1,
-                )
-            ),
-          );
+          return circularProgress();
         }
 
         List<UserResult> searchUserResult = [];

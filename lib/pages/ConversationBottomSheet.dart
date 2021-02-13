@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flash_chat/pages/AllUser.dart';
 import 'package:flash_chat/pages/BottomNavigation.dart';
 import 'package:flash_chat/pages/RecentChats.dart';
 import 'package:flash_chat/pages/serachPage.dart';
@@ -29,7 +30,7 @@ import 'package:like_button/like_button.dart';
 
 
 import 'package:flash_chat/pages/ChatPage.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 class ConversationBottomSheet extends StatefulWidget {
   final String currentUser;
   final bool first_entry;
@@ -59,12 +60,14 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
   Future<QuerySnapshot> futureSearchResults;
 
   bool first;
+  PageController _pageController;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     controlSearching();
+    _pageController = PageController();
 
     if (first_entry == false) {
       first = true;
@@ -94,65 +97,15 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
 
   Widget build(BuildContext context) {
     List children = [
-      Stack(
-        children: [
-
-          SingleChildScrollView(
-            child: Column(children: <Widget>[
-
-              SizedBox(
-                height: 20,
-              ),
-              futureSearchResults == null
-                  ? displayNoSearchResultScreen()
-                  : displayUserFoundScreen(),
-            ]),
-          ),
-          Container(
-            decoration: new BoxDecoration(
-              color: Colors.grey.shade300,
-              borderRadius: BorderRadius.vertical(
-                  bottom: Radius.elliptical(
-                      MediaQuery.of(context).size.width, 30.0)),
-            ),
-            child: ListView(
-              shrinkWrap: true,
-              physics: ClampingScrollPhysics(),
-              children: <Widget>[
-                NavigationPillWidget(),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-
-                      children: [
-                        Icon(
-                          Icons.flash_on_rounded,
-                          color: Colors.yellow.shade900,
-                          size: 30,
-                        ),
-                        Text('Flash Chat',
-                            style: TextStyle(
-                                fontSize:22,
-                                color: Colors.deepOrange
-                            )),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-              ],
-            ),
-          ),
-        ],
+      AllUsers(
+        currentUser: currentUser,
       ),
       searchScreen(
         currentUser: currentUser,
       ),
-      RecentChats(),
+      RecentChat(
+        currentUser: currentUser,
+      ),
 
       SettingScreen()
 
@@ -171,51 +124,157 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
               showElevation: true, // use this to remove appBar's elevation
               onItemSelected: (index) => setState(() {
                 selectedIndex = index;
+                _pageController.jumpToPage(index);
 
               }),
-              animationDuration: Duration(milliseconds: 600),
+
+
+
               items: <BottomNavyBarItem> [
                 BottomNavyBarItem(
-                  icon: Icon(Icons.flash_on_rounded),
-                  title: Text('Flash Chat',
-                    style: TextStyle(
-                        color: Colors.deepOrange
-                    ),
+                  icon: Icon(Icons.flash_on_rounded,
+                  color: Colors.red,
                   ),
-                  activeColor: Colors.orangeAccent,
+                  title: Text('Flash Chat',
+                    style: GoogleFonts.quicksand(
+                      textStyle:  TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.normal
+                      ),
+                    )
+                  ),
+                  activeColor: Colors.blueAccent,
                 ),
                 BottomNavyBarItem(
-                    icon: Icon(Icons.search),
-                    title: Text('Search',
-                      style: TextStyle(
-                          color: Colors.deepOrange
-                      ),
+                    icon: Icon(Icons.search,
+
+                    color: Colors.blue.shade700,),
+                    title: Text('   Search',
+                      style: GoogleFonts.quicksand(
+                        textStyle:  TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.normal
+
+                        ),
+                      )
+
+
                     ),
-                    activeColor: Colors.orangeAccent
+                    activeColor: Colors.blueAccent
                 ),
                 BottomNavyBarItem(
-                    icon: Icon(Icons.message),
-                    title: Text('Chat',
-                      style: TextStyle(
-                          color: Colors.deepOrange
-                      ),
+                    icon: Icon(Icons.message,
+                    color: Colors.blue.shade700,
                     ),
-                    activeColor: Colors.orangeAccent
+                    title: Text('     Chat',
+                      style: GoogleFonts.quicksand(
+                        textStyle: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.normal
+                        ),
+                      )
+
+
+                    ),
+                    activeColor: Colors.blueAccent
                 ),
                 BottomNavyBarItem(
-                    icon: Icon(Icons.person),
-                    title: Text('User Profile',
-                      style: TextStyle(
-                          color: Colors.deepOrange
-                      ),
+                    icon: Icon(Icons.person,
+                    color: Colors.blue.shade700,
                     ),
-                    activeColor: Colors.orangeAccent
+                    title: Text('    User ',
+                      style: GoogleFonts.quicksand(
+                        textStyle: TextStyle(
+                            color: Colors.blue,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      )
+                    ),
+                    activeColor: Colors.blueAccent
                 ),
               ],
             ),
 
               backgroundColor: Colors.white,
-              body: children[selectedIndex],
+              body: SizedBox.expand(
+                child: Stack(
+                  children: [
+                    PageView(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() => selectedIndex = index);
+                      },
+                      children: <Widget>[
+                        AllUsers(
+                          currentUser: currentUser,
+                        ),
+                        searchScreen(
+                          currentUser: currentUser,
+                        ),
+                        RecentChat(
+                          currentUser: currentUser,
+                        ),
+
+                        SettingScreen()
+
+                      ],
+                    ),
+                    Container(
+                      decoration: new BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: selectedIndex == 1 ? Colors.transparent: Colors.grey.withOpacity(0.3) ,
+                            spreadRadius: 3,
+                            blurRadius: 7,
+                            offset: Offset(0, 3), // changes position of shadow
+                          ),
+                        ],
+
+                      ),
+                      child: ListView(
+                        shrinkWrap: true,
+                        physics: ClampingScrollPhysics(),
+                        children: <Widget>[
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+
+                                children: [
+                                  Icon(
+                                    Icons.flash_on_rounded,
+                                    color: Colors.yellow.shade900,
+                                    size: 30,
+                                  ),
+                                  Text('Flash Chat',
+                                    style: GoogleFonts.quicksand(
+                                        textStyle: TextStyle(
+                                          fontSize: 22,
+                                          letterSpacing: 3,
+                                          color: Colors.black,
+
+                                        )
+                                    ),
+
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 12,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
           ),
         ));
@@ -224,27 +283,8 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
   displayNoSearchResultScreen() {
     final Orientation orientation = MediaQuery.of(context).orientation;
 
-    return Container(
-      child: Center(
-        child: ListView(
-          children: <Widget>[
-            Icon(
-              Icons.group,
-              color: Colors.grey,
-              size: 150,
-            ),
-            Text(
-              "Welcome To Flash Chat",
-              style: TextStyle(
-                color: Colors.lightBlueAccent,
-                fontWeight: FontWeight.w500,
-                fontSize: 50,
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+    return circularProgress();
+
   }
 
   displayUserFoundScreen() {
@@ -269,16 +309,16 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
         return Column(
           children: [
             SizedBox(
-              height: 50,
+              height: 70 ,
             ),
             GridView.count(
               physics: const NeverScrollableScrollPhysics(),
               scrollDirection: Axis.vertical,
-              mainAxisSpacing: 18,
+              mainAxisSpacing: 15,
               crossAxisSpacing: 8,
               shrinkWrap: true,
               crossAxisCount: 2,
-              childAspectRatio: (2/2.9 ),
+              childAspectRatio: (2/3 ),
 
               children: searchUserResult,
 

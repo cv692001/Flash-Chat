@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class FullPhoto extends StatelessWidget {
   final String url;
@@ -8,24 +10,68 @@ class FullPhoto extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(35),
+
+
+      body: Stack(
+
+        children: [
+
+          FullPhotoScreen(url: url),
+          Container(
+            decoration: new BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  spreadRadius: 3,
+                  blurRadius: 7,
+                  offset: Offset(0, 3), // changes position of shadow
+                ),
+              ],
+
+            ),
+            child: ListView(
+              shrinkWrap: true,
+              physics: ClampingScrollPhysics(),
+              children: <Widget>[
+                SizedBox(
+                  height: 10,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+
+                      children: [
+                        Icon(
+                          Icons.flash_on_rounded,
+                          color: Colors.yellow.shade900,
+                          size: 30,
+                        ),
+                        Text('Flash Chat',
+                          style: GoogleFonts.quicksand(
+                              textStyle: TextStyle(
+                                fontSize: 22,
+                                letterSpacing: 3,
+                                color: Colors.black,
+
+                              )
+                          ),
+
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+              ],
+            ),
           ),
-        ),
-        backgroundColor: Colors.red,
-        //iconTheme: IconThemeData(color: Colors.white),
-        title: Text(
-          'Full Image',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: FullPhotoScreen(url: url),
+        ],
+      )
     );
   }
 }
@@ -45,7 +91,7 @@ class _FullPhotoScreenState extends State<FullPhotoScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: PhotoView(imageProvider: NetworkImage(url)),
+      child: PhotoView(imageProvider: CachedNetworkImageProvider(url),),
     );
   }
 }

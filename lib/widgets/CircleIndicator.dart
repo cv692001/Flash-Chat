@@ -19,8 +19,7 @@ class _CircleIndicatorState extends State<CircleIndicator> {
       height: widget.isActive ? 12 : 8,
       width: widget.isActive ? 12 : 8,
       decoration: BoxDecoration(
-          color:
-          widget.isActive ? Palette.primaryColor : Palette.secondaryTextColorLight,
+          color: Colors.transparent,
           borderRadius: BorderRadius.all(Radius.circular(12))),
     );
   }

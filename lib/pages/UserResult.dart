@@ -4,6 +4,7 @@ import 'package:flash_chat/models/user.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'ChatPage.dart';
 
@@ -87,267 +88,294 @@ class _UserResultState extends State<UserResult> {
 
 
 
-    return Card(
+    return Container(
+      decoration: new BoxDecoration(
 
-      color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(.2),
+            blurRadius: 2.0, // soften the shadow
+            spreadRadius: 0.0, //extend the shadow
+            offset: Offset(
+              1.0, // Move to right 10  horizontally
+              1.0, // Move to bottom 10 Vertically
+            ),
+          )
+        ],
+      ),
+      child: Card(
+
+        elevation: 2,
+        shadowColor: Colors.grey.shade300,
 
 
-      child: Stack(
-        alignment: AlignmentDirectional.bottomCenter,
+
+        color: Colors.white,
+
+
+        child: Stack(
+          alignment: AlignmentDirectional.bottomCenter,
 
 
 
 
-        children: [
+          children: [
 
 
 
-          GestureDetector(
-            onTap: () => sendUserToChatPage(context),
-            child: Container(
+            GestureDetector(
+              onTap: () => sendUserToChatPage(context),
+              child: Container(
 
-              height: 305 ,
+                height: 305 ,
 
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(60),
-              ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(60),
+                ),
 
-              
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: CachedNetworkImage(
-                  imageUrl: eachUser.photourl,
-                  imageBuilder: (context, imageProvider) => Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: imageProvider,
-                        fit: BoxFit.cover,
 
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: CachedNetworkImage(
+                    imageUrl: eachUser.photourl,
+                    imageBuilder: (context, imageProvider) => Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: imageProvider,
+                          fit: BoxFit.cover,
+
+                        ),
                       ),
                     ),
+                    progressIndicatorBuilder: (context, url, downloadProgress) =>
+                        Center(child: CircularProgressIndicator(value: downloadProgress.progress,
+                          strokeWidth: 1.0,
+
+                        )),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
+
+
                   ),
-                  progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      Center(child: CircularProgressIndicator(value: downloadProgress.progress,
-                        strokeWidth: 1.0,
-
-                      )),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
-
-
                 ),
+
+
+
+                // Image.network(eachUser.photourl,fit: BoxFit.cover,
+                //   loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent loadingProgress) {
+                //     if (loadingProgress == null) return child;
+                //     return Center(
+                //       child: CircularProgressIndicator(
+                //         value: loadingProgress.expectedTotalBytes != null ?
+                //         loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes
+                //             : null,
+                //       ),
+                //     );
+                //   },
+                // ),
+
+
+
+                //                 child: Image.network(
+                //                   eachUser.photourl,
+                //                   loadingBuilder: (context,child,progress){
+                //                     return progress == null ? child:
+                //                     LinearProgressIndicator(
+                //                     backgroundColor: Colors.cyanAccent,
+                // valueColor: new AlwaysStoppedAnimation<Color>(Colors.red),
+                // value: progress.dou,
+                // ),
+                //                 ),
               ),
-
-
-
-              // Image.network(eachUser.photourl,fit: BoxFit.cover,
-              //   loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent loadingProgress) {
-              //     if (loadingProgress == null) return child;
-              //     return Center(
-              //       child: CircularProgressIndicator(
-              //         value: loadingProgress.expectedTotalBytes != null ?
-              //         loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes
-              //             : null,
-              //       ),
-              //     );
-              //   },
-              // ),
-
-
-
-              //                 child: Image.network(
-              //                   eachUser.photourl,
-              //                   loadingBuilder: (context,child,progress){
-              //                     return progress == null ? child:
-              //                     LinearProgressIndicator(
-              //                     backgroundColor: Colors.cyanAccent,
-              // valueColor: new AlwaysStoppedAnimation<Color>(Colors.red),
-              // value: progress.dou,
-              // ),
-              //                 ),
             ),
-          ),
-          Container(
-            decoration: new BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              gradient: new LinearGradient(
-                  colors: [
-                    Colors.white70,
-                    Colors.transparent,
-                  ],
-                  begin: const FractionalOffset(0.0, 0.0),
-                  end: const FractionalOffset(4.0, 0.0),
-                  stops: [0.0, 1.0],
-                  tileMode: TileMode.clamp),
+            GestureDetector(
+              onTap:  () => sendUserToChatPage(context),
+              child: Container(
+                decoration: new BoxDecoration(
+
+
+                  borderRadius: BorderRadius.circular(8),
+                  gradient: new LinearGradient(
+
+                      colors: [
+                        Colors.black54.withOpacity(0.5),
+                        Colors.transparent,
+                      ],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      stops: [0,0.28]
+                     ),
+                ),
+
+              ),
             ),
-            height: 50,
 
-          ),
-
-          Positioned(
-            bottom: 0,
-            left: 0,
-            child: Padding(
-
-              padding: const EdgeInsets.only(left: 10,top: 5,bottom: 4 ),
+            Positioned(
+              bottom: 4,
+              left: 8,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                      eachUser.nickname[0].toUpperCase() +
-                          eachUser.nickname.substring(1),
+                  (eachUser.nickname[0].toUpperCase() +
+                          eachUser.nickname.substring(1)).length <=15 ? ( eachUser.nickname[0].toUpperCase() +
+      eachUser.nickname.substring(1) ): ( eachUser.nickname[0].toUpperCase() +
+                      eachUser.nickname.substring(1) ).replaceRange(13, (eachUser.nickname[0].toUpperCase() +
+                      eachUser.nickname.substring(1)).length, "...."),
                       textAlign: TextAlign.left,
-                      style: TextStyle(
+                      style: GoogleFonts.sourceSansPro(
+                        textStyle:  TextStyle(
 
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 1,
+                          fontSize: 14,
+                        )
                       )
+
+
                   ),
 
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
 
-    (eachUser.aboutMe).length <= 15 ?  (eachUser.aboutMe) :
-    (eachUser.aboutMe).replaceRange(15,  (eachUser.aboutMe).length, '...'),
-
-
-                          softWrap: false,
-                          maxLines: 1,
-                          overflow: TextOverflow.clip,
-                          style: TextStyle(
-                              color: Colors.black45,
-                            fontWeight: FontWeight.bold,
-                          )
-                      ),
+      (eachUser.aboutMe).length <= 15 ?  (eachUser.aboutMe) :
+      (eachUser.aboutMe).replaceRange(15,  (eachUser.aboutMe).length, '...'),
 
 
-                    ],
+                        softWrap: false,
+                        maxLines: 1,
+                        overflow: TextOverflow.clip,
+                        style: TextStyle(
+                            color: Colors.white,
+                          fontSize: 11,
+
+                        )
+                    ),
                   ),
 
                 ],
               ),
             ),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 4,
-            child: Column(
-              children: [
-                GestureDetector(
-                    onTap : (){
+            Positioned(
+              bottom: 2,
+              right: 4,
+              child: Column(
+                children: [
+                  GestureDetector(
+                      onTap : (){
 
 
-                      Firestore.instance.collection("users").document(eachUser.id).get().then((value) {
-                        List a = value.data["likedby"];
-                        print(a);
-                        if(a.contains(id)){
+                        Firestore.instance.collection("users").document(eachUser.id).get().then((value) {
+                          List a = value.data["likedby"];
+                          print(a);
+                          if(a.contains(id)){
 
-                          Firestore.instance.collection("users").document(eachUser.id).updateData({
+                            Firestore.instance.collection("users").document(eachUser.id).updateData({
 
-                            "likedby": FieldValue.arrayRemove([id]),
+                              "likedby": FieldValue.arrayRemove([id]),
 
-                          }).then((value) {
+                            }).then((value) {
 
-                            setState(() {
-                              isLiked=false;
-                              likes = likes-1;
+                              setState(() {
+                                isLiked=false;
+                                likes = likes-1;
+                              });
                             });
-                          });
 
 
-                          print("TRUE");
-                          print(a.length);
-                          print(isLiked);
-                          print(a.length);
-                        }
-                        else{
+                            print("TRUE");
+                            print(a.length);
+                            print(isLiked);
+                            print(a.length);
+                          }
+                          else{
 
-                          Firestore.instance.collection("users").document(eachUser.id).updateData({
+                            Firestore.instance.collection("users").document(eachUser.id).updateData({
 
-                            "likedby": FieldValue.arrayUnion([id]),
-                          }).then((value) {
-                            setState(() {
-                              isLiked=true;
-                              likes = likes+1;
+                              "likedby": FieldValue.arrayUnion([id]),
+                            }).then((value) {
+                              setState(() {
+                                isLiked=true;
+                                likes = likes+1;
+                              });
                             });
-                          });
 
 
 
-                          print("true");
-                          print(a.length);
-                          print(isLiked);
-                          print(a.length);
-                        }
-
+                            print("true");
+                            print(a.length);
+                            print(isLiked);
+                            print(a.length);
+                          }
 
 
 
 
-                      });
-
-
-                      Firestore.instance.collection("users").document(eachUser.id).get().then((value){
-                        List a = value.data["likedby"];
-                        setState(() {
-                          likes = a.length;
 
                         });
 
 
-                      });
+                        Firestore.instance.collection("users").document(eachUser.id).get().then((value){
+                          List a = value.data["likedby"];
+                          setState(() {
+                            likes = a.length;
 
-                      Firestore.instance.collection("users").document(eachUser.id).updateData({
-
-                        "likes": likes,
-
-                      });
-
+                          });
 
 
+                        });
+
+                        Firestore.instance.collection("users").document(eachUser.id).updateData({
+
+                          "likes": likes,
+
+                        });
 
 
-                    },
 
-                    child: isLiked == true ?Icon(
-                      Icons.favorite,
-                      size: 29,
-                      color: Colors.red,
-                    ): Icon(
-                      Icons.favorite,
 
-                      size: 29,
-                      color: Colors.black45,
-                    )
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 2),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
 
-                        "Likes: $likes ",
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black45,
-                        ),
-                      ),
-                    ],
+                      },
+
+                      child: isLiked == true ?Icon(
+                        Icons.favorite,
+                        size: 28,
+                        color: Colors.red,
+                      ): Icon(
+                        Icons.favorite,
+
+                        size: 28,
+                        color: Colors.grey.shade700,
+                      )
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+
+                          "Likes: $likes ",
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
 
-              ],
+                ],
+              ),
             ),
-          ),
 
 
 
@@ -356,14 +384,16 @@ class _UserResultState extends State<UserResult> {
 
 
 
-        ],
+
+          ],
+        ),
+
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+
+
       ),
-
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-
-
     );
   }
 
