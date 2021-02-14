@@ -1,17 +1,19 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flash_chat/widgets/NavigationPillWIdget.dart';
 import 'package:flash_chat/widgets/ProgressWidget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'RegisterPage.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 import 'fullImageWidget.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -56,33 +58,55 @@ class _SettingScreenState extends State<SettingScreen> {
   void initState() {
     super.initState();
 
+    editingMode = false;
+
     readDataFromLocal();
   }
 
   TextEditingController nicknameTextEditingController = TextEditingController();
   TextEditingController aboutMeTextEditingController = TextEditingController();
+  TextEditingController ageTextEditingController = TextEditingController();
 
   String id = "";
+  String age ="";
   String nickname = "";
   String aboutMe = "";
   String photourl = "";
-  int age = 18;
   File imageFileAvatar;
   bool isLoading = false;
   final FocusNode nicknameFocusNide = FocusNode();
+  final FocusNode ageFocusNode = FocusNode();
   final FocusNode aboutMeFocusNode = FocusNode();
+  int likes =0;
 
   void readDataFromLocal() async {
     preferences = await SharedPreferences.getInstance();
 
+
+
     id = preferences.getString("id");
+    age = preferences.getString("age");
     nickname = preferences.getString("nickname");
     aboutMe = preferences.getString("aboutMe");
-    age = preferences.getInt("age");
     photourl = preferences.getString("photourl");
+
+    print(age);
+
+    Firestore.instance.collection("users").document(id).get().then((value){
+      List a = value.data["likedby"];
+      setState(() {
+        likes = a.length;
+
+
+      });
+    });
 
     nicknameTextEditingController = TextEditingController(
       text: nickname,
+    );
+
+    ageTextEditingController= TextEditingController(
+      text: age,
     );
 
     aboutMeTextEditingController = TextEditingController(
@@ -97,8 +121,6 @@ class _SettingScreenState extends State<SettingScreen> {
     await ImagePicker.pickImage(source: ImageSource.gallery,
     imageQuality: 30
     );
-
-
 
 
     final filePath = newImageFile.absolute.path;
@@ -125,6 +147,7 @@ class _SettingScreenState extends State<SettingScreen> {
     }
 
     uploadImageToFireStoreAndStorage();
+
   }
 
   Future uploadImageToFireStoreAndStorage() async {
@@ -175,19 +198,24 @@ class _SettingScreenState extends State<SettingScreen> {
   void updateData() {
     nicknameFocusNide.unfocus();
     aboutMeFocusNode.unfocus();
+    ageFocusNode.unfocus();
+
 
     setState(() {
       isLoading = false;
     });
 
+
     Firestore.instance.collection("users").document(id).updateData({
       "photourl": photourl,
       "aboutMe": aboutMe,
       "nickname": nickname,
+      "age": age,
     }).then((data) async {
       await preferences.setString("photourl", photourl);
       await preferences.setString("nickname", nickname);
       await preferences.setString("aboutMe", aboutMe);
+      await preferences.setString("age", age);
 
       setState(() {
         isLoading = false;
@@ -197,325 +225,451 @@ class _SettingScreenState extends State<SettingScreen> {
     });
   }
 
+  bool editingMode =false ;
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: GestureDetector(
-          onTap: (){
-            Navigator.pop(context);
 
-          },
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.deepOrange,
+      backgroundColor: Colors.white,
 
-          ),
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(5),
-          ),
-        ),
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        backgroundColor: Colors.white,
-        title: Text(
-          "Flash Chat",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal),
-        ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
+      body: Stack(
 
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 3,
-                right: 3,
 
-              ),
-              child: Container(
+        children: [
+          SingleChildScrollView(
+            child: Column(
 
-                height: 430,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: Colors.orange,
-                  ),
-                  borderRadius: BorderRadius.only(
-                    bottomRight: Radius.circular(50),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0, 3), // changes position of shadow
-                    ),
-                  ],
-
+              children: <Widget>[
+                SizedBox(
+                  height: 87,
                 ),
 
-                child: Column(
-                  children: [
-                    Container(
-                      height: 350,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          bottomRight: Radius.circular(80),
-                        ),
-                        boxShadow: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 3,
+                    right: 3,
 
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
-                            spreadRadius: 2,
-                            blurRadius: 7,
-                            offset: Offset(0, 3), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        borderRadius: BorderRadius.only(
-                          bottomRight: Radius.circular(80),
-                        ),
+                  ),
+                  child: Stack(
+                    children: [
+                      Container(
+                        height: 460,
 
-                        clipBehavior: Clip.hardEdge,
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => FullPhoto(
-                                      url: photourl,
-                                    )));
-                          },
-                          child: Stack(
+                        child: Material(
 
-                            children: [
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => FullPhoto(
+                                        url: photourl,
+                                      )));
+                            },
+                            child: Stack(
+                              children: <Widget>[
+                                (imageFileAvatar == null)
+                                    ? (photourl != null)
+                                    ? Container(
+                                  // display the old image
+                                  child: Center(
 
-                              imageFileAvatar == null ?
-                              (photourl!= null) ?
-                              Material(
-                                child: CachedNetworkImage(
-                                  progressIndicatorBuilder: (context, url, downloadProgress) =>
-                                      Center(child: CircularProgressIndicator(value: downloadProgress.progress,
-                                        strokeWidth: 1.0,
+                                    child: ClipRRect(
 
-                                      )),
-                                  imageUrl: photourl,
+                                      child: CachedNetworkImage(
+                                        placeholder: (context, url) => Container(
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.lightBlueAccent),
+                                              strokeWidth: 1.0,
 
-                                  width: MediaQuery.of(context).size.width,
-                                  height: 350,
-                                  fit: BoxFit.cover,
-                                ),
-                              )
-                                  : Icon(
-                                Icons.account_circle,
-                                size: 90,
-                                color: Colors.grey,
-                              )
-                                  : Material(
-                                child: Image.file(
-                                  imageFileAvatar,
-                                  width: MediaQuery.of(context).size.width,
-                                  height: 350,
-                                  fit: BoxFit.cover,
-                                ),
+                                            ),
+                                          ),
 
-                                clipBehavior: Clip.hardEdge,
-                              ),
-                              Center(
-                                child: IconButton(
-                                  icon: Icon(
-                                    Icons.camera_alt,
-                                    size: 100,
-                                    color: Colors.white54.withOpacity(0.5),
+
+                                        ),
+                                        imageUrl: photourl,
+                                        height: 460,
+                                        width: MediaQuery.of(context).size.width,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
                                   ),
-                                  onPressed: () {
-                                    getImage();
-                                  },
-                                  padding: EdgeInsets.all(0.0),
-                                  splashColor: Colors.transparent,
-                                  highlightColor: Colors.grey,
-                                  iconSize: 200,
+
+
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(Radius.circular(0)),
+                                  ),
+
+
+
+
+                                  clipBehavior: Clip.hardEdge,
+                                )
+                                    : Icon(
+                                  Icons.account_circle,
+                                  size: 90,
+                                  color: Colors.grey,
+                                )
+                                    : Material(
+                                  child: Image.file(
+                                    imageFileAvatar,
+                                    width: MediaQuery.of(context).size.width,
+                                    height:460,
+                                    fit: BoxFit.cover,
+                                  ),
+
                                 ),
-                              ),
-
-                            ],
-
+                                Center(
+                                  child:editingMode == true ? IconButton(
+                                    icon: Icon(
+                                      Icons.add_a_photo,
+                                      size: 50,
+                                      color: Colors.white54.withOpacity(0.6),
+                                    ),
+                                    onPressed: () {
+                                      getImage();
+                                    },
+                                    padding: EdgeInsets.all(0.0),
+                                    splashColor: Colors.transparent,
+                                    highlightColor: Colors.grey,
+                                    iconSize: 200,
+                                  ):Container()
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    Row(
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 396,
+                        ),
+                        child: Expanded(
+                          child: Container(
 
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                      children: [
-                        Column(
 
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left:20, top: 20),
-                              child: Row(
 
-                                children: [
-                                  SizedBox(
-                                    width: 150,
-                                    child: TextField(
-                                      decoration: InputDecoration(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20)
 
-                                        suffixIcon: Icon(
-                                          Icons.edit,
-                                          color: Colors.orange,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                                  children: [
+                                    Column(
+
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(left:20, top: 20),
+                                          child: Row(
+
+                                            children: [
+                                              editingMode == true ? SizedBox(
+                                                width: 200,
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(right: 20),
+                                                  child: TextField(
+                                                    decoration: InputDecoration(
+
+
+                                                      labelStyle: GoogleFonts.quicksand(
+                                                        textStyle: TextStyle(
+                                                          fontSize: 30,
+
+                                                          fontWeight: FontWeight.w500,
+                                                          fontStyle: FontStyle.italic,
+                                                        ),
+                                                      ),
+
+
+
+
+                                                      hintText: "e.g. Chirag Vaishnav",
+                                                      contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                                      hintStyle: GoogleFonts.quicksand(
+                                                        textStyle: TextStyle(
+                                                          fontSize: 15,
+
+                                                          fontWeight: FontWeight.w500,
+
+                                                        ),
+                                                      )
+                                                    ),
+                                                    controller: nicknameTextEditingController,
+                                                    onChanged: (value) {
+                                                      nickname = value;
+                                                    },
+                                                    focusNode: nicknameFocusNide,
+                                                  ),
+                                                ),
+                                              ):
+                                              Text(
+
+
+                                                (nickname).length <= 15 ?  (nickname) :
+                                                (nickname).replaceRange(15,  (nickname).length, '...') ,
+
+                                                textAlign: TextAlign.start,
+
+                                                style: GoogleFonts.quicksand(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 22,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w400,
+
+                                                  ),
+                                                )
+                                              ),
+
+
+
+
+                                              editingMode== true ? SizedBox(
+                                                width: 50,
+                                                child: TextField(
+                                                  textAlign: TextAlign.center,
+                                                  decoration: InputDecoration(
+                                                    focusColor: Colors.black,
+
+
+                                                    labelStyle:GoogleFonts.quicksand(
+                                                      textStyle:  TextStyle(
+                                                        fontSize: 25,
+
+                                                        fontWeight: FontWeight.w500,
+                                                        fontStyle: FontStyle.italic,
+                                                      ),
+                                                    ),
+
+                                                    hintText: "e.g. 19",
+                                                    contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                                    hintStyle: TextStyle(
+                                                      fontSize: 15,
+
+                                                      fontWeight: FontWeight.w500,
+                                                      fontStyle: FontStyle.italic,
+                                                    ),
+                                                  ),
+                                                  controller: ageTextEditingController,
+                                                  onChanged: (value) {
+                                                    age = value;
+                                                  },
+                                                  focusNode: ageFocusNode,
+                                                ),
+                                              )
+                                                  : Text(
+                                                ", "+ age,
+
+                                                style: GoogleFonts.quicksand(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 22,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w400,
+                                                    letterSpacing: 1
+                                                  ),
+                                                ),
+                                              ),
+
+                                            ],
+                                          ),
+
+
                                         ),
-                                        labelStyle: TextStyle(
-                                          fontSize: 30,
-                                          color: Colors.deepOrange,
-                                          fontWeight: FontWeight.w500,
-                                          fontStyle: FontStyle.italic,
-                                        ),
-                                        
-                                        hintText: "e.g. Chirag Vaishnav",
-                                        contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                        hintStyle: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.deepOrange,
-                                          fontWeight: FontWeight.w500,
-                                          fontStyle: FontStyle.italic,
+
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        right: 30,
+                                        top: 10,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Icon(
+                                            Icons.favorite,
+                                            size: 35,
+                                            color: Colors.red.shade700,
+                                          ),
+                                          Text("Likes: $likes",
+                                            style: GoogleFonts.quicksand(
+                                              textStyle: TextStyle(
+                                                color: Colors.deepOrange,
+                                              ),
+                                            ),
+                                            textAlign: TextAlign.right,
+                                          ),
+
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Divider(
+                                  color: Colors.black54,
+                                  thickness: 0.2,
+
+                                ),
+
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 20,
+                                      right: 20,
+                                      top: 20,
+                                      bottom: 80
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    //crossAxisAlignment: CrossAxisAlignment.end,
+                                    //mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        constraints: new BoxConstraints(
+                                            maxWidth: MediaQuery.of(context).size.width - 84),
+                                        child:editingMode == true ? TextField(
+                                          keyboardType: TextInputType.multiline,
+                                          maxLines: null,
+                                          decoration: InputDecoration(
+
+
+                                            hintText: "e.g. Bio",
+                                            contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                            hintStyle: TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          controller: aboutMeTextEditingController,
+                                          onChanged: (value) {
+                                            aboutMe = value;
+                                          },
+                                          focusNode: aboutMeFocusNode,
+                                        ) :
+                                        Text(
+
+
+                                          aboutMe,
+
+                                          textAlign: TextAlign.start,
+
+                                          style:GoogleFonts.quicksand(
+                                            textStyle:  TextStyle(
+
+                                                fontSize: 17,
+                                                color: Colors.black,
+
+
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                      controller: nicknameTextEditingController,
-                                      onChanged: (value) {
-                                        nickname = value;
-                                      },
-                                      focusNode: nicknameFocusNide,
-                                    ),
+                                    ],
                                   ),
-                                  Text(
-                                      " , ",
-
-                                    style: TextStyle(
-                                      fontSize: 30,
-                                      color: Colors.deepOrange,
-                                      fontWeight: FontWeight.w500,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
-
-                                  Text(
-                                    "Age",
-
-                                    style: TextStyle(
-                                      fontSize: 30,
-                                      color: Colors.deepOrange,
-                                      fontWeight: FontWeight.w500,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
-
-                                ],
-                              ),
-
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            right: 30,
-                            top: 10,
-                          ),
-                          child: Column(
-                            children: [
-                             Icon(
-                                Icons.favorite,
-                                size: 35,
-                                color: Colors.red.shade700,
-                              ),
-                              Text(" 10 Likes",
-                                style: TextStyle(
-                                  color: Colors.deepOrange,
                                 ),
-                                textAlign: TextAlign.right,
-                              ),
+                                FlatButton(
+                                  textColor: Colors.black,
+                                  onPressed: () {
+                                    logoutUser();
+                                  },
+                                  child: Text("  Logout  ",
+                                    style: GoogleFonts.quicksand(
+                                      textStyle: TextStyle(
+                                        fontSize: 17,
+                                      ),
+                                    ) ,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    side: BorderSide(
+                                        color: Colors.blue,
+                                        width: 1,
+                                        style: BorderStyle.solid
+                                    ),
+                                    borderRadius: new BorderRadius.circular(15),
 
-                            ],
+                                  ),
+                                ),
+
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 40,
-                left: 20,
-                right: 20,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                // mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-
-                    "About",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-
-                        fontSize: 26,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.deepOrange,
-                        fontStyle: FontStyle.italic
-
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: 20,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                //crossAxisAlignment: CrossAxisAlignment.end,
-                //mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    constraints: new BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width - 84),
-                    child: TextField(
-                      decoration: InputDecoration(
-                       d
-                        suffixIcon: Icon(
-                          Icons.edit,
-                          color: Colors.black54,
-                        ),
-                        hintText: "e.g. Bio",
-                        contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
                         ),
                       ),
-                      controller: aboutMeTextEditingController,
-                      onChanged: (value) {
-                        aboutMe = value;
-                      },
-                      focusNode: aboutMeFocusNode,
+                    ],
+                  ),
+                ),
+
+
+
+              ],
+            ),
+          ),
+
+
+          Positioned(
+            right: 10,
+            top: 100,
+            child: FlatButton(
+              color: Colors.white,
+              textColor: Colors.black,
+              onPressed: () {
+                setState(() {
+                  if(editingMode == true){
+                    updateData();
+                  }
+                  editingMode = !editingMode;
+                });
+
+              },
+              child: editingMode == true ?Row(
+                children: [
+                  Icon(Icons.done),
+                  Text(" Update",
+                  style: GoogleFonts.quicksand(
+                    textStyle: TextStyle(
+                      fontSize: 17,
                     ),
                   ),
+                  ),
+                ],
+              ) : Row(
+                children: [
+                  Icon(
+                    Icons.edit,
+                    size: 20,
+                  ),
+                  Text(" Edit",
+                  style: GoogleFonts.quicksand(
+                    textStyle: TextStyle(
+                      fontSize: 17,
+                    ),
+                  ),),
                 ],
               ),
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                    color: Colors.blue,
+                    width: 1,
+                    style: BorderStyle.solid
+                ),
+                borderRadius: new BorderRadius.circular(15),
+
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
+
       ),
     );
   }

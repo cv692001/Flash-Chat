@@ -9,6 +9,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flash_chat/widgets/ChatAppBar.dart';
 import 'package:flash_chat/config/style.dart';
 import 'package:intl/intl.dart';
@@ -82,7 +83,7 @@ class chat extends StatelessWidget {
                           padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top
                           ),
                           child: CircleAvatar(
-                            radius: 35,
+                            radius: 33,
                             backgroundImage:
                             CachedNetworkImageProvider(recieverAvatar),
                           ),
@@ -182,6 +183,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final String recieverAvatar;
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   final String recieverId;
   final bool isLiked;
 
@@ -191,6 +193,35 @@ class _ChatScreenState extends State<ChatScreen> {
     @required this.recieverId,
     @required this.isLiked,
   });
+
+
+  void registerNotification() {
+    firebaseMessaging.requestNotificationPermissions();
+
+    firebaseMessaging.configure(onMessage: (Map<String, dynamic> message) {
+      print('onMessage: $message');
+      // Platform.isAndroid
+      //     // ? showNotification(message['notification'])
+      //     // : showNotification(message['aps']['alert']);
+      return;
+    }, onResume: (Map<String, dynamic> message) {
+      print('onResume: $message');
+      return;
+    }, onLaunch: (Map<String, dynamic> message) {
+      print('onLaunch: $message');
+      return;
+    });
+
+    firebaseMessaging.getToken().then((token) {
+      print('token: $token');
+      Firestore.instance
+          .collection('users')
+          .document(id)
+          .updateData({'pushToken': token});
+    }).catchError((err) {
+      Fluttertoast.showToast(msg: err.message.toString());
+    });
+  }
 
   readLocal() async {
     preferences = await SharedPreferences.getInstance();
@@ -1108,79 +1139,31 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     return Scaffold(
 
-
-
-
-
-
-
-
-
-
-
+      backgroundColor: Colors.white,
 
       body: Stack(
         children: [
-          Column(
-            children: <Widget>[
+          SingleChildScrollView(
+            child: Column(
 
-
-              SizedBox(
-                height: 150,
-              ),
-
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 3,
-                  right: 3,
-
+              children: <Widget>[
+                SizedBox(
+                  height: 87,
                 ),
-                child: Container(
 
-                  height: 430,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                      color: Colors.orange,
-                    ),
-                    borderRadius: BorderRadius.only(
-                      bottomRight: Radius.circular(50),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3), // changes position of shadow
-                      ),
-                    ],
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 3,
+                    right: 3,
 
                   ),
-
-                  child: Column(
+                  child: Stack(
                     children: [
                       Container(
-                        height: 350,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            bottomRight: Radius.circular(80),
-                          ),
-                          boxShadow: [
+                        height: 460,
 
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              spreadRadius: 2,
-                              blurRadius: 7,
-                              offset: Offset(0, 3), // changes position of shadow
-                            ),
-                          ],
-                        ),
                         child: Material(
-                          borderRadius: BorderRadius.only(
-                            bottomRight: Radius.circular(80),
-                          ),
 
-                          clipBehavior: Clip.hardEdge,
                           child: GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -1190,161 +1173,223 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                         url: recieverAvatar,
                                       )));
                             },
-                            child: CachedNetworkImage(
-                              placeholder: (context, url) => Container(
-                                child: CircularProgressIndicator(
-                                  valueColor:
-                                  AlwaysStoppedAnimation(Colors.lightBlueAccent),
-                                ),
-                                width: 150,
-                                height: 150,
-                                padding: EdgeInsets.all(10.0),
-                              ),
-                              imageUrl: recieverAvatar,
+                            child: Stack(
+                              children: <Widget>[
 
-                              width: MediaQuery.of(context).size.width,
-                              height: 350,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Row(
 
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    Container(
+                                  // display the old image
+                                  child: Center(
 
-                        children: [
-                          Column(
+                                    child: ClipRRect(
 
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(left:20, top: 20),
-                                child: Row(
+                                      child: CachedNetworkImage(
+                                        placeholder: (context, url) => Container(
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.lightBlueAccent),
+                                              strokeWidth: 1.0,
 
-                                  children: [
-                                    Text(
-                                      recieverName[0].toUpperCase() + recieverName.substring(1)  + ", ",
+                                            ),
+                                          ),
 
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        color: Colors.deepOrange,
-                                        fontWeight: FontWeight.w500,
-                                        fontStyle: FontStyle.italic,
+
+                                        ),
+                                        imageUrl: recieverAvatar,
+                                        height: 460,
+                                        width: MediaQuery.of(context).size.width,
+                                        fit: BoxFit.cover,
                                       ),
                                     ),
-
-                                    Text(
-                                      recieverAge,
-
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        color: Colors.deepOrange,
-                                        fontWeight: FontWeight.w500,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-
-                                  ],
-                                ),
-
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              right: 30,
-                              top: 10,
-                            ),
-                            child: Column(
-                              children: [
-                                isLiked==true ?Icon(
-                                  Icons.favorite,
-                                  size: 35,
-                                  color: Colors.red.shade700,
-                                ): Icon(
-                                  Icons.favorite,
-                                  color: Palette.greyColor,
-                                  size: 35,
-
-                                ),
-                                Text(" $likes Likes",
-                                  style: TextStyle(
-                                    color: Colors.deepOrange,
                                   ),
-                                  textAlign: TextAlign.right,
-                                ),
+
+
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(0)),
+                                  ),
+
+
+
+
+                                  clipBehavior: Clip.hardEdge,
+                                )
+
 
                               ],
                             ),
                           ),
-                        ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 396,
+                        ),
+                        child: Expanded(
+                          child: Container(
+
+
+
+
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20)
+
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                                  children: [
+                                    Column(
+
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(left:20, top: 20),
+                                          child: Row(
+
+                                            children: [
+
+                                              Text(
+
+
+                                                  (recieverName[0].toUpperCase() + recieverName.substring(1)).length <= 15 ?  (recieverName[0].toUpperCase() + recieverName.substring(1)  + ", ") :
+                                                  (recieverName[0].toUpperCase() + recieverName.substring(1)  + ", ").replaceRange(15,  (recieverName[0].toUpperCase() + recieverName.substring(1)  + ", ").length, '...') ,
+
+                                                  textAlign: TextAlign.start,
+
+                                                  style: GoogleFonts.quicksand(
+                                                    textStyle: TextStyle(
+                                                      fontSize: 22,
+                                                      color: Colors.black,
+                                                      fontWeight: FontWeight.w400,
+
+                                                    ),
+                                                  )
+                                              ),
+
+
+
+
+
+                                                   Text(
+                                                recieverAge,
+
+                                                style: GoogleFonts.quicksand(
+                                                  textStyle: TextStyle(
+                                                      fontSize: 22,
+                                                      color: Colors.black,
+                                                      fontWeight: FontWeight.w400,
+                                                      letterSpacing: 1
+                                                  ),
+                                                ),
+                                              ),
+
+                                            ],
+                                          ),
+
+
+                                        ),
+
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        right: 30,
+                                        top: 10,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                         isLiked == true ? Icon(
+                                            Icons.favorite,
+                                            size: 35,
+                                            color: Colors.red.shade700,
+                                          ):Icon(
+                                           Icons.favorite,
+                                           size: 35,
+                                           color: Colors.grey,
+                                         ),
+                                          Text("Likes: $likes",
+                                            style: GoogleFonts.quicksand(
+                                              textStyle: TextStyle(
+                                                color: Colors.deepOrange,
+                                              ),
+                                            ),
+                                            textAlign: TextAlign.right,
+                                          ),
+
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Divider(
+                                  color: Colors.black54,
+                                  thickness: 0.2,
+
+                                ),
+
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 20,
+                                      right: 20,
+                                      top: 20,
+                                      bottom: 80
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    //crossAxisAlignment: CrossAxisAlignment.end,
+                                    //mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        constraints: new BoxConstraints(
+                                            maxWidth: MediaQuery.of(context).size.width - 84),
+                                        child:
+                                        Text(
+
+
+    recieverAbout[0].toUpperCase() +
+    recieverAbout.substring(1),
+
+                                          textAlign: TextAlign.start,
+
+                                          style:GoogleFonts.quicksand(
+                                            textStyle:  TextStyle(
+
+                                              fontSize: 17,
+                                              color: Colors.black,
+
+
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 40,
-                  left: 20,
-                  right: 20,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  // mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-
-                      "About",
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-
-                          fontSize: 26,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.deepOrange,
-                          fontStyle: FontStyle.italic
-
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 20,
-                  right: 20,
-                  top: 20,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  //crossAxisAlignment: CrossAxisAlignment.end,
-                  //mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      constraints: new BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width - 84),
-                      child: Text(
 
 
-                        (recieverAbout[0].toUpperCase() +
-                            recieverAbout.substring(1)),
 
-                        textAlign: TextAlign.start,
-
-                        style: TextStyle(
-
-                            fontSize: 17,
-                            color: Colors.orange,
-                            fontStyle: FontStyle.italic
-
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
+
           Container(
             decoration: new BoxDecoration(
               color: Colors.white,

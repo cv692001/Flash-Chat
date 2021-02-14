@@ -327,6 +327,7 @@ class _RegisterPageState extends State<RegisterPage>
   String aboutMe = "";
   String photourl = "";
   List likedby =[ ];
+  List likedto= [ ];
   List activeChat = [];
   File imageFileAvatar;
   TextEditingController nicknameTextEditor = TextEditingController();
@@ -1212,6 +1213,7 @@ class _RegisterPageState extends State<RegisterPage>
           "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
           "chattingWith": null,
           "likedby" : [ ],
+          "likedto" : [ ],
           "activeChat": [ ]
         });
 

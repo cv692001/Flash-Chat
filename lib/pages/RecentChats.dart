@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flash_chat/config/style.dart';
 import 'package:flash_chat/models/user.dart';
+import 'package:flash_chat/pages/AllUser.dart';
+import 'package:flash_chat/pages/WhoLikedYou.dart';
 import 'package:flash_chat/widgets/NavigationPillWIdget.dart';
 import 'package:flash_chat/widgets/ProgressWidget.dart';
 import 'package:flutter/material.dart';
@@ -47,70 +49,68 @@ class _RecentChatState extends State<RecentChat> {
     controlSearchingfirst();
 
   }
+  bool oneSelected = true ;
+  bool twoSelected = false;
 
   final FocusNode searchFocusNode = FocusNode();
   @override
   Widget build(BuildContext context) {
     double statusBarHeight = MediaQuery.of(context).padding.top;
 
-    return Scaffold(
+    return MaterialApp(
+      home: DefaultTabController(
 
-        body: Stack(
-          children: [
-            futureSearchResults == null
-                ? displayNoUserResultScreen()
-                : displayUserFoundScreen(),
-            Container(
-              decoration: new BoxDecoration(
-                color: Colors.white,
+        length: 2,
+        child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.white,
 
 
-              ),
-              child: ListView(
-                shrinkWrap: true,
-                physics: ClampingScrollPhysics(),
-                children: <Widget>[
-                  SizedBox(
-                    height: 10,
+              bottom: TabBar(
+                labelColor: Colors.blue,
+
+                indicatorColor: Colors.blue,
+                tabs: [
+                  Tab(child: Text("Recent Chats",
+                  style: GoogleFonts.quicksand(
+                    fontSize: 16,
+                    letterSpacing: 1,
+                    color: Colors.blue.shade900
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                  ),
 
-                        children: [
-                          Icon(
-                            Icons.flash_on_rounded,
-                            color: Colors.yellow.shade900,
-                            size: 30,
-                          ),
-                          Text('Flash Chat',
-                            style: GoogleFonts.quicksand(
-                                textStyle: TextStyle(
-                                  fontSize: 22,
-                                  letterSpacing: 3,
-                                  color: Colors.black,
 
-                                )
-                            ),
-
-                          ),
-                        ],
+                  ),
+                  Tab(
+                    child: Text("Who Liked You !!",
+                      style: GoogleFonts.quicksand(
+                          fontSize: 16,
+                          letterSpacing: 1,
+                          color: Colors.blue.shade900
                       ),
-                    ],
+                    ),
                   ),
-
 
                 ],
               ),
+              title: Text('TABS TITLE TEXT'),
             ),
+            body: TabBarView(
+              children: [
+                futureSearchResults == null
+                    ? displayNoUserResultScreen()
+                    : displayUserFoundScreen(),
 
-          ],
-        )
+                WhoLikedYou(
+                  currentUser: currentUser,
+                )
+              ],
+            )
 
 
 
+        ),
+      ),
     );
   }
 
@@ -207,7 +207,7 @@ class _RecentChatState extends State<RecentChat> {
 
             children: [
               SizedBox(
-                height: 75,
+                height: 20,
               ),
               GridView.count(
                 physics: const NeverScrollableScrollPhysics(),

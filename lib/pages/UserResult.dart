@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash_chat/models/user.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -238,7 +239,8 @@ class _UserResultState extends State<UserResult> {
 
 
                   Padding(
-                    padding: const EdgeInsets.only(top: 2),
+                    padding: const EdgeInsets.only(top: 2,
+                    bottom: 1),
                     child: Text(
 
       (eachUser.aboutMe).length <= 15 ?  (eachUser.aboutMe) :
@@ -272,6 +274,12 @@ class _UserResultState extends State<UserResult> {
                           List a = value.data["likedby"];
                           print(a);
                           if(a.contains(id)){
+                            Firestore.instance.collection("users").document(id).updateData({
+
+                              "likedto": FieldValue.arrayRemove([eachUser.id]),
+
+                            });
+
 
                             Firestore.instance.collection("users").document(eachUser.id).updateData({
 
@@ -292,6 +300,11 @@ class _UserResultState extends State<UserResult> {
                             print(a.length);
                           }
                           else{
+                            Firestore.instance.collection("users").document(id).updateData({
+
+                              "likedto": FieldValue.arrayUnion([eachUser.id]),
+                            });
+
 
                             Firestore.instance.collection("users").document(eachUser.id).updateData({
 
@@ -398,16 +411,22 @@ class _UserResultState extends State<UserResult> {
   }
 
   sendUserToChatPage(BuildContext context) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (value) => chat(
-              recieverId: eachUser.id,
-              recieverName: eachUser.nickname,
-              recieverAvatar: eachUser.photourl,
-              recieverAbout: eachUser.aboutMe,
-              recieverAge: age11,
-              isLiked : isLiked,
-            )));
+
+
+    Navigator.of(context, rootNavigator:true).push( // ensures fullscreen
+        CupertinoPageRoute(
+            builder: (BuildContext context) {
+              return chat(
+                recieverId: eachUser.id,
+                recieverName: eachUser.nickname,
+                recieverAvatar: eachUser.photourl,
+                recieverAbout: eachUser.aboutMe,
+                recieverAge: age11,
+                isLiked : isLiked,
+              );
+            }
+        ) );
+
+
   }
 }

@@ -15,28 +15,28 @@ import 'package:flash_chat/pages/UserResult.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 
-class AllUsers extends StatefulWidget {
+class WhoLikedYou extends StatefulWidget {
   final String currentUser;
   final bool first_entry;
 
-    AllUsers({
+  WhoLikedYou({
     this.currentUser,
-      this.first_entry,
+    this.first_entry,
 });
   @override
-  _AllUsersState createState() => _AllUsersState(
-    currentUser:currentUser,
+  _WhoLikedYouState createState() => _WhoLikedYouState(
+    currentUser: currentUser,
   );
 }
 
-class _AllUsersState extends State<AllUsers> {
+class _WhoLikedYouState extends State<WhoLikedYou> {
   TextEditingController searchTextController = TextEditingController();
   Future<QuerySnapshot> futureSearchResults;
   Future<QuerySnapshot> futureSearchResultsfirst;
 
-  _AllUsersState({
-    Key key,
 
+  _WhoLikedYouState({
+    Key key,
     this.currentUser,
 });
   final String currentUser;
@@ -78,12 +78,12 @@ class _AllUsersState extends State<AllUsers> {
         if (!datasnapshot.hasData) {
           return Center(
             child: Container(
-              height: 110,
-              width: 110,
-              child:  CircularProgressIndicator(
+                height: 110,
+                width: 110,
+                child:  CircularProgressIndicator(
 
-                strokeWidth: 1,
-              )
+                  strokeWidth: 1,
+                )
             ),
           );
         }
@@ -103,7 +103,7 @@ class _AllUsersState extends State<AllUsers> {
           child: Column(
             children: [
               SizedBox(
-                height: 75,
+                height: 20,
               ),
               GridView.count(
                 physics: const NeverScrollableScrollPhysics(),
@@ -212,7 +212,7 @@ class _AllUsersState extends State<AllUsers> {
 
     Firestore.instance
         .collection("users")
-        .where("nickname", isGreaterThanOrEqualTo: "" ).getDocuments();
+        .where("likedto", arrayContains: currentUser ).getDocuments();
 
 
 

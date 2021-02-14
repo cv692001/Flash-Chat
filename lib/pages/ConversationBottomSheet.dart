@@ -224,7 +224,7 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
                         color: Colors.white,
                         boxShadow: [
                           BoxShadow(
-                            color: selectedIndex == 1 ? Colors.transparent: Colors.grey.withOpacity(0.3) ,
+                            color: selectedIndex == 1 || selectedIndex == 2 ? Colors.transparent: Colors.grey.withOpacity(0.3) ,
                             spreadRadius: 3,
                             blurRadius: 7,
                             offset: Offset(0, 3), // changes position of shadow
