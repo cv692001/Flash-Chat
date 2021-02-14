@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat/pages/RegisterPage.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -77,10 +79,11 @@ class chat extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
 
-                    Expanded(flex: 2, child: Container(
+                    Expanded(flex: 3, child: Container(
                       child: Center(
                         child: Padding(
-                          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top
+                          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top,
+                            left: 10
                           ),
                           child: CircleAvatar(
                             radius: 33,
@@ -91,66 +94,64 @@ class chat extends StatelessWidget {
                       ),
                     ),),
                     Expanded(
-                      flex: 8,
-                      child: Center(
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              flex: 6,
+                      flex: 9,
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            flex: 6,
+                            child: Container(
+                              margin: EdgeInsets.symmetric(horizontal: 40),
                               child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: 40),
-                                child: Container(
-                                  padding: EdgeInsets.only(top: 25),
-                                  child: Column(
+                                padding: EdgeInsets.only(top: 25),
+                                child: Column(
 
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Text(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    Text(
 
-                                        (recieverName[0].toUpperCase() +
-                                            recieverName.substring(1)).length <= 15 ?  (recieverName[0].toUpperCase() +
-                                            recieverName.substring(1)) :
-                                        (recieverName[0].toUpperCase() +
-                                            recieverName.substring(1)).replaceRange(15,  (recieverName[0].toUpperCase() +
-                                            recieverName.substring(1)).length, '...'),
-                                          textAlign: TextAlign.start,
-                                          style:  GoogleFonts.quicksand(
-                                              textStyle: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize:22
+                                      (recieverName[0].toUpperCase() +
+                                          recieverName.substring(1)).length <= 15 ?  (recieverName[0].toUpperCase() +
+                                          recieverName.substring(1)) :
+                                      (recieverName[0].toUpperCase() +
+                                          recieverName.substring(1)).replaceRange(15,  (recieverName[0].toUpperCase() +
+                                          recieverName.substring(1)).length, '...'),
+                                      textAlign: TextAlign.start,
+                                      style:  GoogleFonts.quicksand(
+                                          textStyle: TextStyle(
+                                              color: Colors.black,
+                                              fontSize:22
 
-                                              )
-                                          ),
-                                      ),
-                                      Text(
-
-
-
-                                          (recieverAbout[0].toUpperCase() +
-                                              recieverAbout.substring(1)).length <= 25 ?  (recieverAbout[0].toUpperCase() +
-                                              recieverAbout.substring(1)) :
-                                          (recieverAbout[0].toUpperCase() +
-                                              recieverAbout.substring(1)).replaceRange(25,  (recieverAbout[0].toUpperCase() +
-                                              recieverAbout.substring(1)).length, '...'),
-                                          textAlign: TextAlign.start,
-                                          maxLines: 1,
-                                          style:  GoogleFonts.quicksand(
-                                              textStyle: TextStyle(
-                                                  color: Colors.black54,
-                                                  fontSize:15
-                                              )
                                           )
-                                      )
-                                    ],
-                                  ),
+                                      ),
+                                    ),
+                                    Text(
+
+
+
+                                        (recieverAbout[0].toUpperCase() +
+                                            recieverAbout.substring(1)).length <= 25 ?  (recieverAbout[0].toUpperCase() +
+                                            recieverAbout.substring(1)) :
+                                        (recieverAbout[0].toUpperCase() +
+                                            recieverAbout.substring(1)).replaceRange(25,  (recieverAbout[0].toUpperCase() +
+                                            recieverAbout.substring(1)).length, '...'),
+                                        textAlign: TextAlign.start,
+                                        maxLines: 1,
+                                        style:  GoogleFonts.quicksand(
+                                            textStyle: TextStyle(
+                                                color: Colors.black54,
+                                                fontSize:15
+                                            )
+                                        )
+                                    )
+                                  ],
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
 
@@ -161,7 +162,7 @@ class chat extends StatelessWidget {
           ),
         ),
         body:
-            ChatScreen(recieverAvatar: recieverAvatar, recieverId: recieverId));
+        ChatScreen(recieverAvatar: recieverAvatar, recieverId: recieverId));
   }
 }
 
@@ -184,6 +185,8 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final String recieverAvatar;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
   final String recieverId;
   final bool isLiked;
 
@@ -195,33 +198,8 @@ class _ChatScreenState extends State<ChatScreen> {
   });
 
 
-  void registerNotification() {
-    firebaseMessaging.requestNotificationPermissions();
 
-    firebaseMessaging.configure(onMessage: (Map<String, dynamic> message) {
-      print('onMessage: $message');
-      // Platform.isAndroid
-      //     // ? showNotification(message['notification'])
-      //     // : showNotification(message['aps']['alert']);
-      return;
-    }, onResume: (Map<String, dynamic> message) {
-      print('onResume: $message');
-      return;
-    }, onLaunch: (Map<String, dynamic> message) {
-      print('onLaunch: $message');
-      return;
-    });
 
-    firebaseMessaging.getToken().then((token) {
-      print('token: $token');
-      Firestore.instance
-          .collection('users')
-          .document(id)
-          .updateData({'pushToken': token});
-    }).catchError((err) {
-      Fluttertoast.showToast(msg: err.message.toString());
-    });
-  }
 
   readLocal() async {
     preferences = await SharedPreferences.getInstance();
@@ -258,6 +236,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
 
     focusNode.addListener(onFocusChange);
 
@@ -557,46 +536,46 @@ class _ChatScreenState extends State<ChatScreen> {
     return Flexible(
         child: chatId == null
             ? Center(
-                child: CircularProgressIndicator(
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(Colors.lightBlueAccent),
-                ),
-              )
+          child: CircularProgressIndicator(
+            valueColor:
+            AlwaysStoppedAnimation<Color>(Colors.lightBlueAccent),
+          ),
+        )
             : StreamBuilder(
-                stream: Firestore.instance
-                    .collection('messages')
-                    .document(chatId)
-                    .collection(chatId)
-                    .orderBy("timestamp", descending: true)
-                    .limit(20)
-                    .snapshots(),
-                builder: (context, snapshots) {
-                  if (!snapshots.hasData) {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.lightBlueAccent),
-                      ),
-                    );
-                  } else {
-                    listMessage = snapshots.data.documents;
+            stream: Firestore.instance
+                .collection('messages')
+                .document(chatId)
+                .collection(chatId)
+                .orderBy("timestamp", descending: true)
+                .limit(20)
+                .snapshots(),
+            builder: (context, snapshots) {
+              if (!snapshots.hasData) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.lightBlueAccent),
+                  ),
+                );
+              } else {
+                listMessage = snapshots.data.documents;
 
-                    return ListView.builder(
-                      padding: EdgeInsets.all(10.0),
-                      itemBuilder: (context, index) =>
-                          createItem(index, snapshots.data.documents[index]),
-                      itemCount: snapshots.data.documents.length,
-                      reverse: true,
-                      controller: listScrollController,
-                    );
-                  }
-                }));
+                return ListView.builder(
+                  padding: EdgeInsets.all(10.0),
+                  itemBuilder: (context, index) =>
+                      createItem(index, snapshots.data.documents[index]),
+                  itemCount: snapshots.data.documents.length,
+                  reverse: true,
+                  controller: listScrollController,
+                );
+              }
+            }));
   }
 
   bool isLastMessageLeft(int index) {
     if ((index > 0 &&
-            listMessage != null &&
-            listMessage[index - 1]["idFrom"] == id) ||
+        listMessage != null &&
+        listMessage[index - 1]["idFrom"] == id) ||
         index == 0) {
       return true;
     } else {
@@ -606,8 +585,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   bool isLastMessageRight(int index) {
     if ((index > 0 &&
-            listMessage != null &&
-            listMessage[index - 1]["idFrom"] != id) ||
+        listMessage != null &&
+        listMessage[index - 1]["idFrom"] != id) ||
         index == 0) {
       return true;
     } else {
@@ -622,62 +601,195 @@ class _ChatScreenState extends State<ChatScreen> {
         children: <Widget>[
           document['type'] == 0
               ? Padding(
-                  padding: const EdgeInsets.only(
-          top: 10,bottom: 10,right: 17
-      ),
-                  child: Material(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(30),
-                      bottomRight: Radius.circular(30),
-                      topLeft: Radius.circular(30),
-                    ),
-                    elevation: 3,
-                    shadowColor: Colors.grey.shade400,
-                    color: Palette.selfMessageBackgroundColor,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      child: Text(
-                        document['content'],
-                        style: GoogleFonts.quicksand(
-                            textStyle: TextStyle(
-                                color: Colors.white,
-                                fontSize:15
-                            )
+            padding: const EdgeInsets.only(
+                top: 10,bottom: 10,right: 17
+            ),
+            child: Material(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+                topLeft: Radius.circular(30),
+              ),
+              elevation: 3,
+              shadowColor: Colors.grey.shade400,
+              color: Palette.selfMessageBackgroundColor,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20, vertical: 10),
+                child: Text(
+                    document['content'],
+                    style: GoogleFonts.quicksand(
+                        textStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize:15
                         )
+                    )
+                ),
+              ),
+            ),
+          )
+              : document['type'] == 1
+              ? Container(
+            child: FlatButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FullPhoto(
+                          url: document['content'],
+                        )));
+              },
+              child: Material(
+                child: CachedNetworkImage(
+                  placeholder: (context, url) => Container(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation(
+                          Colors.lightBlueAccent),
+                    ),
+                    width: 200,
+                    height: 200,
+                    padding: EdgeInsets.all(70.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(8.0),
                       ),
                     ),
                   ),
+                  errorWidget: (context, url, error) => Material(
+                    child: Image.asset(
+                      "images/img_not_available.jpeg",
+                      height: 200,
+                      width: 200,
+                      fit: BoxFit.cover,
+                    ),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8.0),
+                    ),
+                    clipBehavior: Clip.hardEdge,
+                  ),
+                  imageUrl: document['content'],
+                  height: 200,
+                  width: 200,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            margin: EdgeInsets.only(
+                bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                right: 0.0),
+          )
+              : Container(
+            child: Image.network(
+              document['content'],
+              loadingBuilder: (context, child, progress) {
+                return progress == null
+                    ? child
+                    : CircularProgressIndicator();
+              },
+              width: 100,
+              height: 100,
+              fit: BoxFit.cover,
+            ),
+            margin: EdgeInsets.only(
+                bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                right: 17.0),
+          )
+        ],
+      );
+    } else {
+      return Container(
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                isLastMessageLeft(index)
+                    ? Material(
+                  child: CachedNetworkImage(
+                    placeholder: (context, url) => Container(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(
+                            Colors.lightBlueAccent),
+                      ),
+                      width: 35,
+                      height: 35,
+                      padding: EdgeInsets.all(10.0),
+                    ),
+                    imageUrl: recieverAvatar,
+                    width: 35,
+                    height: 35,
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(18.0),
+                  ),
+                  clipBehavior: Clip.hardEdge,
                 )
-              : document['type'] == 1
-                  ? Container(
-                      child: FlatButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => FullPhoto(
-                                        url: document['content'],
-                                      )));
-                        },
-                        child: Material(
-                          child: CachedNetworkImage(
-                            placeholder: (context, url) => Container(
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation(
-                                    Colors.lightBlueAccent),
-                              ),
-                              width: 200,
-                              height: 200,
-                              padding: EdgeInsets.all(70.0),
-                              decoration: BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(8.0),
-                                ),
-                              ),
+                    : Container(
+                  width: 35.0,
+                ),
+                document['type'] == 0
+                    ? Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Material(
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
+                          topRight: Radius.circular(30),
+                        ),
+                        elevation: 3,
+                        shadowColor: Colors.grey.shade400,
+                        color: Palette.otherMessageBackgroundColor,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          child: Text(
+                              document['content'],
+                              style: GoogleFonts.quicksand(
+                                  textStyle: TextStyle(
+                                      color: Colors.black,
+                                      fontSize:15
+                                  )
+                              )
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+                    : document['type'] == 1
+                    ? Container(
+                  child: FlatButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => FullPhoto(
+                                url: document['content'],
+                              )));
+                    },
+                    child: Material(
+                      child: CachedNetworkImage(
+                        placeholder: (context, url) => Container(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation(
+                                Colors.lightBlueAccent),
+                          ),
+                          width: 200,
+                          height: 200,
+                          padding: EdgeInsets.all(70.0),
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(8.0),
                             ),
-                            errorWidget: (context, url, error) => Material(
+                          ),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            Material(
                               child: Image.asset(
                                 "images/img_not_available.jpeg",
                                 height: 200,
@@ -689,184 +801,51 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                               clipBehavior: Clip.hardEdge,
                             ),
-                            imageUrl: document['content'],
-                            height: 200,
-                            width: 200,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      margin: EdgeInsets.only(
-                          bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                          right: 0.0),
-                    )
-                  : Container(
-                      child: Image.network(
-                        document['content'],
-                        loadingBuilder: (context, child, progress) {
-                          return progress == null
-                              ? child
-                              : CircularProgressIndicator();
-                        },
-                        width: 100,
-                        height: 100,
+                        imageUrl: document['content'],
+                        height: 200,
+                        width: 200,
                         fit: BoxFit.cover,
                       ),
-                      margin: EdgeInsets.only(
-                          bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                          right: 17.0),
-                    )
-        ],
-      );
-    } else {
-      return Container(
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                isLastMessageLeft(index)
-                    ? Material(
-                        child: CachedNetworkImage(
-                          placeholder: (context, url) => Container(
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation(
-                                  Colors.lightBlueAccent),
-                            ),
-                            width: 35,
-                            height: 35,
-                            padding: EdgeInsets.all(10.0),
-                          ),
-                          imageUrl: recieverAvatar,
-                          width: 35,
-                          height: 35,
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(18.0),
-                        ),
-                        clipBehavior: Clip.hardEdge,
-                      )
+                    ),
+                  ),
+                  margin: EdgeInsets.only(
+                      bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                      right: 10.0),
+                )
                     : Container(
-                        width: 35.0,
-                      ),
-                document['type'] == 0
-                    ? Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Material(
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(30),
-                                bottomRight: Radius.circular(30),
-                                topRight: Radius.circular(30),
-                              ),
-                              elevation: 3,
-                              shadowColor: Colors.grey.shade400,
-                              color: Palette.otherMessageBackgroundColor,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 10),
-                                child: Text(
-                                  document['content'],
-                                  style: GoogleFonts.quicksand(
-                                      textStyle: TextStyle(
-                                          color: Colors.black,
-                                          fontSize:15
-                                      )
-                                  )
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : document['type'] == 1
-                        ? Container(
-                            child: FlatButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => FullPhoto(
-                                              url: document['content'],
-                                            )));
-                              },
-                              child: Material(
-                                child: CachedNetworkImage(
-                                  placeholder: (context, url) => Container(
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation(
-                                          Colors.lightBlueAccent),
-                                    ),
-                                    width: 200,
-                                    height: 200,
-                                    padding: EdgeInsets.all(70.0),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(8.0),
-                                      ),
-                                    ),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      Material(
-                                    child: Image.asset(
-                                      "images/img_not_available.jpeg",
-                                      height: 200,
-                                      width: 200,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(8.0),
-                                    ),
-                                    clipBehavior: Clip.hardEdge,
-                                  ),
-                                  imageUrl: document['content'],
-                                  height: 200,
-                                  width: 200,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            margin: EdgeInsets.only(
-                                bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                                right: 10.0),
-                          )
-                        : Container(
-                            child: Image.network(
-                              document['content'],
-                              loadingBuilder: (context, child, progress) {
-                                return progress == null
-                                    ? child
-                                    : CircularProgressIndicator();
-                              },
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            ),
-                            margin: EdgeInsets.only(
-                                bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                                right: 10.0),
-                          )
+                  child: Image.network(
+                    document['content'],
+                    loadingBuilder: (context, child, progress) {
+                      return progress == null
+                          ? child
+                          : CircularProgressIndicator();
+                    },
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  ),
+                  margin: EdgeInsets.only(
+                      bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                      right: 10.0),
+                )
               ],
             ),
             isLastMessageLeft(index)
                 ? Container(
-                    child: Text(
-                      "Last Seen :" +
-                          DateFormat("dd MM yyyy - hh:mm:aa").format(
-                              DateTime.fromMillisecondsSinceEpoch(
-                                  int.parse(document['timestamp']))),
-                      style: GoogleFonts.quicksand(
-                          textStyle: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize:12
-                          )
+              child: Text(
+                  "Last Seen :" +
+                      DateFormat("dd MM yyyy - hh:mm:aa").format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                              int.parse(document['timestamp']))),
+                  style: GoogleFonts.quicksand(
+                      textStyle: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize:12
                       )
-                    ),
-                    margin: EdgeInsets.only(bottom: 5.0, left: 50.0, top: 0.0),
                   )
+              ),
+              margin: EdgeInsets.only(bottom: 5.0, left: 50.0, top: 0.0),
+            )
                 : Container()
           ],
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -906,42 +885,42 @@ class _ChatScreenState extends State<ChatScreen> {
 
             Flexible(
                 child: GestureDetector(
-              onVerticalDragEnd: (details) {
-                print('Dragged Down');
-                if (details.primaryVelocity < 50) {
-                  Navigator.pop(context);
-                }
-              },
-              child: Container(
-                child: TextField(
-                  cursorColor: Colors.blue,
+                  onVerticalDragEnd: (details) {
+                    print('Dragged Down');
+                    if (details.primaryVelocity < 50) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Container(
+                    child: TextField(
+                        cursorColor: Colors.blue,
 
-                  focusNode: focusNode,
+                        focusNode: focusNode,
 
-                  textAlign: TextAlign.center,
-                  controller: textEditingController,
-                  decoration: InputDecoration(
+                        textAlign: TextAlign.center,
+                        controller: textEditingController,
+                        decoration: InputDecoration(
 
-                      border: InputBorder.none,
-                      hintText: "Write here...",
-                      alignLabelWithHint: true,
-                      hintStyle: GoogleFonts.quicksand(
-                        textStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize:16
+                            border: InputBorder.none,
+                            hintText: "Write here...",
+                            alignLabelWithHint: true,
+                            hintStyle: GoogleFonts.quicksand(
+                                textStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize:16
+                                )
+                            )
+
+                        ),
+                        style: GoogleFonts.quicksand(
+                            textStyle: TextStyle(
+                                color: Colors.black54,
+                                fontSize:17
+                            )
                         )
-                      )
-
-    ),
-                  style: GoogleFonts.quicksand(
-                      textStyle: TextStyle(
-                          color: Colors.black54,
-                          fontSize:17
-                      )
-                  )
-                ),
-              ),
-            )),
+                    ),
+                  ),
+                )),
             Material(
               child: Container(
                 margin: EdgeInsets.symmetric(horizontal: 8.0),
@@ -963,13 +942,13 @@ class _ChatScreenState extends State<ChatScreen> {
         decoration: BoxDecoration(
           border: Border(
               top: BorderSide(
-            color: Colors.grey,
-            width: 0.5,
-          ),
-            bottom:  BorderSide(
-              color: Colors.grey,
-              width: 0.5,
-            )
+                color: Colors.grey,
+                width: 0.5,
+              ),
+              bottom:  BorderSide(
+                color: Colors.grey,
+                width: 0.5,
+              )
           ),
           color: Colors.white,
         ));
@@ -977,7 +956,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future getImage() async {
     imageFile1 = await ImagePicker.pickImage(source: ImageSource.gallery,
-    imageQuality: 30,
+      imageQuality: 30,
     );
 
 
@@ -1015,12 +994,12 @@ class _ChatScreenState extends State<ChatScreen> {
   Future uploadImageFile() async {
     String fileName = DateTime.now().millisecondsSinceEpoch.toString();
     StorageReference storageReference =
-        FirebaseStorage.instance.ref().child("Chat Images").child(fileName);
+    FirebaseStorage.instance.ref().child("Chat Images").child(fileName);
 
     StorageUploadTask storageUploadTask = storageReference.putFile(imageFile);
 
     StorageTaskSnapshot storageTaskSnapshot =
-        await storageUploadTask.onComplete;
+    await storageUploadTask.onComplete;
 
     storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
       imageUrl = downloadUrl;
@@ -1058,13 +1037,13 @@ class UserProfileScreen extends StatefulWidget {
   }) : super(key: key);
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState(
-        recieverAbout,
-        recieverId,
-        recieverAvatar,
-        recieverName,
-        recieverAge,
-        isLiked,
-      );
+    recieverAbout,
+    recieverId,
+    recieverAvatar,
+    recieverName,
+    recieverAge,
+    isLiked,
+  );
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
@@ -1073,16 +1052,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final String recieverAvatar;
   final String recieverName;
   final String recieverAge;
-   bool isLiked;
+  bool isLiked;
 
   _UserProfileScreenState(
-    this.recieverAbout,
-    this.recieverId,
-    this.recieverAvatar,
-    this.recieverName,
+      this.recieverAbout,
+      this.recieverId,
+      this.recieverAvatar,
+      this.recieverName,
       this.recieverAge,
       this.isLiked,
-  );
+      );
 
   int likes =0;
 
@@ -1148,7 +1127,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
               children: <Widget>[
                 SizedBox(
-                  height: 87,
+                  height: 78,
                 ),
 
                 Padding(
@@ -1177,7 +1156,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               children: <Widget>[
 
 
-                                    Container(
+                                Container(
                                   // display the old image
                                   child: Center(
 
@@ -1226,157 +1205,155 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         padding: const EdgeInsets.only(
                           top: 396,
                         ),
-                        child: Expanded(
-                          child: Container(
+                        child: Container(
 
 
 
 
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(20),
-                                  topRight: Radius.circular(20)
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(18),
+                                topRight: Radius.circular(18),
 
-                              ),
                             ),
-                            child: Column(
-                              children: [
-                                Row(
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
 
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                                  children: [
-                                    Column(
+                                children: [
+                                  Column(
 
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(left:20, top: 20),
-                                          child: Row(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(left:20, top: 20),
+                                        child: Row(
 
-                                            children: [
+                                          children: [
 
-                                              Text(
-
-
-                                                  (recieverName[0].toUpperCase() + recieverName.substring(1)).length <= 15 ?  (recieverName[0].toUpperCase() + recieverName.substring(1)  + ", ") :
-                                                  (recieverName[0].toUpperCase() + recieverName.substring(1)  + ", ").replaceRange(15,  (recieverName[0].toUpperCase() + recieverName.substring(1)  + ", ").length, '...') ,
-
-                                                  textAlign: TextAlign.start,
-
-                                                  style: GoogleFonts.quicksand(
-                                                    textStyle: TextStyle(
-                                                      fontSize: 22,
-                                                      color: Colors.black,
-                                                      fontWeight: FontWeight.w400,
-
-                                                    ),
-                                                  )
-                                              ),
+                                            Text(
 
 
+                                                (recieverName[0].toUpperCase() + recieverName.substring(1)).length <= 15 ?  (recieverName[0].toUpperCase() + recieverName.substring(1)  + ", ") :
+                                                (recieverName[0].toUpperCase() + recieverName.substring(1)  + ", ").replaceRange(15,  (recieverName[0].toUpperCase() + recieverName.substring(1)  + ", ").length, '...') ,
 
-
-
-                                                   Text(
-                                                recieverAge,
+                                                textAlign: TextAlign.start,
 
                                                 style: GoogleFonts.quicksand(
                                                   textStyle: TextStyle(
-                                                      fontSize: 22,
-                                                      color: Colors.black,
-                                                      fontWeight: FontWeight.w400,
-                                                      letterSpacing: 1
+                                                    fontSize: 22,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w400,
+
                                                   ),
+                                                )
+                                            ),
+
+
+
+
+
+                                            Text(
+                                              recieverAge,
+
+                                              style: GoogleFonts.quicksand(
+                                                textStyle: TextStyle(
+                                                    fontSize: 22,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w400,
+                                                    letterSpacing: 1
                                                 ),
                                               ),
+                                            ),
 
-                                            ],
+                                          ],
+                                        ),
+
+
+                                      ),
+
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      right: 30,
+                                      top: 10,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        isLiked == true ? Icon(
+                                          Icons.favorite,
+                                          size: 35,
+                                          color: Colors.red.shade700,
+                                        ):Icon(
+                                          Icons.favorite,
+                                          size: 35,
+                                          color: Colors.grey,
+                                        ),
+                                        Text("Likes: $likes",
+                                          style: GoogleFonts.quicksand(
+                                            textStyle: TextStyle(
+                                              color: Colors.deepOrange,
+                                            ),
                                           ),
-
-
+                                          textAlign: TextAlign.right,
                                         ),
 
                                       ],
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 30,
-                                        top: 10,
-                                      ),
-                                      child: Column(
-                                        children: [
-                                         isLiked == true ? Icon(
-                                            Icons.favorite,
-                                            size: 35,
-                                            color: Colors.red.shade700,
-                                          ):Icon(
-                                           Icons.favorite,
-                                           size: 35,
-                                           color: Colors.grey,
-                                         ),
-                                          Text("Likes: $likes",
-                                            style: GoogleFonts.quicksand(
-                                              textStyle: TextStyle(
-                                                color: Colors.deepOrange,
-                                              ),
-                                            ),
-                                            textAlign: TextAlign.right,
-                                          ),
+                                  ),
+                                ],
+                              ),
+                              Divider(
+                                color: Colors.black54,
+                                thickness: 0.2,
 
-                                        ],
+                              ),
+
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 20,
+                                    right: 20,
+                                    top: 20,
+                                    bottom: 80
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  //crossAxisAlignment: CrossAxisAlignment.end,
+                                  //mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      constraints: new BoxConstraints(
+                                          maxWidth: MediaQuery.of(context).size.width - 84),
+                                      child:
+                                      Text(
+
+
+                                        recieverAbout[0].toUpperCase() +
+                                            recieverAbout.substring(1),
+
+                                        textAlign: TextAlign.start,
+
+                                        style:GoogleFonts.quicksand(
+                                          textStyle:  TextStyle(
+
+                                            fontSize: 17,
+                                            color: Colors.black,
+
+
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                Divider(
-                                  color: Colors.black54,
-                                  thickness: 0.2,
-
-                                ),
-
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 20,
-                                      right: 20,
-                                      top: 20,
-                                      bottom: 80
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    //crossAxisAlignment: CrossAxisAlignment.end,
-                                    //mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Container(
-                                        constraints: new BoxConstraints(
-                                            maxWidth: MediaQuery.of(context).size.width - 84),
-                                        child:
-                                        Text(
+                              ),
 
 
-    recieverAbout[0].toUpperCase() +
-    recieverAbout.substring(1),
-
-                                          textAlign: TextAlign.start,
-
-                                          style:GoogleFonts.quicksand(
-                                            textStyle:  TextStyle(
-
-                                              fontSize: 17,
-                                              color: Colors.black,
-
-
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-
-                              ],
-                            ),
+                            ],
                           ),
                         ),
                       ),

@@ -243,7 +243,7 @@ class _SettingScreenState extends State<SettingScreen> {
 
               children: <Widget>[
                 SizedBox(
-                  height: 87,
+                  height: 78,
                 ),
 
                 Padding(
@@ -257,91 +257,88 @@ class _SettingScreenState extends State<SettingScreen> {
                       Container(
                         height: 460,
 
-                        child: Material(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => FullPhoto(
+                                      url: photourl,
+                                    )));
+                          },
+                          child: Stack(
+                            children: <Widget>[
+                              (imageFileAvatar == null)
+                                  ? (photourl != null)
+                                  ? Container(
+                                // display the old image
+                                child: Center(
 
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => FullPhoto(
-                                        url: photourl,
-                                      )));
-                            },
-                            child: Stack(
-                              children: <Widget>[
-                                (imageFileAvatar == null)
-                                    ? (photourl != null)
-                                    ? Container(
-                                  // display the old image
-                                  child: Center(
+                                  child: ClipRRect(
 
-                                    child: ClipRRect(
+                                    child: CachedNetworkImage(
+                                      placeholder: (context, url) => Container(
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Colors.lightBlueAccent),
+                                            strokeWidth: 1.0,
 
-                                      child: CachedNetworkImage(
-                                        placeholder: (context, url) => Container(
-                                          child: Center(
-                                            child: CircularProgressIndicator(
-                                              valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                  Colors.lightBlueAccent),
-                                              strokeWidth: 1.0,
-
-                                            ),
                                           ),
-
-
                                         ),
-                                        imageUrl: photourl,
-                                        height: 460,
-                                        width: MediaQuery.of(context).size.width,
-                                        fit: BoxFit.cover,
+
+
                                       ),
+                                      imageUrl: photourl,
+                                      height: 460,
+                                      width: MediaQuery.of(context).size.width,
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
-
-
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.all(Radius.circular(0)),
-                                  ),
-
-
-
-
-                                  clipBehavior: Clip.hardEdge,
-                                )
-                                    : Icon(
-                                  Icons.account_circle,
-                                  size: 90,
-                                  color: Colors.grey,
-                                )
-                                    : Material(
-                                  child: Image.file(
-                                    imageFileAvatar,
-                                    width: MediaQuery.of(context).size.width,
-                                    height:460,
-                                    fit: BoxFit.cover,
-                                  ),
-
                                 ),
-                                Center(
-                                  child:editingMode == true ? IconButton(
-                                    icon: Icon(
-                                      Icons.add_a_photo,
-                                      size: 50,
-                                      color: Colors.white54.withOpacity(0.6),
-                                    ),
-                                    onPressed: () {
-                                      getImage();
-                                    },
-                                    padding: EdgeInsets.all(0.0),
-                                    splashColor: Colors.transparent,
-                                    highlightColor: Colors.grey,
-                                    iconSize: 200,
-                                  ):Container()
+
+
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(0)),
                                 ),
-                              ],
-                            ),
+
+
+
+
+                                clipBehavior: Clip.hardEdge,
+                              )
+                                  : Icon(
+                                Icons.account_circle,
+                                size: 90,
+                                color: Colors.grey,
+                              )
+                                  : Material(
+                                child: Image.file(
+                                  imageFileAvatar,
+                                  width: MediaQuery.of(context).size.width,
+                                  height:460,
+                                  fit: BoxFit.cover,
+                                ),
+
+                              ),
+                              Center(
+                                child:editingMode == true ? IconButton(
+                                  icon: Icon(
+                                    Icons.add_a_photo,
+                                    size: 50,
+                                    color: Colors.white54.withOpacity(0.6),
+                                  ),
+                                  onPressed: () {
+                                    getImage();
+                                  },
+                                  padding: EdgeInsets.all(0.0),
+                                  splashColor: Colors.transparent,
+                                  highlightColor: Colors.grey,
+                                  iconSize: 200,
+                                ):Container()
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -349,260 +346,258 @@ class _SettingScreenState extends State<SettingScreen> {
                         padding: const EdgeInsets.only(
                           top: 396,
                         ),
-                        child: Expanded(
-                          child: Container(
+                        child: Container(
 
 
 
 
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20)
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(18),
+                              topRight: Radius.circular(18)
 
-                              ),
                             ),
-                            child: Column(
-                              children: [
-                                Row(
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
 
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                                  children: [
-                                    Column(
+                                children: [
+                                  Column(
 
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(left:20, top: 20),
-                                          child: Row(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(left:20, top: 20),
+                                        child: Row(
 
-                                            children: [
-                                              editingMode == true ? SizedBox(
-                                                width: 200,
-                                                child: Padding(
-                                                  padding: const EdgeInsets.only(right: 20),
-                                                  child: TextField(
-                                                    decoration: InputDecoration(
-
-
-                                                      labelStyle: GoogleFonts.quicksand(
-                                                        textStyle: TextStyle(
-                                                          fontSize: 30,
-
-                                                          fontWeight: FontWeight.w500,
-                                                          fontStyle: FontStyle.italic,
-                                                        ),
-                                                      ),
-
-
-
-
-                                                      hintText: "e.g. Chirag Vaishnav",
-                                                      contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                                      hintStyle: GoogleFonts.quicksand(
-                                                        textStyle: TextStyle(
-                                                          fontSize: 15,
-
-                                                          fontWeight: FontWeight.w500,
-
-                                                        ),
-                                                      )
-                                                    ),
-                                                    controller: nicknameTextEditingController,
-                                                    onChanged: (value) {
-                                                      nickname = value;
-                                                    },
-                                                    focusNode: nicknameFocusNide,
-                                                  ),
-                                                ),
-                                              ):
-                                              Text(
-
-
-                                                (nickname).length <= 15 ?  (nickname) :
-                                                (nickname).replaceRange(15,  (nickname).length, '...') ,
-
-                                                textAlign: TextAlign.start,
-
-                                                style: GoogleFonts.quicksand(
-                                                  textStyle: TextStyle(
-                                                    fontSize: 22,
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w400,
-
-                                                  ),
-                                                )
-                                              ),
-
-
-
-
-                                              editingMode== true ? SizedBox(
-                                                width: 50,
+                                          children: [
+                                            editingMode == true ? SizedBox(
+                                              width: 200,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(right: 20),
                                                 child: TextField(
-                                                  textAlign: TextAlign.center,
                                                   decoration: InputDecoration(
-                                                    focusColor: Colors.black,
 
 
-                                                    labelStyle:GoogleFonts.quicksand(
-                                                      textStyle:  TextStyle(
-                                                        fontSize: 25,
+                                                    labelStyle: GoogleFonts.quicksand(
+                                                      textStyle: TextStyle(
+                                                        fontSize: 30,
 
                                                         fontWeight: FontWeight.w500,
                                                         fontStyle: FontStyle.italic,
                                                       ),
                                                     ),
 
-                                                    hintText: "e.g. 19",
+
+
+
+                                                    hintText: "e.g. Chirag Vaishnav",
                                                     contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                                    hintStyle: TextStyle(
-                                                      fontSize: 15,
+                                                    hintStyle: GoogleFonts.quicksand(
+                                                      textStyle: TextStyle(
+                                                        fontSize: 15,
+
+                                                        fontWeight: FontWeight.w500,
+
+                                                      ),
+                                                    )
+                                                  ),
+                                                  controller: nicknameTextEditingController,
+                                                  onChanged: (value) {
+                                                    nickname = value;
+                                                  },
+                                                  focusNode: nicknameFocusNide,
+                                                ),
+                                              ),
+                                            ):
+                                            Text(
+
+
+                                              (nickname).length <= 15 ?  (nickname) :
+                                              (nickname).replaceRange(15,  (nickname).length, '...') ,
+
+                                              textAlign: TextAlign.start,
+
+                                              style: GoogleFonts.quicksand(
+                                                textStyle: TextStyle(
+                                                  fontSize: 22,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w400,
+
+                                                ),
+                                              )
+                                            ),
+
+
+
+
+                                            editingMode== true ? SizedBox(
+                                              width: 50,
+                                              child: TextField(
+                                                textAlign: TextAlign.center,
+                                                decoration: InputDecoration(
+                                                  focusColor: Colors.black,
+
+
+                                                  labelStyle:GoogleFonts.quicksand(
+                                                    textStyle:  TextStyle(
+                                                      fontSize: 25,
 
                                                       fontWeight: FontWeight.w500,
                                                       fontStyle: FontStyle.italic,
                                                     ),
                                                   ),
-                                                  controller: ageTextEditingController,
-                                                  onChanged: (value) {
-                                                    age = value;
-                                                  },
-                                                  focusNode: ageFocusNode,
-                                                ),
-                                              )
-                                                  : Text(
-                                                ", "+ age,
 
-                                                style: GoogleFonts.quicksand(
-                                                  textStyle: TextStyle(
-                                                    fontSize: 22,
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w400,
-                                                    letterSpacing: 1
+                                                  hintText: "e.g. 19",
+                                                  contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                                  hintStyle: TextStyle(
+                                                    fontSize: 15,
+
+                                                    fontWeight: FontWeight.w500,
+                                                    fontStyle: FontStyle.italic,
                                                   ),
                                                 ),
+                                                controller: ageTextEditingController,
+                                                onChanged: (value) {
+                                                  age = value;
+                                                },
+                                                focusNode: ageFocusNode,
                                               ),
+                                            )
+                                                : Text(
+                                               ", " + age,
 
-                                            ],
+                                              style: GoogleFonts.quicksand(
+                                                textStyle: TextStyle(
+                                                  fontSize: 22,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w400,
+                                                  letterSpacing: 1
+                                                ),
+                                              ),
+                                            ),
+
+                                          ],
+                                        ),
+
+
+                                      ),
+
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      right: 30,
+                                      top: 10,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Icon(
+                                          Icons.favorite,
+                                          size: 35,
+                                          color: Colors.red.shade700,
+                                        ),
+                                        Text("Likes: $likes",
+                                          style: GoogleFonts.quicksand(
+                                            textStyle: TextStyle(
+                                              color: Colors.deepOrange,
+                                            ),
                                           ),
-
-
+                                          textAlign: TextAlign.right,
                                         ),
 
                                       ],
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 30,
-                                        top: 10,
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Icon(
-                                            Icons.favorite,
-                                            size: 35,
-                                            color: Colors.red.shade700,
-                                          ),
-                                          Text("Likes: $likes",
-                                            style: GoogleFonts.quicksand(
-                                              textStyle: TextStyle(
-                                                color: Colors.deepOrange,
-                                              ),
-                                            ),
-                                            textAlign: TextAlign.right,
-                                          ),
+                                  ),
+                                ],
+                              ),
+                              Divider(
+                                color: Colors.black54,
+                                thickness: 0.2,
 
-                                        ],
+                              ),
+
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 20,
+                                    right: 20,
+                                    top: 20,
+                                    bottom: 80
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  //crossAxisAlignment: CrossAxisAlignment.end,
+                                  //mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      constraints: new BoxConstraints(
+                                          maxWidth: MediaQuery.of(context).size.width - 84),
+                                      child:editingMode == true ? TextField(
+                                        keyboardType: TextInputType.multiline,
+                                        maxLines: null,
+                                        decoration: InputDecoration(
+
+
+                                          hintText: "e.g. Bio",
+                                          contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                          hintStyle: TextStyle(
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        controller: aboutMeTextEditingController,
+                                        onChanged: (value) {
+                                          aboutMe = value;
+                                        },
+                                        focusNode: aboutMeFocusNode,
+                                      ) :
+                                      Text(
+
+
+                                        aboutMe,
+
+                                        textAlign: TextAlign.start,
+
+                                        style:GoogleFonts.quicksand(
+                                          textStyle:  TextStyle(
+
+                                              fontSize: 17,
+                                              color: Colors.black,
+
+
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                Divider(
-                                  color: Colors.black54,
-                                  thickness: 0.2,
-
-                                ),
-
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 20,
-                                      right: 20,
-                                      top: 20,
-                                      bottom: 80
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    //crossAxisAlignment: CrossAxisAlignment.end,
-                                    //mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Container(
-                                        constraints: new BoxConstraints(
-                                            maxWidth: MediaQuery.of(context).size.width - 84),
-                                        child:editingMode == true ? TextField(
-                                          keyboardType: TextInputType.multiline,
-                                          maxLines: null,
-                                          decoration: InputDecoration(
-
-
-                                            hintText: "e.g. Bio",
-                                            contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                            hintStyle: TextStyle(
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          controller: aboutMeTextEditingController,
-                                          onChanged: (value) {
-                                            aboutMe = value;
-                                          },
-                                          focusNode: aboutMeFocusNode,
-                                        ) :
-                                        Text(
-
-
-                                          aboutMe,
-
-                                          textAlign: TextAlign.start,
-
-                                          style:GoogleFonts.quicksand(
-                                            textStyle:  TextStyle(
-
-                                                fontSize: 17,
-                                                color: Colors.black,
-
-
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                FlatButton(
-                                  textColor: Colors.black,
-                                  onPressed: () {
-                                    logoutUser();
-                                  },
-                                  child: Text("  Logout  ",
-                                    style: GoogleFonts.quicksand(
-                                      textStyle: TextStyle(
-                                        fontSize: 17,
-                                      ),
-                                    ) ,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    side: BorderSide(
-                                        color: Colors.blue,
-                                        width: 1,
-                                        style: BorderStyle.solid
+                              ),
+                              FlatButton(
+                                textColor: Colors.black,
+                                onPressed: () {
+                                  logoutUser();
+                                },
+                                child: Text("  Logout  ",
+                                  style: GoogleFonts.quicksand(
+                                    textStyle: TextStyle(
+                                      fontSize: 17,
                                     ),
-                                    borderRadius: new BorderRadius.circular(15),
-
-                                  ),
+                                  ) ,
                                 ),
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      color: Colors.blue,
+                                      width: 1,
+                                      style: BorderStyle.solid
+                                  ),
+                                  borderRadius: new BorderRadius.circular(15),
 
-                              ],
-                            ),
+                                ),
+                              ),
+
+                            ],
                           ),
                         ),
                       ),

@@ -68,6 +68,7 @@ class _RegisterPageState extends State<RegisterPage>
 
   @override
   void initState() {
+
     WidgetsBinding.instance.addObserver(this);
     usernameFieldAnimationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
@@ -121,12 +122,16 @@ class _RegisterPageState extends State<RegisterPage>
       setState(() {});
     });
 
+
+
     super.initState();
 
     isSignedIn();
+
   }
 
   void isSignedIn() async {
+
     this.setState(() {
       isLoggedIn = true;
     });
@@ -151,6 +156,7 @@ class _RegisterPageState extends State<RegisterPage>
 
   @override
   Widget build(BuildContext context) {
+
     final theme = Theme.of(context);
     return WillPopScope(
         onWillPop: onWillPop, //user to override the back button press
@@ -221,99 +227,104 @@ class _RegisterPageState extends State<RegisterPage>
   }
 
   buildPageOne() {
-    return Container(
-      child : Stack(
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                      margin: EdgeInsets.only(top: 150),
-                      child: Image.asset('images/launcher/logo.png',
-                          height: controller.value * 130)),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 0),
-                    child: Container(
-                        margin: EdgeInsets.only(top: 35),
-                        child: Text('Flash Chat',
-                            style: GoogleFonts.quicksand(
-                                textStyle: TextStyle(
-                                    fontSize: 30,
-                                    letterSpacing: 2
+    return SingleChildScrollView(
+      child: Container(
+        child : Stack(
+          alignment: Alignment.center,
+          children: [
 
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+
+                  children: <Widget>[
+                    Container(
+                        margin: EdgeInsets.only(top: 0.24*MediaQuery.of(context).size.height),
+                        child: Image.asset('images/launcher/logo.png',
+                            height: controller.value * 130)),
+                    SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 0),
+                        child: Container(
+                            margin: EdgeInsets.only(top: 35),
+                            child: Text('Flash Chat',
+                                style: GoogleFonts.quicksand(
+                                    textStyle: TextStyle(
+                                        fontSize: 30,
+                                        letterSpacing: 2
+
+                                    )
+                                )
+                            )),
+                      ),
+                    ),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: (){
+                    controlSignIn();
+                  },
+                  child: Padding(
+                    padding:  EdgeInsets.only(top: 0.25083612*MediaQuery.of(context).size.height),
+                    child: Container(
+
+
+                      height: 45,
+                      width: 270,
+
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10
+                        ),
+                        color: Colors.white,
+
+
+                        boxShadow: [
+                          BoxShadow(color: Colors.transparent, spreadRadius: 3),
+                        ],
+                      ),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'images/google.png',
+
+
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                                'Sign In with Google',
+                                style: GoogleFonts.quicksand(
+                                    textStyle: TextStyle(
+                                        fontSize: 18,
+                                        letterSpacing: 1
+                                    )
                                 )
                             )
-                        )),
-                  ),
-                ],
-              ),
-              GestureDetector(
-                onTap: (){
-                  controlSignIn();
-                },
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 225),
-                  child: Container(
 
-
-                    height: 45,
-                    width: 270,
-
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10
-                      ),
-                      color: Colors.white,
-
-
-                      boxShadow: [
-                        BoxShadow(color: Colors.transparent, spreadRadius: 3),
-                      ],
-                    ),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'images/google.png',
-
-
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                              'Sign In with Google',
-                              style: GoogleFonts.quicksand(
-                                  textStyle: TextStyle(
-                                      fontSize: 18,
-                                      letterSpacing: 1
-                                  )
-                              )
-                          )
-
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(8),
-                child: isLoading ? circularProgress() : Container(),
-              )
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: isLoading ? circularProgress() : Container(),
-          )
-        ],
-      )
+
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: isLoading ? circularProgress() : Container(),
+            )
+          ],
+        )
 
 
+      ),
     );
   }
 
@@ -328,6 +339,7 @@ class _RegisterPageState extends State<RegisterPage>
   String photourl = "";
   List likedby =[ ];
   List likedto= [ ];
+
   List activeChat = [];
   File imageFileAvatar;
   TextEditingController nicknameTextEditor = TextEditingController();
@@ -455,412 +467,512 @@ class _RegisterPageState extends State<RegisterPage>
 
     readDataFromLocal();
 
-    return InkWell(
-        onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
-        child: Container(
-            color: Colors.blue.shade800,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 20,top: 20, bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Welcome !",
+    final Color background = Colors.blue.shade800;
+    final Color fill = Colors.white;
+    final List<Color> gradient = [
+      background,
+      background,
+      fill,
+      fill,
+    ];
+    final double fillPercent = 50.00; // fills 56.23% for container from bottom
+    final double fillStop = (100 - fillPercent) / 100;
+    final List<double> stops = [0.0, fillStop, fillStop, 1.0];
 
-                            style: GoogleFonts.quicksand(
-                              textStyle: TextStyle(
-                                color: Colors.white,
-
-                                fontWeight: FontWeight.w500,
-                                fontSize: 21,
-
-                              ),
-                            ),
+    return SingleChildScrollView(
+      child: Stack(
+        children: [
+          Container(
+            color: Colors.white,
+            height: MediaQuery.of(context).size.height- MediaQuery.of(context).padding.top,
+          ),
+          Container(
 
 
 
-                          ),
-                          Text("We need some basic information .",
-
-                            style: GoogleFonts.quicksand(
-                              textStyle: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w400,
-                                fontSize: 15,
-
-                              ),
-                            ),
-
-
-
-                          ),
-                        ],
-                      ),
-
-                    ],
-                  ),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: gradient,
+                  stops: stops,
+                  end: Alignment.bottomCenter,
+                  begin: Alignment.topCenter,
                 ),
-                Expanded(
-                  child: Container(
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20,top: 20, bottom: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Welcome !",
 
-                    width:  MediaQuery. of(context). size. width,
+                              style: GoogleFonts.quicksand(
+                                textStyle: TextStyle(
+                                  color: Colors.white,
 
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 50),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Center(
-                            child: Column(
-                              children: [
-                                Container(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 21,
 
-                                  child: GestureDetector(
-                                    onTap: (){
-                                      getImage();
-                                      setState(() {
-                                        imagePicked = true;
-                                      });
-                                    },
-                                    child: Stack(
-                                      children: [
-                                        Positioned( // will be positioned in the top right of the container
-                                          top: 0,
-                                          right: 0,
-                                          child: Icon(
-                                            Icons.add_a_photo,
-                                            color: Colors.blueAccent,
+                                ),
+                              ),
+
+
+
+                            ),
+                            Text("We need some basic information .",
+
+                              style: GoogleFonts.quicksand(
+                                textStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 15,
+
+                                ),
+                              ),
+
+
+
+                            ),
+                          ],
+                        ),
+
+                      ],
+                    ),
+                  ),
+                  SingleChildScrollView(
+                    child: Container(
+
+
+
+
+
+                      width:  MediaQuery. of(context). size. width,
+
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 50),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Center(
+                              child: Column(
+                                children: [
+                                  Container(
+
+                                    child: GestureDetector(
+                                      onTap: (){
+                                        getImage();
+                                        setState(() {
+                                          imagePicked = true;
+                                        });
+                                      },
+                                      child: Stack(
+                                        children: [
+                                          Positioned( // will be positioned in the top right of the container
+                                            top: 0,
+                                            right: 0,
+                                            child: Icon(
+                                              Icons.add_a_photo,
+                                              color: Colors.blueAccent,
+                                            ),
                                           ),
-                                        ),
-                                        imageFileAvatar==null ? Padding(
-                                          padding: const EdgeInsets.all(12.0),
-                                          child: Icon(
-                                            Icons.person,
-                                            size: 80,
-                                            color: Colors.lightBlueAccent,
+                                          imageFileAvatar==null ? Padding(
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: Icon(
+                                              Icons.person,
+                                              size: 80,
+                                              color: Colors.lightBlueAccent,
+                                            ),
+                                          ) : Material(
+                                            child: Image.file(
+                                              imageFileAvatar,
+                                              width: 130,
+                                              height: 130,
+                                              fit: BoxFit.cover,
+                                            ),
+                                            borderRadius:
+                                            BorderRadius.circular(150),
+                                            clipBehavior: Clip.hardEdge,
                                           ),
-                                        ) : Material(
-                                          child: Image.file(
-                                            imageFileAvatar,
-                                            width: 130,
-                                            height: 130,
-                                            fit: BoxFit.cover,
-                                          ),
-                                          borderRadius:
-                                          BorderRadius.circular(150),
-                                          clipBehavior: Clip.hardEdge,
-                                        ),
-                                      ],
+                                        ],
+                                      ),
+                                    ),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [BoxShadow(
+                                          color: Colors.grey,
+                                          blurRadius: 5.0,
+                                        ),]
                                     ),
                                   ),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
-                                      boxShadow: [BoxShadow(
-                                        color: Colors.grey,
-                                        blurRadius: 5.0,
-                                      ),]
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 16),
-                                  child: Text("Add Profile Picture",
-                                    style: GoogleFonts.quicksand(
-                                      textStyle:  TextStyle(
-                                        color: Colors.blue.shade700,
-                                        fontSize: 16,
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 16),
+                                    child: Text("Add Profile Picture",
+                                        style: GoogleFonts.quicksand(
+                                          textStyle:  TextStyle(
+                                            color: Colors.blue.shade700,
+                                            fontSize: 16,
 
-                                        fontWeight: FontWeight.w400,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        )
+
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 20,top: 20),
+                                      child: Text("Gender*",
+                                          style: GoogleFonts.quicksand(
+                                              textStyle: TextStyle(
+                                                color: Colors.blue.shade600,
+
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16,
+                                              )
+                                          )
                                       ),
                                     )
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
 
-                                   ),
+                                    children: [
+                                      Row(
+                                        children: [
+                                          new Radio(
+                                            hoverColor: Colors.lightBlueAccent,
+                                            activeColor: Colors.lightBlueAccent,
+                                            focusColor: Colors.lightBlueAccent,
+                                            value: 0,
+                                            groupValue: _radioValue,
+                                            onChanged: _handleRadioValueChange,
+                                          ),
+                                          Text(
+                                              'Male',
+                                              style: GoogleFonts.quicksand(
+                                                textStyle:  TextStyle(
+                                                  color: _radioValue ==0 ? Colors.lightBlueAccent : Colors.blueGrey,
+                                                  fontWeight:  _radioValue ==0 ?FontWeight.w500 : FontWeight.w200,
+                                                  fontSize: 16,
+                                                ),
+                                              )
+
+
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        width: 20,
+                                      ),
+                                      Row(
+                                        children: [
+                                          new Radio(
+                                            hoverColor: Colors.lightBlueAccent,
+                                            activeColor: Colors.lightBlueAccent,
+                                            focusColor: Colors.lightBlueAccent,
+                                            value: 1,
+                                            groupValue: _radioValue,
+                                            onChanged: _handleRadioValueChange,
+                                          ),
+                                          Text(
+                                              'Female',
+                                              style: GoogleFonts.quicksand(
+                                                textStyle:   TextStyle(
+                                                  color: _radioValue ==1 ? Colors.blue : Colors.blueGrey,
+                                                  fontWeight:  _radioValue ==1 ?FontWeight.w500 : FontWeight.w200,
+                                                  fontSize: 16,
+                                                ),
+                                              )
+                                          ),
+                                        ],
+                                      ),
+
+                                      SizedBox(
+                                        width: 20,
+                                      ),
+                                      Row(
+                                        children: [
+                                          new Radio(
+                                            hoverColor: Colors.lightBlueAccent,
+                                            activeColor: Colors.lightBlueAccent,
+                                            focusColor: Colors.lightBlueAccent,
+                                            value: 2,
+                                            groupValue: _radioValue,
+                                            onChanged: _handleRadioValueChange,
+                                          ),
+                                          Text(
+                                              'None',
+                                              style: GoogleFonts.quicksand(
+                                                textStyle: TextStyle(
+                                                  color: _radioValue ==2 ? Colors.blue : Colors.blueGrey,
+                                                  fontWeight:  _radioValue ==2 ?FontWeight.w500 : FontWeight.w200,
+                                                  fontSize: 16,
+                                                ),
+                                              )
+                                          ),
+                                        ],
+                                      ),
+
+
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 20,top: 20),
-                                    child: Text("Gender*",
-                                      style: GoogleFonts.quicksand(
-                                      textStyle: TextStyle(
-                                        color: Colors.blue.shade600,
+                            Column(
 
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16,
-                                      )
-                                      )
-                                      ),
-                                  )
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8),
-                                child: Row(
+                              children: [
+                                Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
-
                                   children: [
-                                    Row(
-                                      children: [
-                                        new Radio(
-                                          hoverColor: Colors.lightBlueAccent,
-                                          activeColor: Colors.lightBlueAccent,
-                                          focusColor: Colors.lightBlueAccent,
-                                          value: 0,
-                                          groupValue: _radioValue,
-                                          onChanged: _handleRadioValueChange,
-                                        ),
-                                        Text(
-                                          'Male',
-                                          style: GoogleFonts.quicksand(
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
+                                      child: Text("Name*",
+                                          style: GoogleFonts.sourceSansPro(
                                             textStyle:  TextStyle(
-                                              color: _radioValue ==0 ? Colors.lightBlueAccent : Colors.blueGrey,
-                                              fontWeight:  _radioValue ==0 ?FontWeight.w500 : FontWeight.w200,
-                                              fontSize: 16,
+                                              color: Colors.blue.shade600,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 17,
                                             ),
                                           )
+                                      ),
 
 
-                                        ),
-                                      ],
                                     ),
-                                    SizedBox(
-                                      width: 20,
-                                    ),
-                                    Row(
-                                      children: [
-                                        new Radio(
-                                          hoverColor: Colors.lightBlueAccent,
-                                          activeColor: Colors.lightBlueAccent,
-                                          focusColor: Colors.lightBlueAccent,
-                                          value: 1,
-                                          groupValue: _radioValue,
-                                          onChanged: _handleRadioValueChange,
-                                        ),
-                                        Text(
-                                          'Female',
-                                          style: GoogleFonts.quicksand(
-                                            textStyle:   TextStyle(
-                                              color: _radioValue ==1 ? Colors.blue : Colors.blueGrey,
-                                              fontWeight:  _radioValue ==1 ?FontWeight.w500 : FontWeight.w200,
-                                              fontSize: 16,
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 20,top: 0 , right: 40),
+                                      child: Container(
+                                          width :  MediaQuery. of(context). size. width - 70,
+                                          decoration: BoxDecoration(
+                                              color: Colors.grey.shade200,
+                                              border: Border.all(
+                                                  color: Colors.white
+                                              ),
+                                              borderRadius: BorderRadius.all(Radius.circular(10))
+                                          ),
+
+                                          margin: EdgeInsets.only(top: 20),
+
+                                          child: TextField(
+                                            style: GoogleFonts.
+                                            quicksand(
+                                                textStyle: TextStyle(
+                                                  fontSize: 16,
+
+                                                )
                                             ),
-                                          )
-                                        ),
-                                      ],
-                                    ),
+                                            controller: nicknameTextEditor,
+                                            textAlign: TextAlign.start,
+                                            //style: Styles.subHeadingLight,
+                                            focusNode: usernameFocusNode,
+                                            decoration: InputDecoration(
+                                              hintText: 'Enter Your Name Here',
+                                              contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+                                              focusedBorder: OutlineInputBorder(
 
-                                    SizedBox(
-                                      width: 20,
+                                                borderSide:
+                                                BorderSide(width: 0.1,
+                                                ),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderSide:
+                                                BorderSide(color: Palette.primaryColor, width: 0.1),
+                                              ),
+                                            ),
+                                            onChanged: (text){
+
+                                              if(nicknameTextEditor.text == ""){
+
+                                                setState(() {
+                                                  _startedfillingfirstname=false;
+                                                });
+                                                setState(() {
+                                                  _validatefirstname = false;
+                                                });
+                                              }else if(nicknameTextEditor.text.length > 20){
+                                                setState(() {
+                                                  greaterthan20 = true;
+                                                });
+                                                setState(() {
+                                                  _validatefirstname = true;
+
+                                                });
+                                                setState(() {
+                                                  _startedfillingfirstname=true;
+                                                });
+                                              } else{
+                                                setState(() {
+                                                  _validatefirstname = true;
+                                                  greaterthan20 = false;
+                                                });
+                                                setState(() {
+                                                  _startedfillingfirstname=true;
+                                                });
+                                              }
+                                            },
+                                          )),
                                     ),
-                                    Row(
-                                      children: [
-                                        new Radio(
-                                          hoverColor: Colors.lightBlueAccent,
-                                          activeColor: Colors.lightBlueAccent,
-                                          focusColor: Colors.lightBlueAccent,
-                                          value: 2,
-                                          groupValue: _radioValue,
-                                          onChanged: _handleRadioValueChange,
-                                        ),
-                                        Text(
-                                          'None',
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Column(
+
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
+                                      child: Text("Birth Date*",
                                           style: GoogleFonts.quicksand(
                                             textStyle: TextStyle(
-                                              color: _radioValue ==2 ? Colors.blue : Colors.blueGrey,
-                                              fontWeight:  _radioValue ==2 ?FontWeight.w500 : FontWeight.w200,
+                                              color: Colors.blue.shade600,
+                                              fontWeight: FontWeight.w500,
                                               fontSize: 16,
                                             ),
                                           )
-                                        ),
-                                      ],
-                                    ),
 
+                                      ),
+                                    ),
 
                                   ],
                                 ),
-                              ),
-                            ],
-                          ),
-                          Column(
 
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
-                                    child: Text("Name*",
-                                      style: GoogleFonts.sourceSansPro(
-                                        textStyle:  TextStyle(
-                                          color: Colors.blue.shade600,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 17,
-                                        ),
-                                      )
-                                    ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20,bottom: 10 , top: 10),
+                                  child: GestureDetector(
+                                    onTap: (){
 
+                                      setState(() {
+                                        _datefilled = true;
+                                      });
 
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 20,top: 0 , right: 40),
-                                    child: Container(
-                                        width :  MediaQuery. of(context). size. width - 70,
-                                        decoration: BoxDecoration(
-                                            color: Colors.grey.shade200,
-                                            border: Border.all(
-                                                color: Colors.white
-                                            ),
-                                            borderRadius: BorderRadius.all(Radius.circular(10))
-                                        ),
+                                      FocusScopeNode currentFocus = FocusScope.of(context);
 
-                                        margin: EdgeInsets.only(top: 20),
+                                      if (!currentFocus.hasPrimaryFocus) {
+                                        currentFocus.unfocus();
+                                      }
+                                      showDatePicker(context: context,
 
-                                        child: TextField(
-                                          style: GoogleFonts.
-                                          quicksand(
-                                            textStyle: TextStyle(
-                                              fontSize: 16,
-
-                                            )
-                                          ),
-                                          controller: nicknameTextEditor,
-                                          textAlign: TextAlign.start,
-                                          //style: Styles.subHeadingLight,
-                                          focusNode: usernameFocusNode,
-                                          decoration: InputDecoration(
-                                            hintText: 'Enter Your Name Here',
-                                            contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                                            focusedBorder: OutlineInputBorder(
-
-                                              borderSide:
-                                              BorderSide(width: 0.1,
+                                          initialDate: _datetime == null ? DateTime.now() : _datetime,
+                                          builder: (BuildContext context, Widget child) {
+                                            return Theme(
+                                              data: ThemeData.light().copyWith(
+                                                primaryColor: Colors.lightBlueAccent,
+                                                accentColor: Colors.blue,
+                                                colorScheme: ColorScheme.light(primary: Colors.blue),
+                                                buttonTheme: ButtonThemeData(
+                                                    textTheme: ButtonTextTheme.primary
+                                                ),
                                               ),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderSide:
-                                              BorderSide(color: Palette.primaryColor, width: 0.1),
+                                              child: child,
+                                            );
+                                          },
+                                          firstDate: DateTime(1961),
+                                          lastDate:DateTime.now()).then((date) {
+                                        setState(() {
+                                          _datetime = date;
+                                        });
+                                      });
+                                    },
+                                    child: Container(
+                                      width: MediaQuery. of(context). size. width - 70,
+                                      decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          border: Border.all(
+                                            color: Colors.grey.shade300,
+                                          ),
+                                          borderRadius: BorderRadius.all(Radius.circular(10))
+                                      ),
+                                      height: 40,
+
+
+                                      child: Row(
+
+                                        children: [
+                                          Text(
+
+                                              "  Birth Date :  "
+
+                                              ,
+                                              style: GoogleFonts.quicksand(
+                                                textStyle: TextStyle(
+
+                                                  fontSize: 15,
+                                                  color: Colors.black54,
+                                                ),
+                                              )
+                                          ),
+                                          Text(_datetime == null ? "Please Pick Date" : _datetime.toLocal().toString().split(" ")[0],
+                                            style: GoogleFonts.quicksand(
+                                                textStyle: TextStyle(
+                                                  fontSize: 15,
+                                                )
                                             ),
                                           ),
-                                          onChanged: (text){
 
-                                            if(nicknameTextEditor.text == ""){
 
-                                              setState(() {
-                                                _startedfillingfirstname=false;
-                                              });
-                                              setState(() {
-                                                _validatefirstname = false;
-                                              });
-                                            }else if(nicknameTextEditor.text.length > 20){
-                                              setState(() {
-                                                greaterthan20 = true;
-                                              });
-                                              setState(() {
-                                                _validatefirstname = true;
+                                        ],
+                                      ),
 
-                                              });
-                                              setState(() {
-                                                _startedfillingfirstname=true;
-                                              });
-                                            } else{
-                                              setState(() {
-                                                _validatefirstname = true;
-                                                greaterthan20 = false;
-                                              });
-                                              setState(() {
-                                                _startedfillingfirstname=true;
-                                              });
-                                            }
-                                          },
-                                        )),
+                                    ),
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Column(
+                                ),
 
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
-                                    child: Text("Birth Date*",
-                                      style: GoogleFonts.quicksand(
-                                        textStyle: TextStyle(
+
+
+
+
+
+
+
+
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
+                                      child: Text("State*",
+                                        style: TextStyle(
                                           color: Colors.blue.shade600,
                                           fontWeight: FontWeight.w500,
                                           fontSize: 16,
-                                        ),
-                                      )
+                                        ),),
+                                    ),
 
-                                      ),
-                                  ),
-
-                                ],
-                              ),
-
-                              Padding(
-                                padding: const EdgeInsets.only(left: 20,bottom: 10 , top: 10),
-                                child: GestureDetector(
-                                  onTap: (){
-
-                                    setState(() {
-                                      _datefilled = true;
-                                    });
-
-                                    FocusScopeNode currentFocus = FocusScope.of(context);
-
-                                    if (!currentFocus.hasPrimaryFocus) {
-                                      currentFocus.unfocus();
-                                    }
-                                    showDatePicker(context: context,
-
-                                        initialDate: _datetime == null ? DateTime.now() : _datetime,
-                                        builder: (BuildContext context, Widget child) {
-                                          return Theme(
-                                            data: ThemeData.light().copyWith(
-                                              primaryColor: Colors.lightBlueAccent,
-                                              accentColor: Colors.blue,
-                                              colorScheme: ColorScheme.light(primary: Colors.blue),
-                                              buttonTheme: ButtonThemeData(
-                                                  textTheme: ButtonTextTheme.primary
-                                              ),
-                                            ),
-                                            child: child,
-                                          );
-                                        },
-                                        firstDate: DateTime(1961),
-                                        lastDate:DateTime.now()).then((date) {
-                                      setState(() {
-                                        _datetime = date;
-                                      });
-                                    });
-                                  },
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20 , top: 10),
                                   child: Container(
+
+                                    height: 40,
                                     width: MediaQuery. of(context). size. width - 70,
                                     decoration: BoxDecoration(
                                         color: Colors.grey.shade200,
@@ -869,153 +981,89 @@ class _RegisterPageState extends State<RegisterPage>
                                         ),
                                         borderRadius: BorderRadius.all(Radius.circular(10))
                                     ),
-                                    height: 40,
+                                    child: DropdownButton<String>(
+                                      isExpanded: true,
+                                      value: dropdownValue,
 
+                                      icon: Icon(Icons.keyboard_arrow_down_rounded,
 
-                                    child: Row(
-
-                                      children: [
-                                        Text(
-
-                                          "  Birth Date :  "
-
-                                          ,
-                                          style: GoogleFonts.quicksand(
-                                            textStyle: TextStyle(
-
-                                              fontSize: 15,
-                                              color: Colors.black54,
-                                            ),
-                                          )
-                                        ),
-                                        Text(_datetime == null ? "Please Pick Date" : _datetime.toLocal().toString().split(" ")[0],
-                                        style: GoogleFonts.quicksand(
-                                          textStyle: TextStyle(
-                                            fontSize: 15,
-                                          )
-                                        ),
-                                        ),
-
-
-                                      ],
-                                    ),
-
-                                  ),
-                                ),
-                              ),
-
-
-
-
-
-
-
-
-
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 20,top: 20, bottom: 0),
-                                    child: Text("State*",
-                                      style: TextStyle(
-                                        color: Colors.blue.shade600,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16,
-                                      ),),
-                                  ),
-
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 20 , top: 10),
-                                child: Container(
-
-                                  height: 40,
-                                  width: MediaQuery. of(context). size. width - 70,
-                                  decoration: BoxDecoration(
-                                      color: Colors.grey.shade200,
-                                      border: Border.all(
-                                        color: Colors.grey.shade300,
                                       ),
-                                      borderRadius: BorderRadius.all(Radius.circular(10))
-                                  ),
-                                  child: DropdownButton<String>(
-                                    isExpanded: true,
-                                    value: dropdownValue,
+                                      iconSize: 30,
+                                      elevation: 16,
+                                      style: TextStyle(color: Colors.teal),
+                                      underline: Container(
+                                        height: 0,
+                                        color: Colors.black54,
+                                      ),
+                                      onChanged: (String newValue) {
+                                        setState(() {
+                                          dropdownValue = newValue;
+                                          _locationFilled = true;
 
-                                    icon: Icon(Icons.keyboard_arrow_down_rounded,
+                                        });
+                                      },
+                                      items: <String>[
+                                        '  Arunachal Pradesh','  Assam','  Andaman & Nicobar','  Andhra Pradhesh','  Bihar','  Chandigarh','  Chattishgarh',
+                                        '  Dadar & Nagar Haveli'
+                                        ,'  Daman & Deep','  Delhi','  Lakshadweep','  Puducherry','  Goa','  Guuhrat','  Haryana','  Himachal Pradesh','  Jammu & Kashmir',
+                                        '  Jharkhand','  Karnataka','  Kerela','  Madhya Pradesh','  Maharashtra','  Manipur','  Meghalaya','  Mizoram','  Nagaland','  Odisha',
+                                        '  Punjab','  Rajasthan','  Sikkim','  Tamil Nadu','  Telangana','  Tripura','  Uttar Pradesh','  Uttarakhand','  West Bengal',
+                                        '  Please Pick State'
 
+
+
+                                      ]
+                                          .map<DropdownMenuItem<String>>((String value) {
+                                        return DropdownMenuItem<String>(
+
+                                          value: value,
+                                          child: Row(
+                                            children: [
+
+                                              Text(value,
+                                                  style: TextStyle(
+                                                      fontSize: 15,
+                                                      color: Colors.black54
+                                                  )),
+
+
+
+                                            ],
+                                          ),
+                                        );
+                                      }).toList(),
                                     ),
-                                    iconSize: 30,
-                                    elevation: 16,
-                                    style: TextStyle(color: Colors.teal),
-                                    underline: Container(
-                                      height: 0,
-                                      color: Colors.black54,
-                                    ),
-                                    onChanged: (String newValue) {
-                                      setState(() {
-                                        dropdownValue = newValue;
-                                        _locationFilled = true;
-
-                                      });
-                                    },
-                                    items: <String>[
-                                      '  Arunachal Pradesh','  Assam','  Andaman & Nicobar','  Andhra Pradhesh','  Bihar','  Chandigarh','  Chattishgarh',
-                                      '  Dadar & Nagar Haveli'
-                                      ,'  Daman & Deep','  Delhi','  Lakshadweep','  Puducherry','  Goa','  Guuhrat','  Haryana','  Himachal Pradesh','  Jammu & Kashmir',
-                                      '  Jharkhand','  Karnataka','  Kerela','  Madhya Pradesh','  Maharashtra','  Manipur','  Meghalaya','  Mizoram','  Nagaland','  Odisha',
-                                      '  Punjab','  Rajasthan','  Sikkim','  Tamil Nadu','  Telangana','  Tripura','  Uttar Pradesh','  Uttarakhand','  West Bengal',
-                                      '  Please Pick State'
-
-
-
-                                    ]
-                                        .map<DropdownMenuItem<String>>((String value) {
-                                      return DropdownMenuItem<String>(
-
-                                        value: value,
-                                        child: Row(
-                                          children: [
-
-                                            Text(value,
-                                                style: TextStyle(
-                                                    fontSize: 15,
-                                                    color: Colors.black54
-                                                )),
-
-                                            
-
-                                          ],
-                                        ),
-                                      );
-                                    }).toList(),
                                   ),
-                                ),
-                              )
-                            ],
-                          )
-                        ],
+                                )
+                              ],
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(30.0),
-                          topLeft: Radius.circular(30.0),
-                          bottomLeft: Radius.circular(0),
-                          bottomRight: Radius.circular(0),
-                        )
-                    ),
+                      decoration: BoxDecoration(
 
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(30.0),
+                            topLeft: Radius.circular(30.0),
+                            bottomLeft: Radius.circular(0),
+                            bottomRight: Radius.circular(0),
+                          )
+                      ),
+
+                    ),
                   ),
-                )
+                  SizedBox(
+                    height: 30,
+                  )
 
 
-              ],
-            )
-        )
+
+                ],
+              )
+          ),
+        ],
+      ),
     );
   }
 
