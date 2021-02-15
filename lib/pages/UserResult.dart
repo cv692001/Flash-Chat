@@ -4,9 +4,12 @@ import 'package:flash_chat/models/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:like_button/like_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:favorite_button/favorite_button.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'ChatPage.dart';
 
 class UserResult extends StatefulWidget {
@@ -80,6 +83,93 @@ class _UserResultState extends State<UserResult> {
 
 
 
+  }
+
+  bool hi = true;
+
+
+  Future<bool> onLikeButtonTapped(bool hi) async{
+
+    Firestore.instance.collection("users").document(eachUser.id).get().then((value) {
+      List a = value.data["likedby"];
+      print(a);
+      if(a.contains(id)){
+        Firestore.instance.collection("users").document(id).updateData({
+
+          "likedto": FieldValue.arrayRemove([eachUser.id]),
+
+        });
+
+
+        Firestore.instance.collection("users").document(eachUser.id).updateData({
+
+          "likedby": FieldValue.arrayRemove([id]),
+
+        }).then((value) {
+
+          setState(() {
+            isLiked=false;
+            likes = likes-1;
+          });
+        });
+
+
+        print("TRUE");
+        print(a.length);
+        print(isLiked);
+        print(a.length);
+      }
+      else{
+        Firestore.instance.collection("users").document(id).updateData({
+
+          "likedto": FieldValue.arrayUnion([eachUser.id]),
+        });
+
+
+        Firestore.instance.collection("users").document(eachUser.id).updateData({
+
+          "likedby": FieldValue.arrayUnion([id]),
+        }).then((value) {
+          setState(() {
+            isLiked=true;
+            likes = likes+1;
+          });
+        });
+
+
+
+        print("true");
+        print(a.length);
+        print(isLiked);
+        print(a.length);
+      }
+
+
+
+
+
+    });
+
+
+    Firestore.instance.collection("users").document(eachUser.id).get().then((value){
+      List a = value.data["likedby"];
+      setState(() {
+        likes = a.length;
+
+      });
+
+
+    });
+
+    Firestore.instance.collection("users").document(eachUser.id).updateData({
+
+      "likes": likes,
+
+    });
+
+
+
+    return !hi;
   }
 
 
@@ -285,6 +375,8 @@ class _UserResultState extends State<UserResult> {
               right: 4,
               child: Column(
                 children: [
+
+
                   GestureDetector(
                       onTap : (){
 
@@ -372,16 +464,20 @@ class _UserResultState extends State<UserResult> {
 
                       },
 
+
+
                       child: isLiked == true ?Icon(
                         Icons.favorite,
-                        size: 28,
+                        size: 29,
                         color: Colors.red,
-                      ): Icon(
-                        Icons.favorite,
+                      ): SvgPicture.asset(
+                      'images/heart.svg',
+                        height: 29,
 
-                        size: 28,
-                        color: Colors.grey.shade700,
-                      )
+
+                        //color: Colors.green,
+
+                      ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 2),
@@ -393,12 +489,13 @@ class _UserResultState extends State<UserResult> {
                         Text(
 
                           "Likes: $likes ",
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
+                          style: GoogleFonts.quicksand(
+                            textStyle: TextStyle(
+                              fontSize: 11,
 
-                            color: Colors.white,
-                          ),
+                              color: Colors.white,
+                            ),
+                          )
                         ),
                       ],
                     ),

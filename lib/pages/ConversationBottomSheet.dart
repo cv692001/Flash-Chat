@@ -195,7 +195,7 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
   int selectedIndex=0;
 
 
-
+  DateTime currentBackPressTime;
   @override
 
   Widget build(BuildContext context) {
@@ -370,7 +370,7 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
 
                                   ),
 
-                                  
+
                                 ],
                               ),
                             ],
@@ -401,6 +401,17 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
 
           ),
         ));
+  }
+
+  Future<bool> onWillPop() {
+    DateTime now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      Fluttertoast.showToast(msg: "Double Tap to Exit !!");
+      return Future.value(false);
+    }
+    return Future.value(true);
   }
 
   displayNoSearchResultScreen() {

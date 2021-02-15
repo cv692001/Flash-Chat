@@ -21,7 +21,9 @@ class FlashChat extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: RegisterPage(),
+      home: WillPopScope(
+          onWillPop: ()async => false,
+          child: RegisterPage()),
     );
   }
 }
