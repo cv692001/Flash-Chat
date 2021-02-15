@@ -5,19 +5,19 @@ import 'package:flutter/services.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      [DeviceOrientation.portraitUp,DeviceOrientation.portraitDown]);
 
-  runApp(Messio());
+  runApp(FlashChat());
 
 }
 
-class Messio extends StatelessWidget {
+class FlashChat extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Messio',
+      title: 'Flash Chat',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
