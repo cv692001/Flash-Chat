@@ -62,38 +62,41 @@ class _RecentChatState extends State<RecentChat> {
 
         length: 2,
         child: Scaffold(
-            appBar: AppBar(
-              backgroundColor: Colors.white,
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(93),
+              child: AppBar(
+                backgroundColor: Colors.white,
 
 
-              bottom: TabBar(
-                labelColor: Colors.blue,
+                bottom: TabBar(
+                  labelColor: Colors.blue,
 
-                indicatorColor: Colors.blue,
-                tabs: [
-                  Tab(child: Text("Recent Chats",
-                  style: GoogleFonts.quicksand(
-                    fontSize: 16,
-                    letterSpacing: 1,
-                    color: Colors.blue.shade900
-                  ),
-                  ),
+                  indicatorColor: Colors.blue,
+                  tabs: [
+                    Tab(child: Text("Recent Chats",
+                    style: GoogleFonts.quicksand(
+                      fontSize: 16,
+                      letterSpacing: 1,
+                      color: Colors.blue.shade900
+                    ),
+                    ),
 
 
-                  ),
-                  Tab(
-                    child: Text("Who Liked You !!",
-                      style: GoogleFonts.quicksand(
-                          fontSize: 16,
-                          letterSpacing: 1,
-                          color: Colors.blue.shade900
+                    ),
+                    Tab(
+                      child: Text("Who Liked You !!",
+                        style: GoogleFonts.quicksand(
+                            fontSize: 16,
+                            letterSpacing: 1,
+                            color: Colors.blue.shade900
+                        ),
                       ),
                     ),
-                  ),
 
-                ],
+                  ],
+                ),
+                title: Text('TABS TITLE TEXT'),
               ),
-              title: Text('TABS TITLE TEXT'),
             ),
             body: TabBarView(
               children: [

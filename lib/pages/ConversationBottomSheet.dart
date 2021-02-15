@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:share/share.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -73,14 +74,40 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     controlSearching();
     registerNotification();
     configLocalNotification();
+    readDataFromLocal();
     _pageController = PageController();
 
     if (first_entry == false) {
       first = true;
     }
+  }
+
+  String applink =" Flash Chat !! ";
+
+
+  void readDataFromLocal() async {
+
+
+
+
+    Firestore.instance.collection("applink").document("applink").get().then((value){
+      print(value.data["link"]);
+
+      applink = value.data["link"];
+      setState(() {
+
+      applink = applink;
+
+      });
+    });
+
+
+
+    setState(() {});
   }
 
 
@@ -114,7 +141,7 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
 
   void configLocalNotification() {
     var initializationSettingsAndroid =
-    new AndroidInitializationSettings('app_icon');
+    new AndroidInitializationSettings('logo');
     var initializationSettingsIOS = new IOSInitializationSettings();
     var initializationSettings = new InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
@@ -188,6 +215,8 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
 
     ];
     double statusBarHeight = MediaQuery.of(context).padding.top;
+
+
 
     return Material(
         child: WillPopScope(
@@ -340,6 +369,8 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
                                     ),
 
                                   ),
+
+                                  
                                 ],
                               ),
                             ],
@@ -350,6 +381,20 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
                         ],
                       ),
                     ),
+                   selectedIndex == 3 ? Positioned(
+                      right: 10,
+                      top: statusBarHeight+3,
+                      child: IconButton(icon: Icon(Icons.share,
+
+                        color: Colors.blue.shade700,
+                        ), onPressed:(){
+
+                        Share.share(applink, subject: 'Look what I made!');
+
+                      },
+
+                      ),
+                    ):Container(),
                   ],
                 ),
               ),

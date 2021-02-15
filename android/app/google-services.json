@@ -1,33 +1,41 @@
 {
   "project_info": {
-    "project_number": "92522785063",
-    "project_id": "aifly-flash-chat",
-    "storage_bucket": "aifly-flash-chat.appspot.com"
+    "project_number": "88960393974",
+    "project_id": "flash-chat-2cf0f",
+    "storage_bucket": "flash-chat-2cf0f.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:92522785063:android:6735d466c90a9c1dc4a102",
+        "mobilesdk_app_id": "1:88960393974:android:90ef0dd6c653505552c2d7",
         "android_client_info": {
-          "package_name": "com.aifly.flash_chat"
+          "package_name": "com.aifly.flashchat"
         }
       },
       "oauth_client": [
         {
-          "client_id": "92522785063-rtrl615gv9aj7nmpqb1gke7jlhdmh7gh.apps.googleusercontent.com",
+          "client_id": "88960393974-l4qpqekha4ah7t5ftbgai2f68lb52742.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aifly.flashchat",
+            "certificate_hash": "a0a68e98252f67e36cddd18345ede9d4d267547f"
+          }
+        },
+        {
+          "client_id": "88960393974-f6e1uios0rqfa2jbdt09iqs1pt4c7te6.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBx-SteZCSm-qMdWFvsg_nlnF2bkouXjgg"
+          "current_key": "AIzaSyDJF-oDyTFfx_glYAr520AQnOL94jgzEJs"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "92522785063-rtrl615gv9aj7nmpqb1gke7jlhdmh7gh.apps.googleusercontent.com",
+              "client_id": "88960393974-f6e1uios0rqfa2jbdt09iqs1pt4c7te6.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

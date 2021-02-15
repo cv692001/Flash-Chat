@@ -16,6 +16,7 @@ import 'package:flash_chat/widgets/ChatAppBar.dart';
 import 'package:flash_chat/config/style.dart';
 import 'package:intl/intl.dart';
 import 'package:flash_chat/config/color_palette.dart';
+import 'package:share/share.dart';
 import 'fullImageWidget.dart';
 import 'package:flash_chat/widgets/ProgressWidget.dart';
 import 'package:flutter/material.dart';
@@ -76,31 +77,31 @@ class chat extends StatelessWidget {
                 ),
                 //color: Palette.primaryBackgroundColor,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+
                   children: <Widget>[
 
-                    Expanded(flex: 3, child: Container(
-                      child: Center(
-                        child: Padding(
-                          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top,
-                            left: 10
-                          ),
-                          child: CircleAvatar(
-                            radius: 33,
-                            backgroundImage:
-                            CachedNetworkImageProvider(recieverAvatar),
-                          ),
+
+
+
+                    Column(
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).padding.top+15,
                         ),
-                      ),
-                    ),),
+                        IconButton(
+                          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ],
+                    ),
                     Expanded(
-                      flex: 9,
+                      flex: 7,
                       child: Row(
                         children: <Widget>[
                           Expanded(
                             flex: 6,
                             child: Container(
-                              margin: EdgeInsets.symmetric(horizontal: 40),
+                              margin: EdgeInsets.symmetric(horizontal: 20),
                               child: Container(
                                 padding: EdgeInsets.only(top: 25),
                                 child: Column(
@@ -154,6 +155,20 @@ class chat extends StatelessWidget {
                         ],
                       ),
                     ),
+                    Expanded(flex: 4, child: Container(
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top,
+                              left: 10
+                          ),
+                          child: CircleAvatar(
+                            radius: 33,
+                            backgroundImage:
+                            CachedNetworkImageProvider(recieverAvatar),
+                          ),
+                        ),
+                      ),
+                    ),),
 
                   ],
                 ),
@@ -871,7 +886,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   }),
             ),
             Padding(
-              padding: const EdgeInsets.all(0.0),
+              padding: const EdgeInsets.only(right: 20),
               child: IconButton(
                   icon: Icon(
                     Icons.insert_emoticon,
@@ -897,7 +912,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
                         focusNode: focusNode,
 
-                        textAlign: TextAlign.center,
+                        textAlign: TextAlign.left,
                         controller: textEditingController,
                         decoration: InputDecoration(
 
@@ -1079,6 +1094,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   SharedPreferences preferences;
 
   String id = "";
+  String applink = " Flash Chat !!";
 
   void readDataFromLocal() async {
 
@@ -1106,6 +1122,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       });
     });
 
+
+    Firestore.instance.collection("applink").document("applink").get().then((value){
+      print(value.data["link"]);
+
+      applink = value.data["link"];
+      setState(() {
+
+        applink = applink;
+
+      });
+    });
 
 
 
@@ -1420,6 +1447,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               ],
             ),
           ),
+          Positioned(
+            right: 10,
+            top: MediaQuery.of(context).padding.top+3,
+            child: IconButton(icon: Icon(Icons.share,
+
+              color: Colors.blue.shade700,
+            ), onPressed:(){
+
+              Share.share(applink, subject: 'Look what I made!');
+
+            },
+
+            ),
+          )
         ],
       ),
     );

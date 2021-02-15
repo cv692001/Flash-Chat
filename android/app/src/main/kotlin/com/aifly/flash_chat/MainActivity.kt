@@ -1,4 +1,4 @@
-package com.aifly.flash_chat
+package com.aifly.flashchat
 
 import io.flutter.embedding.android.FlutterActivity
 

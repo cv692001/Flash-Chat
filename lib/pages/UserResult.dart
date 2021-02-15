@@ -92,8 +92,13 @@ class _UserResultState extends State<UserResult> {
     return Container(
       decoration: new BoxDecoration(
 
+
+        borderRadius: BorderRadius.circular(8),
         boxShadow: [
+
+
           BoxShadow(
+
             color: Colors.grey.withOpacity(.2),
             blurRadius: 2.0, // soften the shadow
             spreadRadius: 0.0, //extend the shadow
@@ -213,52 +218,66 @@ class _UserResultState extends State<UserResult> {
             Positioned(
               bottom: 4,
               left: 8,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                  (eachUser.nickname[0].toUpperCase() +
-                          eachUser.nickname.substring(1)).length <=15 ? ( eachUser.nickname[0].toUpperCase() +
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (value) => UserProfileScreen(
+                            recieverAbout: eachUser.aboutMe,
+                            recieverAvatar: eachUser.photourl,
+                            recieverId: eachUser.id,
+                            recieverName:eachUser.nickname,
+                            recieverAge: age11,
+                          )));
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                    (eachUser.nickname[0].toUpperCase() +
+                            eachUser.nickname.substring(1)).length <=15 ? ( eachUser.nickname[0].toUpperCase() +
       eachUser.nickname.substring(1) ): ( eachUser.nickname[0].toUpperCase() +
-                      eachUser.nickname.substring(1) ).replaceRange(13, (eachUser.nickname[0].toUpperCase() +
-                      eachUser.nickname.substring(1)).length, "...."),
-                      textAlign: TextAlign.left,
-                      style: GoogleFonts.sourceSansPro(
-                        textStyle:  TextStyle(
+                        eachUser.nickname.substring(1) ).replaceRange(13, (eachUser.nickname[0].toUpperCase() +
+                        eachUser.nickname.substring(1)).length, "...."),
+                        textAlign: TextAlign.left,
+                        style: GoogleFonts.sourceSansPro(
+                          textStyle:  TextStyle(
 
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 1,
-                          fontSize: 14,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 1,
+                            fontSize: 14,
+                          )
                         )
-                      )
 
 
-                  ),
+                    ),
 
 
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2,
-                    bottom: 1),
-                    child: Text(
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2,
+                      bottom: 1),
+                      child: Text(
 
       (eachUser.aboutMe).length <= 15 ?  (eachUser.aboutMe) :
       (eachUser.aboutMe).replaceRange(15,  (eachUser.aboutMe).length, '...'),
 
 
-                        softWrap: false,
-                        maxLines: 1,
-                        overflow: TextOverflow.clip,
-                        style: TextStyle(
-                            color: Colors.white,
-                          fontSize: 11,
+                          softWrap: false,
+                          maxLines: 1,
+                          overflow: TextOverflow.clip,
+                          style: TextStyle(
+                              color: Colors.white,
+                            fontSize: 11,
 
-                        )
+                          )
+                      ),
                     ),
-                  ),
 
-                ],
+                  ],
+                ),
               ),
             ),
             Positioned(

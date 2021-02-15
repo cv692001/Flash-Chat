@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
 
   flutter_speed_dial: ^1.2.5
+  share: ^0.6.5+4
   firebase_auth: ^0.14.0+5
   google_sign_in: ^4.0.7
   cloud_firestore: ^0.12.9+5
@@ -44,10 +45,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_launcher_icons: ^0.7.2+1
+  flutter_launcher_icons:
 
 flutter_icons:
-  android: "launcher_icon"
+  android: true
   ios: true
   image_path : "images/launcher/logo.png"
 
