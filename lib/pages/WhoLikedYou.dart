@@ -89,12 +89,28 @@ class _WhoLikedYouState extends State<WhoLikedYou> {
         }
 
         List<UserResult> searchUserResult = [];
+        List a;
+        bool isblocked;
 
         datasnapshot.data.documents.forEach((document) {
           User eachUser = User.fromDocument(document);
-          UserResult userResult = UserResult(eachUser: eachUser);
+          UserResult userResult = UserResult(
+                           eachUser: eachUser,
+          recent: true,
+          );
 
-          if (currentUser != document["id"]) {
+          a = eachUser.blockedto;
+
+          print(a);
+          if(a.contains(currentUser)){
+            isblocked = true;
+          }else{
+            isblocked = false;
+          }
+
+          print(isblocked);
+
+          if (currentUser != document["id"] && isblocked == false) {
             searchUserResult.add(userResult);
           }
         });
@@ -140,12 +156,28 @@ class _WhoLikedYouState extends State<WhoLikedYou> {
         }
 
         List<UserResult> searchUserResult = [];
+        bool isblocked;
+        List a;
+
 
         datasnapshot.data.documents.forEach((document) {
           User eachUser = User.fromDocument(document);
-          UserResult userResult = UserResult(eachUser: eachUser);
+          UserResult userResult = UserResult(eachUser: eachUser
+          ,recent: true,
+          );
 
-          if (currentUser != document["id"]) {
+          a = eachUser.blockedto;
+
+          print(a);
+          if(a.contains(currentUser)){
+            isblocked = true;
+          }else{
+            isblocked = false;
+          }
+
+          print(isblocked);
+
+          if (currentUser != document["id"] && isblocked == false) {
             searchUserResult.add(userResult);
           }
         });

@@ -1,8 +1,14 @@
 import 'dart:convert';
+
 import 'dart:io';
+import 'package:flash_chat/services/encoding_decoding_services.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+//import 'package:emoji_picker/emoji_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_string_encryption/flutter_string_encryption.dart';
+import 'package:flutter_emoji_keyboard/flutter_emoji_keyboard.dart';
 import 'package:flash_chat/pages/RegisterPage.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -24,8 +30,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
-class chat extends StatelessWidget {
+class chat extends StatefulWidget {
   final String recieverAbout;
   final String recieverId;
   final String recieverAvatar;
@@ -44,135 +49,402 @@ class chat extends StatelessWidget {
   });
 
   @override
+  _chatState createState() => _chatState(recieverAge: recieverAge,recieverAvatar: recieverAvatar,
+      recieverId: recieverId,recieverName: recieverName,recieverAbout: recieverAbout);
+}
+
+class _chatState extends State<chat> {
+  final String recieverAbout;
+  final String recieverId;
+  final String recieverAvatar;
+  final String recieverName;
+  final String recieverAge;
+  final bool isLiked;
+
+  _chatState({
+    Key key,
+    this.recieverAbout,
+    @required this.recieverAvatar,
+    @required this.recieverId,
+    @required this.recieverName,
+    @required this.recieverAge,
+    @required this.isLiked,
+});
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    readLocal();
+  }
+
+  SharedPreferences preferences;
+  String id;
+
+  readLocal() async {
+    preferences = await SharedPreferences.getInstance();
+    id = preferences.getString("id") ?? "";
+
+
+
+    Firestore.instance
+        .collection("users")
+        .document(id)
+        .updateData({'chattingWith': recieverId});
+
+
+    Firestore.instance.collection("users").document(id).get().then((value){
+      List a = value.data["blockedto"];
+
+      if(a.contains(recieverId)){
+        setState(() {
+          block = true;
+        });
+      }else{
+        setState(() {
+          block = false;
+        });
+      }
+    });
+
+    setState(() {});
+  }
+
+  bool block = false;
+
+  @override
   Widget build(BuildContext context) {
+    blockFunction(){
+      Firestore.instance.collection("users").document(id).get().then((value) {
+        List a = value.data["blockedto"];
+        List b = value.data["blockedby"];
+        print(a);
+
+        if(a.contains(recieverId)){
+          Firestore.instance.collection("users").document(id).updateData({
+
+            "blockedto": FieldValue.arrayRemove([recieverId]),
+
+          });
+
+          Firestore.instance.collection("users").document(recieverId).updateData({
+
+            "blockedby": FieldValue.arrayRemove([id]),
+
+          });
+
+
+
+
+          Firestore.instance.collection("users").document(id).updateData({
+
+
+
+          }).then((value) {
+
+            setState(() {
+              block = !block;
+            });
+          });
+
+
+          print("TRUE");
+          print(a.length);
+          print(isLiked);
+          print(a.length);
+        }
+        else{
+
+          Firestore.instance.collection("users").document(recieverId).updateData({
+
+            "blockedby": FieldValue.arrayUnion([id]),
+          });
+
+          Firestore.instance.collection("users").document(id).updateData({
+
+            "blockedto": FieldValue.arrayUnion([recieverId]),
+          }).then((value) {
+            setState(() {
+              block = !block;
+
+            });
+          });
+
+
+
+          print("true");
+          print(a.length);
+          print(isLiked);
+          print(a.length);
+        }
+
+
+
+
+
+      });
+
+    }
+
+    showAlertDialog(BuildContext context) {
+
+      // set up the button
+      Widget okButton = FlatButton(
+        child: Text("OK"),
+        onPressed: () {
+
+          //onDeleteMsg(document);
+
+          blockFunction();
+          Navigator.pop(context);
+        },
+      );
+
+      Widget cancelButton = FlatButton(
+        child: Text("NO"),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      );
+
+      // set up the AlertDialog
+      AlertDialog alert = AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30)),
+        title: block ?  Text("Unblock User"):Text("Block User") ,
+        content: block ? Text("Are you sure to Unblock $recieverName !!"):Text("Are you sure to Block $recieverName !!"),
+        actions: [
+          okButton,
+          cancelButton,
+        ],
+      );
+
+      // show the dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
+
+    void handleClick(String value) {
+      switch (value) {
+        case 'Block':
+          showAlertDialog(context) ;
+
+          break;
+        case 'Profile':
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (value) => UserProfileScreen(
+                    recieverAbout: recieverAbout,
+                    recieverAvatar: recieverAvatar,
+                    recieverId: recieverId,
+                    recieverName: recieverName,
+                    recieverAge: recieverAge,
+                  )));
+          break;
+      }
+    }
+    void handleClick2(String value) {
+      switch (value) {
+        case 'Unblock':
+          showAlertDialog(context) ;
+
+          break;
+        case 'Profile':
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (value) => UserProfileScreen(
+                    recieverAbout: recieverAbout,
+                    recieverAvatar: recieverAvatar,
+                    recieverId: recieverId,
+                    recieverName: recieverName,
+                    recieverAge: recieverAge,
+                  )));
+          break;
+      }
+    }
     return Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(80),
+          preferredSize: Size.fromHeight(90),
           child: Material(
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (value) => UserProfileScreen(
-                          recieverAbout: recieverAbout,
-                          recieverAvatar: recieverAvatar,
-                          recieverId: recieverId,
-                          recieverName: recieverName,
-                          recieverAge: recieverAge,
-                        )));
-              },
-              child: Container(
-                decoration: new BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.3),
-                      spreadRadius: 3,
-                      blurRadius: 7,
-                      offset: Offset(0, 3), // changes position of shadow
-                    ),
-                  ],
-
-                ),
-                //color: Palette.primaryBackgroundColor,
-                child: Row(
-
-                  children: <Widget>[
-
-
-
-
-                    Column(
-                      children: [
-                        SizedBox(
-                          height: MediaQuery.of(context).padding.top+15,
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
-                          onPressed: () => Navigator.of(context).pop(),
+            child: Column(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (value) => UserProfileScreen(
+                              recieverAbout: recieverAbout,
+                              recieverAvatar: recieverAvatar,
+                              recieverId: recieverId,
+                              recieverName: recieverName,
+                              recieverAge: recieverAge,
+                            )));
+                  },
+                  child: Container(
+                    decoration: new BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 3,
+                          blurRadius: 7,
+                          offset: Offset(0, 3), // changes position of shadow
                         ),
                       ],
+
                     ),
-                    Expanded(
-                      flex: 7,
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            flex: 6,
-                            child: Container(
-                              margin: EdgeInsets.symmetric(horizontal: 20),
-                              child: Container(
-                                padding: EdgeInsets.only(top: 25),
-                                child: Column(
+                    //color: Palette.primaryBackgroundColor,
+                    child: Row(
 
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    Text(
-
-                                      (recieverName[0].toUpperCase() +
-                                          recieverName.substring(1)).length <= 15 ?  (recieverName[0].toUpperCase() +
-                                          recieverName.substring(1)) :
-                                      (recieverName[0].toUpperCase() +
-                                          recieverName.substring(1)).replaceRange(15,  (recieverName[0].toUpperCase() +
-                                          recieverName.substring(1)).length, '...'),
-                                      textAlign: TextAlign.start,
-                                      style:  GoogleFonts.quicksand(
-                                          textStyle: TextStyle(
-                                              color: Colors.black,
-                                              fontSize:22
-
-                                          )
-                                      ),
-                                    ),
-                                    Text(
+                      children: <Widget>[
 
 
 
-                                        (recieverAbout[0].toUpperCase() +
-                                            recieverAbout.substring(1)).length <= 25 ?  (recieverAbout[0].toUpperCase() +
-                                            recieverAbout.substring(1)) :
-                                        (recieverAbout[0].toUpperCase() +
-                                            recieverAbout.substring(1)).replaceRange(25,  (recieverAbout[0].toUpperCase() +
-                                            recieverAbout.substring(1)).length, '...'),
-                                        textAlign: TextAlign.start,
-                                        maxLines: 1,
-                                        style:  GoogleFonts.quicksand(
-                                            textStyle: TextStyle(
-                                                color: Colors.black54,
-                                                fontSize:15
+
+                        Column(
+                          children: [
+                            SizedBox(
+                              height: MediaQuery.of(context).padding.top+3,
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                          ],
+                        ),
+                        Expanded(
+                          flex: 7,
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                flex: 6,
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(horizontal: 20),
+                                  child: Container(
+                                    padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+                                    child: Column(
+
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        Text(
+
+                                          (recieverName[0].toUpperCase() +
+                                              recieverName.substring(1)).length <= 15 ?  (recieverName[0].toUpperCase() +
+                                              recieverName.substring(1)) :
+                                          (recieverName[0].toUpperCase() +
+                                              recieverName.substring(1)).replaceRange(15,  (recieverName[0].toUpperCase() +
+                                              recieverName.substring(1)).length, '...'),
+                                          textAlign: TextAlign.start,
+                                          style:  GoogleFonts.quicksand(
+                                              textStyle: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize:22
+
+                                              )
+                                          ),
+                                        ),
+                                        Text(
+
+
+
+                                            (recieverAbout[0].toUpperCase() +
+                                                recieverAbout.substring(1)).length <= 25 ?  (recieverAbout[0].toUpperCase() +
+                                                recieverAbout.substring(1)) :
+                                            (recieverAbout[0].toUpperCase() +
+                                                recieverAbout.substring(1)).replaceRange(25,  (recieverAbout[0].toUpperCase() +
+                                                recieverAbout.substring(1)).length, '...'),
+                                            textAlign: TextAlign.start,
+                                            maxLines: 1,
+                                            style:  GoogleFonts.quicksand(
+                                                textStyle: TextStyle(
+                                                    color: Colors.black54,
+                                                    fontSize:15
+                                                )
                                             )
                                         )
-                                    )
-                                  ],
+                                      ],
+                                    ),
+                                  ),
                                 ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(flex: 2, child: Container(
+                          child: Center(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top,
+                                  left: 10
+                              ),
+                              child: CircleAvatar(
+                                radius: 33,
+                                backgroundImage:
+                                CachedNetworkImageProvider(recieverAvatar),
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),),
+                        Column(
+                          children: [
+                            SizedBox(
+                              height: MediaQuery.of(context).padding.top+3,
+                            ),
+                            PopupMenuButton<String>(
+                              onSelected: block ? handleClick2 : handleClick,
+                              itemBuilder: (BuildContext context) {
+                                return block ? {'Unblock', 'Profile'}.map((String choice) {
+                                  return PopupMenuItem<String>(
+                                    value: choice,
+                                    child: Text(choice),
+                                  );
+                                }).toList()
+                                    : {'Block', 'Profile'}.map((String choice) {
+                                  return PopupMenuItem<String>(
+                                    value: choice,
+                                    child: Text(choice),
+                                  );
+                                }).toList();
+                              },
+                            ),
+                            // IconButton(
+                            //   icon: Icon(Icons.,
+                            //
+                            //       size: 30,
+                            //       color: Colors.redAccent),
+                            //   onPressed: () => Navigator.of(context).pop(),
+                            // ),
+                          ],
+                        ),
+                      ],
                     ),
-                    Expanded(flex: 4, child: Container(
-                      child: Center(
-                        child: Padding(
-                          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top,
-                              left: 10
-                          ),
-                          child: CircleAvatar(
-                            radius: 33,
-                            backgroundImage:
-                            CachedNetworkImageProvider(recieverAvatar),
-                          ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.lock,size: 10,),
+                      Text("  End to End Encrpted Chats",
+                        style: TextStyle(
+                          fontSize: 10
                         ),
                       ),
-                    ),),
-
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
@@ -180,6 +452,7 @@ class chat extends StatelessWidget {
         ChatScreen(recieverAvatar: recieverAvatar, recieverId: recieverId));
   }
 }
+
 
 class ChatScreen extends StatefulWidget {
   final String recieverAvatar;
@@ -243,6 +516,7 @@ class _ChatScreenState extends State<ChatScreen> {
   File imageFile;
   File imageFile1;
   String imageUrl;
+  bool isShowSticker;
 
   String chatId;
   SharedPreferences preferences;
@@ -251,6 +525,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    isShowSticker = false;
 
 
     focusNode.addListener(onFocusChange);
@@ -262,6 +537,22 @@ class _ChatScreenState extends State<ChatScreen> {
     readLocal();
   }
 
+
+  Future<bool> onBackPress() {
+    if (isShowSticker) {
+      setState(() {
+        isShowSticker = false;
+      });
+    } else {
+      Navigator.pop(context);
+    }
+
+    return Future.value(false);
+  }
+
+
+
+
   onFocusChange() {
     //hide stickers whenever keypad appears
     if (focusNode.hasFocus) {
@@ -271,10 +562,33 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  void onSendMessage(String contentMsg, int type) {
+
+  String encryptedS,decryptedS = "Text";
+  var password = "null";
+  PlatformStringCryptor cryptor;
+
+
+  var key = "1";
+
+  void onSendMessage(String contentMsg, int type) async {
     //type 0 message
     //type 2 gif
     //type 1 images
+
+    cryptor = PlatformStringCryptor();
+    final salt = await cryptor.generateSalt();
+    password = contentMsg;
+    key = await cryptor.generateKeyFromPassword(password, salt);
+    // here pass the password entered by user and the key
+    encryptedS = EncodingDecodingService.encodeAndEncrypt(
+      contentMsg,
+      chatId, // using doc id as IV
+      "1",
+    );
+
+
+
+
 
     if (contentMsg != "") {
       textEditingController.clear();
@@ -282,18 +596,26 @@ class _ChatScreenState extends State<ChatScreen> {
 
       Firestore.instance.collection("users").document(id).updateData({
 
-        "activeChat": FieldValue.arrayUnion([recieverId]),
+        "activeChat": FieldValue.arrayUnion([
+
+          recieverId
+
+        ]),
       });
       Firestore.instance.collection("users").document(recieverId).updateData({
 
-        "activeChat": FieldValue.arrayUnion([id]),
+        "activeChat": FieldValue.arrayUnion([
+          id
+        ]),
       });
+
+      String time = DateTime.now().millisecondsSinceEpoch.toString();
 
       var docRef = Firestore.instance
           .collection("messages")
           .document(chatId)
           .collection(chatId)
-          .document(DateTime.now().millisecondsSinceEpoch.toString());
+          .document(time);
 
       Firestore.instance.runTransaction((transaction) async {
         await transaction.set(
@@ -303,8 +625,8 @@ class _ChatScreenState extends State<ChatScreen> {
             "idFrom": id,
             //reciever of the message
             "idTo": recieverId,
-            "timestamp": DateTime.now().millisecondsSinceEpoch.toString(),
-            "content": contentMsg,
+            "timestamp": time,
+            "content": encryptedS,
             "type": type,
           },
         );
@@ -315,6 +637,57 @@ class _ChatScreenState extends State<ChatScreen> {
     } else {
       Fluttertoast.showToast(msg: "Empty message Can't be send");
     }
+  }
+
+  onDeleteMsg(DocumentSnapshot document) {
+
+    var docRef = Firestore.instance
+        .collection("messages")
+        .document(chatId)
+        .collection(chatId)
+        .document(document['timestamp']);
+
+    encryptedS = EncodingDecodingService.encodeAndEncrypt(
+      "🚫 This msg was deleted",
+
+      
+      chatId, // using doc id as IV
+      "1",
+    );
+
+
+
+    docRef.updateData({
+      "content": encryptedS,
+      "type": 0,
+    });
+
+  }
+
+  Widget buildSticker() {
+
+
+
+    void onEmojiSelected(Emoji emoji) {
+      textEditingController.text += emoji.text;
+    }
+
+    return EmojiKeyboard(
+      onEmojiSelected: onEmojiSelected,
+    );
+
+    // return EmojiPicker(
+    //   rows: 3,
+    //   columns: 7,
+    //   buttonMode: ButtonMode.MATERIAL,
+    //   recommendKeywords: ["smile", "love","Happy","heart"],
+    //   numRecommended: 10,
+    //   onEmojiSelected: (emoji, category) {
+    //     print(emoji);
+    //     textEditingController.text += emoji.emoji;
+    //
+    //   },
+    // );
   }
 
   @override
@@ -328,8 +701,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Column(
                     children: <Widget>[
                       createListMessagaes(),
-                      (isDisplayStickers ? createStickers() : Container()),
+
                       createInput(),
+                      (isShowSticker ? buildSticker() : Container()),
                     ],
                   ),
                 ),
@@ -345,17 +719,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Positioned(child: isLoading ? circularProgress() : Container());
   }
 
-  Future<bool> onBackPress() {
-    if (isDisplayStickers) {
-      setState(() {
-        isDisplayStickers = false;
-      });
-    } else {
-      Navigator.pop(context);
-    }
 
-    return Future.value(false);
-  }
 
   createStickers() {
     print("yes");
@@ -546,6 +910,9 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   var listMessage;
+  var lst = new List();
+  var s;
+  int a=0;
 
   createListMessagaes() {
     return Flexible(
@@ -564,6 +931,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 .orderBy("timestamp", descending: true)
                 .limit(20)
                 .snapshots(),
+
+
             builder: (context, snapshots) {
               if (!snapshots.hasData) {
                 return Center(
@@ -575,16 +944,46 @@ class _ChatScreenState extends State<ChatScreen> {
               } else {
                 listMessage = snapshots.data.documents;
 
-                return ListView.builder(
+                return  ListView.builder(
+
                   padding: EdgeInsets.all(10.0),
-                  itemBuilder: (context, index) =>
-                      createItem(index, snapshots.data.documents[index]),
                   itemCount: snapshots.data.documents.length,
+
+                  itemBuilder: (context, index) {
+                    // print(index);
+                    // print("sss");
+                    return  createItem(index , listMessage[index] , s);
+                  },
                   reverse: true,
                   controller: listScrollController,
                 );
               }
             }));
+  }
+
+
+
+  int yoyo =0;
+
+  Decrypt(enxryptedText) async{
+    try{
+    return await cryptor.decrypt(enxryptedText, key);
+    /*
+  int length = document.length;
+
+      //here pass encrypted string and the key to decrypt it
+      for(int i =0 ; i<length;i++){
+        s[i] = await cryptor.decrypt(document[i]['content'], key);
+        print('are ye');
+        print(s[i]);
+
+      }
+
+      // print(index);
+*/
+
+    }on MacMismatchException{
+    }
   }
 
   bool isLastMessageLeft(int index) {
@@ -609,108 +1008,174 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  createItem(int index, DocumentSnapshot document) {
+  showAlertDialog(BuildContext context, DocumentSnapshot document) {
+
+    // set up the button
+    Widget okButton = FlatButton(
+      child: Text("OK"),
+      onPressed: () {
+
+        onDeleteMsg(document);
+        Navigator.pop(context);
+      },
+    );
+
+    Widget cancelButton = FlatButton(
+      child: Text("NO"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30)),
+      title: Text("Delete Message"),
+      content: Text("Are you sure to delete message !!"),
+      actions: [
+        okButton,
+        cancelButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+
+  createItem(int index, DocumentSnapshot document , String s) {
+
+    decryptedS = EncodingDecodingService.decryptAndDecode(
+      document['content'],
+      chatId,
+      "1",
+    );
+
     if (document["idFrom"] == id) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          document['type'] == 0
-              ? Padding(
-            padding: const EdgeInsets.only(
-                top: 10,bottom: 10,right: 17
-            ),
-            child: Material(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
-                topLeft: Radius.circular(30),
+      return GestureDetector(
+        onLongPress: (){
+          showAlertDialog(context, document);
+        },
+
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            document['type'] == 0
+                ? Padding(
+              padding: const EdgeInsets.only(
+                  top: 10,bottom: 10,right: 17
               ),
-              elevation: 3,
-              shadowColor: Colors.grey.shade400,
-              color: Palette.selfMessageBackgroundColor,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 10),
-                child: Text(
-                    document['content'],
-                    style: GoogleFonts.quicksand(
-                        textStyle: TextStyle(
-                            color: Colors.white,
-                            fontSize:15
-                        )
-                    )
+              child: Material(
+
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
+                  topLeft: Radius.circular(30),
+                ),
+                elevation: 3,
+                shadowColor: Colors.grey.shade400,
+                color: Palette.selfMessageBackgroundColor,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
+                  child: Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    direction: Axis.horizontal,
+                    children: [
+                      Container(
+
+                        constraints: BoxConstraints(maxWidth: 235),
+
+                        child: Text(
+                            decryptedS == null ? "yoyo":decryptedS,
+                            style: GoogleFonts.quicksand(
+                                textStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontSize:15
+                                )
+                            )
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          )
-              : document['type'] == 1
-              ? Container(
-            child: FlatButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => FullPhoto(
-                          url: document['content'],
-                        )));
-              },
-              child: Material(
-                child: CachedNetworkImage(
-                  placeholder: (context, url) => Container(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(
-                          Colors.lightBlueAccent),
+            )
+                : document['type'] == 1
+                ? Container(
+              child: FlatButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FullPhoto(
+                            url: decryptedS,
+                          )));
+                },
+                child: Material(
+                  child: CachedNetworkImage(
+                    placeholder: (context, url) => Container(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(
+                            Colors.lightBlueAccent),
+                      ),
+                      width: 200,
+                      height: 200,
+                      padding: EdgeInsets.all(70.0),
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8.0),
+                        ),
+                      ),
                     ),
-                    width: 200,
-                    height: 200,
-                    padding: EdgeInsets.all(70.0),
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
+                    errorWidget: (context, url, error) => Material(
+                      child: Image.asset(
+                        "images/img_not_available.jpeg",
+                        height: 200,
+                        width: 200,
+                        fit: BoxFit.cover,
+                      ),
                       borderRadius: BorderRadius.all(
                         Radius.circular(8.0),
                       ),
+                      clipBehavior: Clip.hardEdge,
                     ),
+                    imageUrl: decryptedS,
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.cover,
                   ),
-                  errorWidget: (context, url, error) => Material(
-                    child: Image.asset(
-                      "images/img_not_available.jpeg",
-                      height: 200,
-                      width: 200,
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(8.0),
-                    ),
-                    clipBehavior: Clip.hardEdge,
-                  ),
-                  imageUrl: document['content'],
-                  height: 200,
-                  width: 200,
-                  fit: BoxFit.cover,
                 ),
               ),
-            ),
-            margin: EdgeInsets.only(
-                bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                right: 0.0),
-          )
-              : Container(
-            child: Image.network(
-              document['content'],
-              loadingBuilder: (context, child, progress) {
-                return progress == null
-                    ? child
-                    : CircularProgressIndicator();
-              },
-              width: 100,
-              height: 100,
-              fit: BoxFit.cover,
-            ),
-            margin: EdgeInsets.only(
-                bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                right: 17.0),
-          )
-        ],
+              margin: EdgeInsets.only(
+                  bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                  right: 0.0),
+            )
+                : Container(
+              child: Image.network(
+                decryptedS,
+                loadingBuilder: (context, child, progress) {
+                  return progress == null
+                      ? child
+                      : CircularProgressIndicator();
+                },
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              ),
+              margin: EdgeInsets.only(
+                  bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                  right: 17.0),
+            )
+          ],
+        ),
       );
     } else {
       return Container(
@@ -761,14 +1226,17 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 10),
-                          child: Text(
-                              document['content'],
-                              style: GoogleFonts.quicksand(
-                                  textStyle: TextStyle(
-                                      color: Colors.black,
-                                      fontSize:15
-                                  )
-                              )
+                          child: Container(
+                            constraints: BoxConstraints(maxWidth: 235),
+                            child: Text(
+                                decryptedS==null ? "yoyo ": decryptedS,
+                                style: GoogleFonts.quicksand(
+                                    textStyle: TextStyle(
+                                        color: Colors.black,
+                                        fontSize:15
+                                    )
+                                )
+                            ),
                           ),
                         ),
                       ),
@@ -783,7 +1251,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => FullPhoto(
-                                url: document['content'],
+                                url: decryptedS,
                               )));
                     },
                     child: Material(
@@ -816,7 +1284,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                               clipBehavior: Clip.hardEdge,
                             ),
-                        imageUrl: document['content'],
+                        imageUrl: decryptedS,
                         height: 200,
                         width: 200,
                         fit: BoxFit.cover,
@@ -829,7 +1297,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 )
                     : Container(
                   child: Image.network(
-                    document['content'],
+                    decryptedS,
                     loadingBuilder: (context, child, progress) {
                       return progress == null
                           ? child
@@ -848,7 +1316,7 @@ class _ChatScreenState extends State<ChatScreen> {
             isLastMessageLeft(index)
                 ? Container(
               child: Text(
-                  "Last Seen :" +
+                  "Seen :" +
                       DateFormat("dd MM yyyy - hh:mm:aa").format(
                           DateTime.fromMillisecondsSinceEpoch(
                               int.parse(document['timestamp']))),
@@ -892,14 +1360,27 @@ class _ChatScreenState extends State<ChatScreen> {
                     Icons.insert_emoticon,
                     color: Colors.lightBlueAccent,
                   ),
-                  onPressed: () {
-                    print("yes1");
-                    getSticker();
+                  onPressed: () async{
+                    FocusScope.of(context).unfocus();
+                    await Future.delayed(Duration (milliseconds: 100));
+                    setState(() {
+                      isShowSticker = !isShowSticker;
+                    });
+
+
                   }),
             ),
 
             Flexible(
                 child: GestureDetector(
+                  onTap: (){
+                    if(isShowSticker==true){
+                      setState(() {
+                        isShowSticker = false;
+                      });
+
+                    };
+                  },
                   onVerticalDragEnd: (details) {
                     print('Dragged Down');
                     if (details.primaryVelocity < 50) {
@@ -908,6 +1389,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   },
                   child: Container(
                     child: TextField(
+                        maxLines: 50,
                         cursorColor: Colors.blue,
 
                         focusNode: focusNode,
@@ -1068,6 +1550,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final String recieverName;
   final String recieverAge;
   bool isLiked;
+  bool isShowSticker;
 
   _UserProfileScreenState(
       this.recieverAbout,
@@ -1086,7 +1569,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     // TODO: implement initState
     //likes = eachUser.likes;
     readDataFromLocal();
-
+    isShowSticker = false;
   }
 
   List a;
@@ -1240,8 +1723,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(18),
-                                topRight: Radius.circular(18),
+                              topLeft: Radius.circular(18),
+                              topRight: Radius.circular(18),
 
                             ),
                           ),

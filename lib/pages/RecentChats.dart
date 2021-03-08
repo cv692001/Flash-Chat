@@ -10,6 +10,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat/pages/settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'ConversationPageList.dart';
 import 'package:intl/intl.dart';
 import 'package:flash_chat/pages/ChatPage.dart';
@@ -20,6 +21,7 @@ import 'package:google_fonts/google_fonts.dart';
 class RecentChat extends StatefulWidget {
   final String currentUser;
   final bool first_entry;
+
 
   RecentChat({
     this.currentUser,
@@ -47,6 +49,7 @@ class _RecentChatState extends State<RecentChat> {
     // TODO: implement initState
     super.initState();
     controlSearchingfirst();
+
 
   }
   bool oneSelected = true ;
@@ -135,12 +138,26 @@ class _RecentChatState extends State<RecentChat> {
         }
 
         List<UserResult> searchUserResult = [];
-
+        List a;
+         bool isblocked ;
         datasnapshot.data.documents.forEach((document) {
           User eachUser = User.fromDocument(document);
-          UserResult userResult = UserResult(eachUser: eachUser);
+          UserResult userResult = UserResult(
+              recent: true,
+              eachUser: eachUser);
 
-          if (currentUser != document["id"]) {
+          a = eachUser.blockedto;
+
+          print(a);
+          if(a.contains(currentUser)){
+            isblocked = true;
+          }else{
+            isblocked = false;
+          }
+
+          print(isblocked);
+
+          if (currentUser != document["id"] && isblocked == false) {
             searchUserResult.add(userResult);
           }
         });
@@ -195,12 +212,27 @@ class _RecentChatState extends State<RecentChat> {
         }
 
         List<UserResult> searchUserResult = [];
+        List a;
+        bool isblocked;
 
         datasnapshot.data.documents.forEach((document) {
           User eachUser = User.fromDocument(document);
-          UserResult userResult = UserResult(eachUser: eachUser);
+          UserResult userResult = UserResult(eachUser: eachUser,
+          recent: true,
+          );
 
-          if (currentUser != document["id"]) {
+          a = eachUser.blockedto;
+
+          print(a);
+          if(a.contains(currentUser)){
+            isblocked = true;
+          }else{
+            isblocked = false;
+          }
+
+          print(isblocked);
+
+          if (currentUser != document["id"] && isblocked == false) {
             searchUserResult.add(userResult);
           }
         });
@@ -238,12 +270,17 @@ class _RecentChatState extends State<RecentChat> {
     searchTextController.clear();
   }
 
+
+
   controlSearchingfirst() {
 
     Future<QuerySnapshot> allFoundUsers = Firestore.instance
         .collection("users")
-        .where("activeChat", arrayContains: currentUser)
+        .where("activeChat" , arrayContains: currentUser)
         .getDocuments();
+
+
+
 
     setState(() {
       futureSearchResults = allFoundUsers;

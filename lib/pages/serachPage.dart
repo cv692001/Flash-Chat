@@ -189,14 +189,28 @@ class _searchScreenState extends State<searchScreen> {
         }
 
         List<UserResult> searchUserResult = [];
+        List a;
+        bool isblocked ;
 
         datasnapshot.data.documents.forEach((document) {
           User eachUser = User.fromDocument(document);
           UserResult userResult = UserResult(eachUser: eachUser);
+          a = eachUser.blockedto;
 
-          if (currentUser != document["id"]) {
+          print(a);
+          if(a.contains(currentUser)){
+            isblocked = true;
+          }else{
+            isblocked = false;
+          }
+
+          print(isblocked);
+
+          if (currentUser != document["id"] && isblocked == false) {
             searchUserResult.add(userResult);
           }
+
+
         });
 
         return SingleChildScrollView(
@@ -320,8 +334,8 @@ class _searchScreenState extends State<searchScreen> {
 
 
     Firestore.instance
-        .collection("users")
-        .where("nickname", isGreaterThanOrEqualTo: "" ).getDocuments();
+          .collection("users")
+        .orderBy("createdAt", descending: true).getDocuments();
 
 
 

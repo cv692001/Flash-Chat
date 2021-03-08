@@ -14,22 +14,26 @@ import 'ChatPage.dart';
 
 class UserResult extends StatefulWidget {
   final User eachUser;
+  final bool recent;
 
   UserResult({
     @required this.eachUser,
+    this.recent,
   });
   @override
-  _UserResultState createState() => _UserResultState(eachUser);
+  _UserResultState createState() => _UserResultState(eachUser,recent);
 }
 
 
 class _UserResultState extends State<UserResult> {
   User eachUser;
+  bool recent ;
   String age11 = "18";
   int likes;
   bool isLiked;
   _UserResultState(
       this.eachUser,
+      this.recent,
       );
 
   @override
@@ -38,7 +42,7 @@ class _UserResultState extends State<UserResult> {
     // TODO: implement initState
     //likes = eachUser.likes;
     readDataFromLocal();
-    print("contains");
+   // print("contains");
     onLikeButton(isLiked);
   }
 
@@ -49,14 +53,16 @@ class _UserResultState extends State<UserResult> {
     preferences = await SharedPreferences.getInstance();
 
     id = preferences.getString("id");
+    print("eachUser");
+    print(eachUser);
 
     setState(() {
       List a = eachUser.likedby;
       for(int i =0; i< a.length; i++){
-        print(a[i]);
-        print("Id $id");
+        // print(a[i]);
+        // print("Id $id");
         if(a[i] == id){
-          print("I AM IN");
+         // print("I AM IN");
           isLiked = true;
           break;
         }else{
@@ -74,8 +80,8 @@ class _UserResultState extends State<UserResult> {
 
 
     Firestore.instance.collection("users").document(eachUser.id).get().then((value){
-      print("age is");
-      print(value.data["age"]);
+    //  print("age is");
+      //print(value.data["age"]);
       setState(() {
         age11 = value.data["age"].toString();
       });
@@ -92,7 +98,7 @@ class _UserResultState extends State<UserResult> {
 
     Firestore.instance.collection("users").document(eachUser.id).get().then((value) {
       List a = value.data["likedby"];
-      print(a);
+   //   print(a);
       if(a.contains(id)){
         Firestore.instance.collection("users").document(id).updateData({
 
@@ -114,10 +120,10 @@ class _UserResultState extends State<UserResult> {
         });
 
 
-        print("TRUE");
-        print(a.length);
-        print(isLiked);
-        print(a.length);
+        // print("TRUE");
+        // print(a.length);
+        // print(isLiked);
+        // print(a.length);
       }
       else{
         Firestore.instance.collection("users").document(id).updateData({
@@ -137,11 +143,11 @@ class _UserResultState extends State<UserResult> {
         });
 
 
-
-        print("true");
-        print(a.length);
-        print(isLiked);
-        print(a.length);
+        //
+        // print("true");
+        // print(a.length);
+        // print(isLiked);
+        // print(a.length);
       }
 
 
@@ -310,16 +316,19 @@ class _UserResultState extends State<UserResult> {
               left: 8,
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (value) => UserProfileScreen(
-                            recieverAbout: eachUser.aboutMe,
-                            recieverAvatar: eachUser.photourl,
-                            recieverId: eachUser.id,
-                            recieverName:eachUser.nickname,
-                            recieverAge: age11,
-                          )));
+                 if(recent!=true){
+                   print("yes");
+                   Navigator.push(
+                       context,
+                       MaterialPageRoute(
+                           builder: (value) => UserProfileScreen(
+                             recieverAbout: eachUser.aboutMe,
+                             recieverAvatar: eachUser.photourl,
+                             recieverId: eachUser.id,
+                             recieverName:eachUser.nickname,
+                             recieverAge: age11,
+                           )));
+                 }
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -383,7 +392,7 @@ class _UserResultState extends State<UserResult> {
 
                         Firestore.instance.collection("users").document(eachUser.id).get().then((value) {
                           List a = value.data["likedby"];
-                          print(a);
+                         // print(a);
                           if(a.contains(id)){
                             Firestore.instance.collection("users").document(id).updateData({
 
@@ -405,10 +414,10 @@ class _UserResultState extends State<UserResult> {
                             });
 
 
-                            print("TRUE");
-                            print(a.length);
-                            print(isLiked);
-                            print(a.length);
+                            // print("TRUE");
+                            // print(a.length);
+                            // print(isLiked);
+                            // print(a.length);
                           }
                           else{
                             Firestore.instance.collection("users").document(id).updateData({
@@ -429,10 +438,10 @@ class _UserResultState extends State<UserResult> {
 
 
 
-                            print("true");
-                            print(a.length);
-                            print(isLiked);
-                            print(a.length);
+                            // print("true");
+                            // print(a.length);
+                            // print(isLiked);
+                            // print(a.length);
                           }
 
 

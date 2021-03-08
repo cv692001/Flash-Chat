@@ -138,6 +138,9 @@ class _RegisterPageState extends State<RegisterPage>
 
     preferences = await SharedPreferences.getInstance();
 
+
+
+
     isLoggedIn = await googledignin.isSignedIn();
     if (isLoggedIn) {
       Navigator.push(
@@ -339,7 +342,8 @@ class _RegisterPageState extends State<RegisterPage>
   String photourl = "";
   List likedby =[ ];
   List likedto= [ ];
-
+  List blockedto = [];
+  List blockedby = [];
   List activeChat = [];
   File imageFileAvatar;
   TextEditingController nicknameTextEditor = TextEditingController();
@@ -1170,19 +1174,21 @@ class _RegisterPageState extends State<RegisterPage>
           timeInSecForIosWeb: 1
       );
     } else if((DateTime.now().year - _datetime.year >=14 )&&(_validatefirstname==true) && (_locationFilled == true) && (imagePicked == true)){
-      print("Shi hai");
+    //  print("Shi hai");
 
-      print("AGE");
-      print(DateTime.now().year - _datetime.year);
+      //print("AGE");
+      //print(DateTime.now().year - _datetime.year);
 
       setState(() {
         age = (DateTime.now().year - _datetime.year);
         _datefilled=false;
       });
 
+
       Firestore.instance.collection("users").document(id).updateData({
         "age": age.toString(),
         "nickname": nicknameTextEditor.text,
+        "first_loggedin":true,
       }).then((data) async {
         await preferences.setString("nickname", nicknameTextEditor.text);
         await preferences.setString("age", age.toString());
@@ -1205,7 +1211,7 @@ class _RegisterPageState extends State<RegisterPage>
       );
 
     }else{
-      print("nhi bhai");
+     // print("nhi bhai");
       Fluttertoast.showToast(
           backgroundColor: Colors.black,
           msg: "User's age must be greater than 14",
@@ -1261,6 +1267,8 @@ class _RegisterPageState extends State<RegisterPage>
           "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
           "chattingWith": null,
           "likedby" : [ ],
+          "blockedto": [ ],
+          "blockedby": [ ],
           "likedto" : [ ],
           "activeChat": [ ]
         });
@@ -1287,10 +1295,36 @@ class _RegisterPageState extends State<RegisterPage>
         isLoading = false;
       });
 
-      this.setState(() {
-        updatePageState(1);
+      bool a;
+
+      Firestore.instance.collection("users").document(preferences.getString("id")).get().then((value) {
+         a = value.data["first_loggedin"];
+      }).then((value) {
+        if(a==true){
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ConversationBottomSheet(
+                    currentUser: preferences.getString("id"),
+                    first_entry: false,
+                  )
+              )
+          );
+        }else{
+          this.setState(() {
+            updatePageState(1);
+          });
+        }
+      }).then((value) {
+        print("check kr rha");
+        print(a);
       });
-    } else {
+
+
+
+
+    }
+    else {
       Fluttertoast.showToast(msg: "Try Again , Sign In Failed");
       this.setState(() {
         isLoading = false;

@@ -5,7 +5,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -36,11 +36,15 @@ dependencies:
   bottom_navy_bar: ^5.6.0
   google_fonts: ^1.1.2
   cupertino_icons: ^0.1.3
-
+  emoji_picker: ^0.1.0
+  flutter_keyboard_visibility: ^4.0.4
+  flutter_emoji_keyboard: ^0.1.3
   rubber: ^0.4.0
   infinite_listview: ^1.0.0
   modal_bottom_sheet: ^1.0.0+1
   cupertino_radio_choice: 1.0.0+1
+  flutter_string_encryption: ^0.3.1
+  encrypt: ^4.1.0
   numberpicker: ^1.3.0
   shimmer: ^1.1.2
 
@@ -69,15 +73,7 @@ flutter:
     - images/google.png
     - images/heart.svg
     - images/user.jpg
-    - images/mimi1.gif
-    - images/mimi2.gif
-    - images/mimi3.gif
-    - images/mimi4.gif
-    - images/mimi5.gif
-    - images/mimi6.gif
-    - images/mimi7.gif
-    - images/mimi8.gif
-    - images/mimi9.gif
+
 
 
 

@@ -8,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat/pages/settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'ConversationPageList.dart';
 import 'package:intl/intl.dart';
 import 'package:flash_chat/pages/ChatPage.dart';
@@ -40,13 +41,42 @@ class _AllUsersState extends State<AllUsers> {
     this.currentUser,
 });
   final String currentUser;
+  List a = [];
 
   @override
   void initState() {
+
     // TODO: implement initState
     super.initState();
     controlSearchingfirst();
+    readLocal();
 
+
+
+
+
+    setState(() {
+
+    });
+  }
+  
+  SharedPreferences preferences;
+  String id;
+
+  readLocal() async {
+
+    preferences = await SharedPreferences.getInstance();
+    id = preferences.getString("id") ?? "";
+
+
+
+
+
+
+
+
+
+    setState(() {});
   }
 
   final FocusNode searchFocusNode = FocusNode();
@@ -88,15 +118,33 @@ class _AllUsersState extends State<AllUsers> {
           );
         }
 
+
         List<UserResult> searchUserResult = [];
+        List a;
+
+
+        bool isblocked = false;
 
         datasnapshot.data.documents.forEach((document) {
+
+
           User eachUser = User.fromDocument(document);
           UserResult userResult = UserResult(eachUser: eachUser);
+           a = eachUser.blockedto;
 
-          if (currentUser != document["id"]) {
+           print(a);
+           if(a.contains(currentUser)){
+             isblocked = true;
+           }else{
+             isblocked = false;
+           }
+
+           print(isblocked);
+
+          if (currentUser != document["id"] && isblocked == false) {
             searchUserResult.add(userResult);
           }
+
         });
 
         return SingleChildScrollView(
@@ -133,38 +181,64 @@ class _AllUsersState extends State<AllUsers> {
 
   displayUserFoundScreen() {
     return FutureBuilder(
-      future: futureSearchResults,
+      future: futureSearchResultsfirst,
       builder: (context, datasnapshot) {
         if (!datasnapshot.hasData) {
-          return circularProgress();
+          return Center(
+            child: Container(
+                height: 110,
+                width: 110,
+                child:  CircularProgressIndicator(
+
+                  strokeWidth: 1,
+                )
+            ),
+          );
         }
 
+
         List<UserResult> searchUserResult = [];
+        List a;
+        bool isblocked;
+
 
         datasnapshot.data.documents.forEach((document) {
           User eachUser = User.fromDocument(document);
-          UserResult userResult = UserResult(eachUser: eachUser);
+          UserResult userResult = UserResult(eachUser: eachUser,
+            recent: false,
+          );
 
-          if (currentUser != document["id"]) {
+
+          a = eachUser.blockedto;
+
+          print(a);
+          if(a.contains(currentUser)){
+            isblocked = true;
+          }else{
+            isblocked = false;
+          }
+
+          print(isblocked);
+
+          if (currentUser != document["id"] && isblocked == false) {
             searchUserResult.add(userResult);
           }
         });
 
-        return  SingleChildScrollView(
+        return SingleChildScrollView(
           child: Column(
-
             children: [
               SizedBox(
-                height: 110,
+                height: 75,
               ),
               GridView.count(
                 physics: const NeverScrollableScrollPhysics(),
                 scrollDirection: Axis.vertical,
-                mainAxisSpacing: 15,
+                mainAxisSpacing: 18,
                 crossAxisSpacing: 8,
                 shrinkWrap: true,
                 crossAxisCount: 2,
-                childAspectRatio: (2/3 ),
+                childAspectRatio: (2/2.9 ),
 
                 children: searchUserResult,
 
@@ -175,6 +249,10 @@ class _AllUsersState extends State<AllUsers> {
             ],
           ),
         );
+
+        // return Row(
+        //   children: searchUserResult,
+        // );
       },
     );
   }
@@ -212,7 +290,7 @@ class _AllUsersState extends State<AllUsers> {
 
     Firestore.instance
         .collection("users")
-        .where("nickname", isGreaterThanOrEqualTo: "" ).getDocuments();
+        .orderBy('createdAt', descending: true).getDocuments();
 
 
 

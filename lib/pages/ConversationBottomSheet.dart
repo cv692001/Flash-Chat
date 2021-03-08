@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/cupertino.dart';
 import 'package:share/share.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -69,11 +70,13 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
 
   bool first;
   PageController _pageController;
-
+  final GlobalKey<NavigatorState> navigatorKey =
+  GlobalKey(debugLabel: "Main Navigator");
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
 
     controlSearching();
     registerNotification();
@@ -88,14 +91,12 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
 
   String applink =" Flash Chat !! ";
 
-
+ List a;
   void readDataFromLocal() async {
 
-
-
-
     Firestore.instance.collection("applink").document("applink").get().then((value){
-      print(value.data["link"]);
+      print("link");
+     print(value.data["link"]);
 
       applink = value.data["link"];
       setState(() {
@@ -107,29 +108,57 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
 
 
 
+    // print("check");
+    // print(currentUser);
+
+
+
+
     setState(() {});
   }
+
 
 
   void registerNotification() {
     firebaseMessaging.requestNotificationPermissions();
 
-    firebaseMessaging.configure(onMessage: (Map<String, dynamic> message) {
-      print('onMessage: $message');
+    firebaseMessaging.configure(
+        onMessage: (Map<String, dynamic> message) {
+          print("onM essafew");
+      print(message['notification']['title']);
+
+
+
+          // Navigator.of(context, rootNavigator:true).push( // ensures fullscreen
+          //     CupertinoPageRoute(
+          //         builder: (BuildContext context) {
+          //           return chat(
+          //             recieverId: eachUser.id,
+          //             recieverName: eachUser.nickname,
+          //             recieverAvatar: eachUser.photourl,
+          //             recieverAbout: eachUser.aboutMe,
+          //             recieverAge: age11,
+          //             isLiked : isLiked,
+          //           );
+          //         }
+          //     ) );
+          setState(() => selectedIndex = 2);
       Platform.isAndroid
           ? showNotification(message['notification'])
           : showNotification(message['aps']['alert']);
       return;
     }, onResume: (Map<String, dynamic> message) {
-      print('onResume: $message');
+      setState(() => selectedIndex = 2);
+     // print('onResume: $message');
       return;
     }, onLaunch: (Map<String, dynamic> message) {
-      print('onLaunch: $message');
+      setState(() => selectedIndex = 2);
+   //   print('onLaunch: $message');
       return;
     });
 
     firebaseMessaging.getToken().then((token) {
-      print('token: $token');
+     // print('token: $token');
       Firestore.instance
           .collection('users')
           .document(currentUser)
@@ -164,7 +193,7 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
     var platformChannelSpecifics = new NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
 
-    print(message);
+ //   print(message);
 //    print(message['body'].toString());
 //    print(json.encode(message));
 
@@ -238,7 +267,7 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
               items: <BottomNavyBarItem> [
                 BottomNavyBarItem(
                   icon: Icon(Icons.flash_on_rounded,
-                  color: Colors.red,
+                  color: Colors.yellow.shade800,
                   ),
                   title: Text('Flash Chat',
                     style: GoogleFonts.quicksand(
@@ -317,6 +346,7 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
                           currentUser: currentUser,
                         ),
                         RecentChat(
+
                           currentUser: currentUser,
                         ),
 
@@ -355,7 +385,7 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
                                 children: [
                                   Icon(
                                     Icons.flash_on_rounded,
-                                    color: Colors.yellow.shade900,
+                                    color: Colors.yellow.shade800,
                                     size: 30,
                                   ),
                                   Text('Flash Chat',
@@ -422,6 +452,7 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
   }
 
   displayUserFoundScreen() {
+
     return FutureBuilder(
       future: futureSearchResults,
       builder: (context, datasnapshot) {
@@ -434,10 +465,23 @@ class _ConversationBottomSheetState extends State<ConversationBottomSheet> {
         datasnapshot.data.documents.forEach((document) {
           User eachUser = User.fromDocument(document);
           UserResult userResult = UserResult(eachUser: eachUser);
+          List a;
+          Firestore.instance.collection("users").document(currentUser).get().then((value) {
+             a = value.data["blockedto"];
+          });
 
-          if (currentUser != document["id"]) {
+          print(a);
+
+
+            if (  !a.contains(document["id"])) {
+              print("yoyoyoyoyooy");
             searchUserResult.add(userResult);
-          }
+          }else{
+              if(a.contains(document["id0"])){
+                print("lnmiit");
+                print(currentUser);
+              }
+            }
         });
 
         return Column(

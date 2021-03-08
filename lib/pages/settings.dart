@@ -210,6 +210,7 @@ class _SettingScreenState extends State<SettingScreen> {
       "photourl": photourl,
       "aboutMe": aboutMe,
       "nickname": nickname,
+      "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
       "age": age,
     }).then((data) async {
       await preferences.setString("photourl", photourl);

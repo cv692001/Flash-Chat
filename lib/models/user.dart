@@ -8,7 +8,8 @@ class User {
   final String aboutMe;
   final int likes;
   final List likedby;
-
+  final List blockedto;
+  final List blockedby;
 
   User({
     this.id,
@@ -17,7 +18,9 @@ class User {
     this.createdAt,
     this.aboutMe,
     this.likes,
-    this.likedby
+    this.likedby,
+    this.blockedto,
+    this.blockedby,
   });
 
   factory User.fromDocument(DocumentSnapshot doc) {
@@ -29,6 +32,8 @@ class User {
       aboutMe: doc['aboutMe'],
       likes: doc['likes'],
       likedby: doc['likedby'],
+      blockedto: doc['blockedto'],
+        blockedby:doc['blockedby'],
     );
   }
 }
